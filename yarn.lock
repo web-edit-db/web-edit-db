@@ -1073,6 +1073,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/emscripten@*":
+  version "1.39.4"
+  resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.4.tgz#d61990c0cee72c4e475de737a140b51fe925a2c8"
+  integrity sha512-k3LLVMFrdNA9UCvMDPWMbFrGPNb+GcPyw29ktJTo1RCN7RmxFG5XzPZcPKRlnLuLT/FRm8wp4ohvDwNY7GlROQ==
+
 "@types/express-serve-static-core@*", "@types/express-serve-static-core@^4.17.18":
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.20.tgz#44caee029f2c26c46711da5e845cdc12167ad72d"
@@ -1174,6 +1179,14 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@types/source-list-map/-/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
   integrity sha512-K5K+yml8LTo9bWJI/rECfIPrGgxdpeNbj+d53lwN4QjW1MCwlkhUms+gtdzigTeUyBr09+u8BwOIY3MXvHdcsA==
+
+"@types/sql.js@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@types/sql.js/-/sql.js-1.4.2.tgz#7bf4f9ec12013f48d23d77f42fe0945b37ac8808"
+  integrity sha512-3Mq6KcJp+1qJ6FfE7c16oNZcgGrPiUZWj8DSePRRZQCPhi4vawX/thGCzwqIg59tOCjdQI1eMC+pLk9FLfTXwQ==
+  dependencies:
+    "@types/emscripten" "*"
+    "@types/node" "*"
 
 "@types/tapable@^1":
   version "1.0.7"
@@ -2412,6 +2425,11 @@ brorand@^1.0.1, brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
   integrity sha1-EsJe/kCkXjwyPrhnWgoM5XsiNx8=
+
+browser-fs-access@^0.17.2:
+  version "0.17.2"
+  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.17.2.tgz#6debfe35ebce77a1eecca7822a449c740a8de9db"
+  integrity sha512-z3H37rU3fmKkGJ1r09v3hAwByUI0vYIh8a7LsUaQnnMxdVUJm1UzsffvNK6Qnvk9jGqvY7uiX2DPu4BZXavcWA==
 
 browserify-aes@^1.0.0, browserify-aes@^1.0.4:
   version "1.2.0"
@@ -8482,6 +8500,11 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
+
+sql.js@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/sql.js/-/sql.js-1.5.0.tgz#6625c3e41115194f6bfab80a5e53647f1378c3fb"
+  integrity sha512-Qqr6HgX/hCDpLFWdN0BNoNpYQ2c1tOl1c3HGI0cshjaFSAWszKICuLZ9CyFUvRFPpEGW8RzHzwuXWWvXVGTKBg==
 
 sshpk@^1.7.0:
   version "1.16.1"
