@@ -1,63 +1,42 @@
 <template>
   <aside>
-    <header>{{ database.name }}</header>
-    <main></main>
+    <header>{{ name }}</header>
+    <main>
+      <router-link v-for="table in tables" :key="table.name" :to="`/table/${table.name}`">
+        <div>
+          {{ table.name }}
+        </div>
+      </router-link>
+      {{ version }}
+    </main>
     <footer>
-      <span @click="file.open">Open Database</span>
-      <span @click="file.save">Write Database</span>
+      <span @click="file.create">Create Database</span><br>
+      <span @click="file.open">Open Database</span><br>
+      <span @click="file.save" v-if="saveReady">Write Database</span><br>
     </footer>
   </aside>
   <router-view/>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref } from 'vue'
-import { fileOpen, fileSave, FileSystemHandle } from 'browser-fs-access'
-import { Database, SqlJsStatic } from 'sql.js'
-
-const EXTENSIONS = ['.db', '.sqlite', '.sqlite3']
+import { defineComponent } from 'vue'
+import { useDatabase } from '@/database'
 
 export default defineComponent({
+  components: { },
   setup () {
-    const sqlite3 = inject<SqlJsStatic>('sqlite3')
-    const handle = ref<FileSystemHandle|undefined>(undefined)
-    const db = ref<Database|null>(null)
-    const file = {
-      async open () {
-        const file = await fileOpen({
-          mimeTypes: ['application/vnd.sqlite3'],
-          extensions: EXTENSIONS
-        })
-        if (sqlite3) {
-          db.value = new sqlite3.Database(new Uint8Array(await file.arrayBuffer()))
-        }
-        handle.value = file.handle
-      },
-      async save () {
-        if (db.value) {
-          const file = new File([db.value.export()], handle.value?.name ?? 'database.db', {
-            type: 'application/vnd.sqlite3'
-          })
-
-          const newHandle = await fileSave(file,
-            {
-              fileName: handle.value?.name,
-              extensions: EXTENSIONS
-            },
-            handle.value,
-            false
-          )
-
-          handle.value = newHandle
-        }
-      }
-    }
+    const { open, save, name, saveReady, tables, create, version } = useDatabase()
 
     return {
-      file,
-      database: {
-        name: 'Database Name'
-      }
+      file: {
+        open,
+        save,
+        create
+      },
+      saveReady,
+      name,
+      tables,
+      version
     }
   }
 })
