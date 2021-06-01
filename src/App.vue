@@ -4,9 +4,9 @@
     <main>
     </main>
     <footer>
-      <span @click="create">Create Database</span><br>
-      <span @click="open">Open Database</span><br>
-      <span @click="save" v-if="loaded">Write Database</span><br>
+      <icon icon='file-upload' size='lg' @click="open" title="open database" />
+      <icon icon='file' size='lg' @click="create" />
+      <icon icon='save' size='lg' @click='loaded && save' :wrapper="{disabled: loaded, class: {'opacity-30': !loaded}}" />
     </footer>
   </aside>
   <router-view/>
@@ -15,9 +15,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useDatabase } from '@/database'
+import Icon from './components/Icon.vue'
 
 export default defineComponent({
-  components: { },
+  components: { Icon },
   setup () {
     const { open, save, name, create, loaded } = useDatabase()
 
@@ -42,7 +43,7 @@ export default defineComponent({
 #app > aside {
   @apply w-60;
   @apply bg-white;
-  @apply rounded-3xl;
+  @apply rounded-r-3xl;
   @apply shadow-md;
   @apply flex flex-col;
 }
@@ -55,5 +56,9 @@ export default defineComponent({
 
 #app > aside main {
   @apply flex-grow;
+}
+
+#app > aside footer fa-icon {
+  @apply h-12 w-12 inline-flex;
 }
 </style>
