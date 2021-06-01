@@ -2,17 +2,11 @@
   <aside>
     <header>{{ name }}</header>
     <main>
-      <router-link v-for="table in tables" :key="table.name" :to="`/table/${table.name}`">
-        <div>
-          {{ table.name }}
-        </div>
-      </router-link>
-      {{ version }}
     </main>
     <footer>
-      <span @click="file.create">Create Database</span><br>
-      <span @click="file.open">Open Database</span><br>
-      <span @click="file.save" v-if="saveReady">Write Database</span><br>
+      <span @click="create">Create Database</span><br>
+      <span @click="open">Open Database</span><br>
+      <span @click="save" v-if="loaded">Write Database</span><br>
     </footer>
   </aside>
   <router-view/>
@@ -25,18 +19,14 @@ import { useDatabase } from '@/database'
 export default defineComponent({
   components: { },
   setup () {
-    const { open, save, name, saveReady, tables, create, version } = useDatabase()
+    const { open, save, name, create, loaded } = useDatabase()
 
     return {
-      file: {
-        open,
-        save,
-        create
-      },
-      saveReady,
+      open,
+      save,
+      create,
       name,
-      tables,
-      version
+      loaded
     }
   }
 })

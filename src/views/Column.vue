@@ -1,23 +1,21 @@
 <template>
   <div>
-    <template v-for="column in (table?.columns ?? [])" :key="column.name">
-      {{ column }}
-    </template>
+    {{ list }}
+    <div v-if="list.length" @click="drop(list[0])">Drop Top</div>
   </div>
 </template>
 
 <script lang="ts">
-import { useDatabase } from '@/database'
-import { computed, defineComponent } from 'vue'
-import { useRoute } from 'vue-router'
+import { useTables } from '@/database'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   setup () {
-    const { tables } = useDatabase()
-    const route = useRoute()
-    const table = computed(() => tables.value.find((table) => table.name === route.params.tableName))
+    const { list, drop } = useTables()
+
     return {
-      table
+      list,
+      drop
     }
   }
 })
