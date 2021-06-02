@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ list }}
     <div v-if="list.length" @click="drop(list[0])">Drop Top</div>
   </div>
 </template>
@@ -11,11 +10,11 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   setup () {
-    const { list, drop } = useTables()
+    const { drop, list } = useTables()
 
     return {
-      list,
-      drop
+      drop,
+      list
     }
   }
 })

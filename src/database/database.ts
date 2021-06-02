@@ -34,7 +34,6 @@ export default function useDatabase () {
     database.value = reactive(new (await sql).Database(fileBufferArray))
     // add missing info
     database.value.handle = file.handle
-    console.log((database.value))
     database.value.name = file.handle?.name ?? file.name
   }
   const save = async () => {
@@ -49,7 +48,10 @@ export default function useDatabase () {
       // save the file updating the handle
       database.value.handle = await fileSave(
         file,
-        { extensions: SQLITE_EXTENSIONS },
+        {
+          extensions: SQLITE_EXTENSIONS,
+          fileName: file.name
+        },
         database.value.handle,
         false
       )

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 import Column from '../views/Column.vue'
+import { useTables } from '@/database'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -26,6 +27,12 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, _from, next) => {
+  const { list } = useTables()
+  if (to.name === 'Table' && !list.value.includes(to.params.tableName as string)) return next('/')
+  next()
 })
 
 export default router

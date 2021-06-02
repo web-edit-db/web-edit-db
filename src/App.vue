@@ -2,11 +2,12 @@
   <aside>
     <header>{{ name }}</header>
     <main>
+      <table-menu />
     </main>
     <footer>
-      <icon icon='file-upload' size='lg' @click="open" title="open database" />
-      <icon icon='file' size='lg' @click="create" />
-      <icon icon='save' size='lg' @click='loaded && save' :wrapper="{disabled: loaded, class: {'opacity-30': !loaded}}" />
+      <icon icon='file-upload' size='lg' @click='open' title='open database' />
+      <icon icon='file' size='lg' @click='create' />
+      <icon icon='save' size='lg' @click='loaded && save()' :wrapper="{disabled: loaded, class: {'opacity-30': !loaded}}" />
     </footer>
   </aside>
   <router-view/>
@@ -16,9 +17,10 @@
 import { defineComponent } from 'vue'
 import { useDatabase } from '@/database'
 import Icon from './components/Icon.vue'
+import TableMenu from './components/aside/TableMenu.vue'
 
 export default defineComponent({
-  components: { Icon },
+  components: { Icon, TableMenu },
   setup () {
     const { open, save, name, create, loaded } = useDatabase()
 

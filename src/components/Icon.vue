@@ -12,10 +12,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faFile, faFileUpload, faIcons, faSave, faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faFile, faFileUpload, faPen, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faFileUpload, faSave, faFile)
+library.add(
+  faFileUpload,
+  faSave,
+  faFile,
+  faPen,
+  faTrash,
+  faTimes,
+  faCheck
+)
 
 export default defineComponent({
   name: 'icon',
