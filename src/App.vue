@@ -10,7 +10,9 @@
       <icon icon='save' size='lg' @click='loaded && save()' :wrapper="{disabled: loaded, class: {'opacity-30': !loaded}}" />
     </footer>
   </aside>
-  <router-view/>
+  <main>
+    <router-view/>
+  </main>
 </template>
 
 <script lang="ts">
@@ -62,5 +64,10 @@ export default defineComponent({
 
 #app > aside footer fa-icon {
   @apply h-12 w-12 inline-flex;
+}
+
+#app > main {
+  @apply overflow-y-auto;
+  @apply flex-grow;
 }
 </style>
