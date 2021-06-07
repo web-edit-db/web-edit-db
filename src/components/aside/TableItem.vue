@@ -1,6 +1,6 @@
 <template>
   <router-link :to="{name: 'Table', params: { name }}" custom v-slot="{ navigate, isActive }">
-    <div @click="navigate">
+    <div @click.self="navigate">
       <input type="text" :value="name" :disabled="!edit" ref="newName">
       <span v-if="isActive">
         <icon :icon="edit ? 'times' : 'pen'" @click="button.one"/>
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onUnmounted, ref, toRefs } from 'vue'
+import { defineComponent, nextTick, ref, toRefs } from 'vue'
 import Icon from '@/components/Icon.vue'
 import { useTables } from '@/database'
 import { useRouter } from 'vue-router'
@@ -26,8 +26,6 @@ export default defineComponent({
     const { drop, list } = useTables()
     const router = useRouter()
 
-    const tableAfter = list.value[list.value.indexOf(name) + 1]
-
     const button = {
       one () {
         edit.value = !edit.value
@@ -38,14 +36,18 @@ export default defineComponent({
           console.log(newName.value?.value)
           edit.value = false
         } else if (confirm(`Are you sure you want to delete '${name.value}'`)) {
+          if (list.value.length > 1) {
+            // there are other tables so push to next table
+            // get the next table name
+            const nextName = list.value[
+              (list.value.indexOf(name.value) + 1) % list.value.length
+            ]
+            router.push(`/table/${nextName}`)
+          } else router.push('/') // no tables so push /
           drop(name.value)
         }
       }
     }
-
-    onUnmounted(() => {
-      router.push('/')
-    })
 
     return { edit, button, newName }
   }

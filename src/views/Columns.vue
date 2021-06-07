@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { useColumn, useTables } from '@/database'
-import { computed, defineComponent, ref, toRaw, unref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import ColumnForm from '@/components/ColumnForm.vue'
 
 export default defineComponent({
@@ -17,10 +17,12 @@ export default defineComponent({
   setup (props) {
     const { list } = useColumn()
     const { update } = useTables()
-    const columns = computed(() => list(props.name))
+
     const refs = ref<typeof ColumnForm[]>([])
+    const columns = computed(() => list(props.name))
     const modified = computed(() => { return refs.value.map(column => column.modified) })
     const isModified = computed(() => refs.value.some(column => column.isModified))
+
     const commit = () => update(props.name, modified.value)
 
     return {
@@ -29,8 +31,6 @@ export default defineComponent({
       modified,
       isModified,
       commit
-      // columnsUpdated,
-      // modified
     }
   }
 })
