@@ -1,17 +1,17 @@
 <template>
   <div>
     <header>
-      {{ column.name }} - {{ status}}
+      {{ column.name }} - {{ isModified ? 'modified' : 'unmodified' }}
     </header>
     <main>
-      <input type="text" name="name" v-model="newColumn.name">
-      <input type="text" name="type" v-model="newColumn.type">
-      <input type="number" name="min" v-model="newColumn.min">
-      <input type="number" name="max" v-model="newColumn.max">
-      <input type="text" name="default" v-model="newColumn.defaultValue">
-      <label>Not Null: <input type="checkbox" name="notNull" v-model="newColumn.notNull"></label>
-      <label>PK: <input type="checkbox" name="primaryKey" v-model="newColumn.primaryKey"></label>
-      <label>unique: <input type="checkbox" name="unique" v-model="newColumn.unique"></label>
+      <input type="text" name="name" v-model="modified.name">
+      <input type="text" name="type" v-model="modified.type">
+      <input type="number" name="min" v-model="modified.min">
+      <input type="number" name="max" v-model="modified.max">
+      <input type="text" name="default" v-model="modified.defaultValue">
+      <label>Not Null: <input type="checkbox" name="notNull" v-model="modified.notNull"></label>
+      <label>PK: <input type="checkbox" name="primaryKey" v-model="modified.primaryKey"></label>
+      <label>unique: <input type="checkbox" name="unique" v-model="modified.unique"></label>
     </main>
   </div>
 </template>
@@ -24,19 +24,14 @@ import { useColumn } from '@/database'
 export default defineComponent({
   props: ['column'],
   setup (props) {
-    const newColumn = ref({ ...props.column, _name: unref(props.column.name) })
-    const status = computed(() =>
-      isEqual(
-        { ...newColumn.value, ref: undefined, _name: undefined },
-        { ...props.column, ref: undefined, _name: undefined }
-      ) ? 'unmodified' : 'modified'
-    )
+    const modified = ref({ ...props.column, origName: props.column.name })
+    const isModified = computed(() => !isEqual(modified.value, { ...props.column, origName: unref(props.column.name) }))
     const { columnToString } = useColumn()
 
     return {
       columnToString,
-      newColumn,
-      status
+      modified,
+      isModified
     }
   }
 })

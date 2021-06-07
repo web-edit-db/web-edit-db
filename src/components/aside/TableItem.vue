@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{name: 'Table', params: {tableName: name}}" custom v-slot="{ navigate, isActive }">
+  <router-link :to="{name: 'Table', params: { name }}" custom v-slot="{ navigate, isActive }">
     <div @click="navigate">
       <input type="text" :value="name" :disabled="!edit" ref="newName">
       <span v-if="isActive">
@@ -14,7 +14,7 @@
 import { defineComponent, nextTick, onUnmounted, ref, toRefs } from 'vue'
 import Icon from '@/components/Icon.vue'
 import { useTables } from '@/database'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   props: ['name'],

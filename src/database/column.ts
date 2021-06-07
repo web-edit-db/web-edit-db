@@ -1,10 +1,11 @@
+import { track, TrackOpTypes } from '@vue/reactivity'
 import { database } from './database'
 import { reference, runAsObject } from '.'
 import { SqlValue } from 'sql.js'
 
 export interface Column {
   name: string,
-  _name?: string,
+  origName?: string,
   type: string | null,
   min?: number | null,
   max?: number | null,
@@ -21,8 +22,7 @@ export interface Column {
 export default function useColumn () {
   const list = (name: string): Column[] => {
     if (!database.value) return []
-    // eslint-disable-next-line no-unused-expressions
-    reference.value
+    track(reference, 'get' as TrackOpTypes.GET, 'value')
     const uniqueColumns = runAsObject<{name: string}>(
       `SELECT index_info.name
         FROM pragma_index_list('${name}') AS index_list

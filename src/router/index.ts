@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
-import Column from '../views/Column.vue'
+import Column from '../views/Columns.vue'
 import { useTables } from '@/database'
 
 const routes: Array<RouteRecordRaw> = [
@@ -18,9 +18,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/table/:tableName',
+    path: '/table/:name',
     name: 'Table',
-    component: Column
+    component: Column,
+    props: true
   }
 ]
 
@@ -31,7 +32,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const { list } = useTables()
-  if (to.name === 'Table' && !list.value.includes(to.params.tableName as string)) return next('/')
+  if (to.name === 'Table' && !list.value.includes(to.params.name as string)) return next('/')
   next()
 })
 

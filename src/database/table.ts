@@ -1,4 +1,5 @@
-import { computed } from 'vue'
+import { computed, TrackOpTypes, triggerRef } from 'vue'
+import { track } from '@vue/reactivity'
 import { database } from './database'
 import { reference, runAsObject } from '.'
 import useColumn, { Column } from './column'
@@ -6,22 +7,19 @@ import useColumn, { Column } from './column'
 export default function useTables () {
   const list = computed(() => {
     if (!database.value) return []
-    // eslint-disable-next-line no-unused-expressions
-    reference.value
+    track(reference, 'get' as TrackOpTypes.GET, 'value')
     const query = database.value.prepare(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1"
     )
     return runAsObject(query).map((obj) => obj.name) as string[]
   })
   const drop = (table: string) => {
-    // eslint-disable-next-line no-unused-expressions
-    reference.value++
+    triggerRef(reference)
     database.value && database.value.run(`DROP TABLE ${table}`)
   }
   const create = (table: string, columns: Column[]) => {
     if (!database.value) return
-    // eslint-disable-next-line no-unused-expressions
-    reference.value
+    track(reference, 'get' as TrackOpTypes.GET, 'value')
     const { columnToString } = useColumn()
     return (`CREATE TABLE [${table}] (${columns.map(columnToString).join(', ')})`)
   }
@@ -29,28 +27,25 @@ export default function useTables () {
     if (!database.value) return
     const tempTable = `${table}_red_sqluirrel`
     const { columnToString } = useColumn()
-    const columnRenamed = columns.filter(column => (column._name !== undefined))
-    const sql = `PRAGMA foreign_keys = 0;
-
-    CREATE TABLE [${tempTable}] AS SELECT * FROM [${table}];
-
-    DROP TABLE [${table}];
-
-    CREATE TABLE [${table}] (
+    const columnsModified = columns.filter(column => (column.origName !== undefined))
+    const sql = []
+    sql.push(`CREATE TABLE [${tempTable}] AS SELECT * FROM [${table}];`)
+    sql.push(`DROP TABLE [${table}];`)
+    sql.push(
+    `CREATE TABLE [${table}] (
       ${columns.map(columnToString).join(', ')}
-    );
-
-    INSERT INTO [${table}] (
-      ${columnRenamed.map(column => `[${column.name}]`).join(', ')}
-    ) SELECT ${columnRenamed.map((column: Column) => `[${column._name}]`).join(', ')}
-        FROM ${tempTable};
-
-    DROP TABLE [${tempTable}];
-
-    PRAGMA foreign_keys = 1;`
-    console.log(sql)
-    database.value.run(sql)
-    reference.value++
+    );`)
+    // if there are modified columns transfer the data from the temp table to the new one
+    if (columnsModified.length) {
+      sql.push(
+      `INSERT INTO [${table}] (
+        ${columnsModified.map(column => `[${column.name}]`).join(', ')}
+      ) SELECT ${columnsModified.map((column: Column) => `[${column.origName}]`).join(', ')}
+          FROM ${tempTable};`)
+    }
+    sql.push(`DROP TABLE [${tempTable}];`)
+    database.value.run(sql.join('\n\n'))
+    triggerRef(reference)
   }
   return { list, drop, reference, create, update }
 }

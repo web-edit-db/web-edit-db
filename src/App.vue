@@ -11,7 +11,7 @@
     </footer>
   </aside>
   <main>
-    <router-view/>
+    <router-view :key="$route.path"/>
   </main>
 </template>
 
