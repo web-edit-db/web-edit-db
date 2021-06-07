@@ -23,7 +23,7 @@ export default defineComponent({
     const edit = ref(false)
     const newName = ref<HTMLInputElement>()
     const { name } = toRefs(props)
-    const { drop, list } = useTables()
+    const { drop, list, rename } = useTables()
     const router = useRouter()
 
     const button = {
@@ -32,9 +32,9 @@ export default defineComponent({
         nextTick().then(() => newName.value && newName.value.focus())
       },
       two () {
-        if (edit.value) {
-          console.log(newName.value?.value)
-          edit.value = false
+        if (edit.value && newName.value) {
+          rename(props.name, newName.value.value)
+          router.replace({ params: { name: newName.value.value } })
         } else if (confirm(`Are you sure you want to delete '${name.value}'`)) {
           if (list.value.length > 1) {
             // there are other tables so push to next table

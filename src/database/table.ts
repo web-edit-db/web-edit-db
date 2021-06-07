@@ -23,7 +23,7 @@ export default function useTables () {
     const { columnToString } = useColumn()
     return (`CREATE TABLE [${table}] (${columns.map(columnToString).join(', ')})`)
   }
-  const update = (table: string, columns: Column[]) => {
+  const update = (table: string, columns: Column[], newName?: string) => {
     if (!database.value) return
     const tempTable = `${table}_red_sqluirrel`
     const { columnToString } = useColumn()
@@ -32,13 +32,13 @@ export default function useTables () {
     sql.push(`CREATE TABLE [${tempTable}] AS SELECT * FROM [${table}];`)
     sql.push(`DROP TABLE [${table}];`)
     sql.push(
-    `CREATE TABLE [${table}] (
+    `CREATE TABLE [${newName ?? table}] (
       ${columns.map(columnToString).join(', ')}
     );`)
     // if there are modified columns transfer the data from the temp table to the new one
     if (columnsModified.length) {
       sql.push(
-      `INSERT INTO [${table}] (
+      `INSERT INTO [${newName ?? table}] (
         ${columnsModified.map(column => `[${column.name}]`).join(', ')}
       ) SELECT ${columnsModified.map((column: Column) => `[${column.origName}]`).join(', ')}
           FROM ${tempTable};`)
@@ -47,5 +47,10 @@ export default function useTables () {
     database.value.run(sql.join('\n\n'))
     triggerRef(reference)
   }
-  return { list, drop, reference, create, update }
+  const rename = (table: string, newName: string) => {
+    const { list: columnList } = useColumn()
+    const columns = columnList(table)
+    update(table, columns, newName)
+  }
+  return { list, drop, reference, create, update, rename }
 }

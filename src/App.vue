@@ -12,6 +12,9 @@
   </aside>
   <main>
     <router-view :key="$route.path"/>
+    <p>
+      {{ supported }}
+    </p>
   </main>
 </template>
 
@@ -20,6 +23,7 @@ import { defineComponent } from 'vue'
 import { useDatabase } from '@/database'
 import Icon from './components/Icon.vue'
 import TableMenu from './components/aside/TableMenu.vue'
+import { supported } from 'browser-fs-access'
 
 export default defineComponent({
   components: { Icon, TableMenu },
@@ -31,7 +35,8 @@ export default defineComponent({
       save,
       create,
       name,
-      loaded
+      loaded,
+      supported
     }
   }
 })
