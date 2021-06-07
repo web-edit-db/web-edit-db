@@ -11,10 +11,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, ref, toRefs } from 'vue'
+import { defineComponent, nextTick, onBeforeUpdate, ref, toRefs, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
 import { useTables } from '@/database'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   props: ['name'],
@@ -22,9 +22,12 @@ export default defineComponent({
   setup (props) {
     const edit = ref(false)
     const newName = ref<HTMLInputElement>()
+
     const { name } = toRefs(props)
     const { drop, list, rename } = useTables()
+
     const router = useRouter()
+    const route = useRoute()
 
     const button = {
       one () {
@@ -49,6 +52,8 @@ export default defineComponent({
       }
     }
 
+    watch(() => route.params.name, () => (edit.value = false))
+
     return { edit, button, newName }
   }
 })
@@ -56,31 +61,41 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 div {
-  @apply m-1.5;
+  @apply flex flex-col;
   @apply bg-gray-100;
-  @apply flex-col flex;
-  @apply py-2.5 px-3;
+  @apply px-3 py-2.5;
   @apply rounded-md;
+  @apply mb-2;
 }
 
-div input {
+input {
   @apply block;
-  @apply p-0.5;
-  @apply text-lg;
-  @apply leading-none;
+  @apply text-base;
+  @apply font-medium;
+  @apply leading-snug;
+  @apply rounded;
+  @apply px-1 py-0.5;
+  @apply outline-none;
+
+  &:disabled {
+    @apply bg-transparent;
+    @apply select-none;
+    @apply pointer-events-none;
+  }
 }
 
-div input:disabled {
-  @apply bg-transparent;
-  @apply select-none;
-  @apply pointer-events-none;
-}
-
-div span {
+span {
   @apply flex;
-}
+  @apply mt-1;
 
-div span fa-icon {
-  @apply h-6 w-6;
+  & fa-icon {
+    @apply h-6 w-6;
+    @apply mr-1;
+    @apply rounded;
+
+    &:hover {
+      @apply bg-white;
+    }
+  }
 }
 </style>
