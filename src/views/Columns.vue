@@ -18,10 +18,15 @@ import { computed, defineComponent, ref, watch } from 'vue'
 import ColumnCard from '@/components/ColumnCard.vue'
 import FormButton from '@/components/Form/Button.vue'
 import draggable from 'vuedraggable'
-import { isEqual, omit } from 'lodash'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
 
 export default defineComponent({
-  components: { ColumnCard, draggable, FormButton },
+  components: {
+    ColumnCard,
+    draggable,
+    FormButton
+  },
   props: ['name'],
   setup (props) {
     const { list } = useColumn()

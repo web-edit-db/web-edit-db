@@ -5,31 +5,14 @@
   </main>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import { useDatabase } from '@/database'
-// import Icon from './components/Icon.vue'
-// import TableMenu from './components/aside/TableMenu.vue'
+<script>
 import SideMenu from '@/components/Side/Menu.vue'
-import { supported } from 'browser-fs-access'
 
-export default defineComponent({
+export default {
   components: {
     SideMenu
-  },
-  setup () {
-    const { open, save, name, create, loaded } = useDatabase()
-
-    return {
-      open,
-      save,
-      create,
-      name,
-      loaded,
-      supported
-    }
   }
-})
+}
 </script>
 
 <style lang="postcss">

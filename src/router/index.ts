@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
-import Column from '../views/Columns.vue'
 import { useTables } from '@/database'
 
 const routes: Array<RouteRecordRaw> = [
@@ -20,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/table/:name',
     name: 'Table',
-    component: Column,
+    component: () => import(/* webpackChunkName: 'table' */'@/views/Columns.vue'),
     props: true
   }
 ]

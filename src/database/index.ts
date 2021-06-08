@@ -3,7 +3,8 @@ import useDatabase, { database } from './database'
 import useColumn, { Column } from './column'
 import { ref } from 'vue'
 import { Database, ParamsObject, Statement } from 'sql.js'
-export { useDatabase, useTables, useColumn, Column }
+export { useDatabase, useTables, useColumn }
+export type { Column }
 
 export const reference = ref(0) // this is used as a common references between all methods so that results are recomputed
 export function runAsObject <T extends ParamsObject> (statement: Statement | string): Array<T> {

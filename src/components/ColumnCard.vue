@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref, unref } from 'vue'
-import { isEqual } from 'lodash'
+import isEqual from 'lodash/isEqual'
 import { useColumn } from '@/database'
 import FormInput from '@/components/Form/Input.vue'
 
