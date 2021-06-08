@@ -30,10 +30,23 @@ const router = createRouter({
   routes
 })
 
+let backspacePressed = false
+
+window.addEventListener('keydown', (event) => (backspacePressed = event.key === 'Backspace'))
+window.addEventListener('keyup', () => (backspacePressed = false))
+
 router.beforeEach((to, _from, next) => {
   const { list } = useTables()
-  if (to.name === 'Table' && !list.value.includes(to.params.name as string)) return next('/')
-  next()
+  if (backspacePressed) {
+    // backspace navigation so prevent
+    next(false)
+  } else if (to.name === 'Table' && !list.value.includes(to.params.name as string)) {
+    // sent to table that doesn't exist anymore
+    next('/')
+  } else {
+    next()
+  }
+  backspacePressed = false
 })
 
 export default router
