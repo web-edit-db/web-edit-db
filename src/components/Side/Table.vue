@@ -1,7 +1,7 @@
 <template>
   <router-link :to="{name: 'Table', params: { name }}" custom v-slot="{ navigate, isActive }">
-    <div @click.self="navigate">
-      <input type="text" :value="name" :disabled="!edit" ref="newName">
+    <div @click.self="navigate" @keyup.self.enter="navigate" tabindex="0" >
+      <input type="text" :value="name" :disabled="!edit" ref="newName" @keyup.enter="() => edit && button.two()">
       <span v-if="isActive">
         <icon :icon="edit ? 'times' : 'pen'" @click="button.one"/>
         <icon :icon="edit ? 'check' : 'trash'" @click="button.two" />
@@ -11,10 +11,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onBeforeUpdate, ref, toRefs, watch } from 'vue'
+import { defineComponent, nextTick, ref, toRefs, watch } from 'vue'
 import Icon from '@/components/Icon.vue'
 import { useTables } from '@/database'
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   props: ['name'],
@@ -66,6 +66,11 @@ div {
   @apply px-3 py-2.5;
   @apply rounded-md;
   @apply mb-2;
+  @apply outline-none;
+
+  &:focus {
+    @apply ring-2 ring-blue-400;
+  }
 }
 
 input {
@@ -75,6 +80,7 @@ input {
   @apply leading-snug;
   @apply rounded;
   @apply px-1 py-0.5;
+  @apply border-none;
   @apply outline-none;
 
   &:disabled {

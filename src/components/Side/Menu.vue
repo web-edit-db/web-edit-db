@@ -44,7 +44,7 @@ aside {
   @apply w-60;
   @apply rounded-r-3xl;
   @apply bg-white;
-  @apply shadow-md;
+  @apply shadow-lg;
 }
 
 header {

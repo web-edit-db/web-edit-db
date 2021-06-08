@@ -2,9 +2,6 @@
   <side-menu />
   <main>
     <router-view :key="$route.path"/>
-    <p>
-      {{ supported }}
-    </p>
   </main>
 </template>
 
