@@ -10,28 +10,29 @@
       />
       <footer>
         <form-button
-          value="Apply Changes"
+          value="Commit Changes"
           color="green"
-          @click="commit"
+          @click="changes.commit"
           :disabled="!isModified"
         />
         <form-button
           value="Disscard Changes"
           color="red"
+          @click="changes.discard"
           :disabled="!isModified"
         />
       </footer>
     </div>
     <nav ref="columnNav">
       <form-button v-for="key in order" :key="columns[key].name" :value="columns[key].name" color="white" @click="() => scrollToColumn(columns[key].name)" sortable/>
-      <form-button value="Apply Changes" color="green" :disabled="!isModified" @click="commit" />
-      <form-button value="Discard Changes" color="red" :disabled="!isModified"/>
+      <form-button value="Apply Changes" color="green" :disabled="!isModified" @click="changes.commit" />
+      <form-button value="Discard Changes" color="red" :disabled="!isModified" @apply="changes.discard" />
     </nav>
   </div>
 </template>
 
 <script lang="ts">
-import { useColumn, useTables } from '@/database'
+import { Column, useColumn, useTables } from '@/database'
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import ColumnCard from '@/components/ColumnCard.vue'
 import FormButton from '@/components/Form/Button.vue'
@@ -55,6 +56,7 @@ export default defineComponent({
 
     const order = ref<number[]>([])
     const refs = ref<typeof ColumnCard[]>([])
+    const newColumns = ref<Column[]>([])
     const columns = computed(() => list(props.name))
     const columnsInOrder = computed(() =>
       order.value.map(key => columns.value[key])
@@ -72,12 +74,24 @@ export default defineComponent({
     )
 
     watch(
-      () => list(props.name),
+      () => columns.value,
       () => (order.value = Array.from(columns.value.keys())),
       { immediate: true }
     )
 
-    const commit = () => update(props.name, modified.value)
+    const changes = {
+      commit () {
+        return update(props.name, modified.value)
+      },
+      discard () {
+        // revert each column
+        refs.value.forEach(column => column.revert())
+        // clear new columns
+        newColumns.value = []
+        // reset order
+        order.value = Array.from(columns.value.keys())
+      }
+    }
 
     function scrollToColumn (name: string) {
       const column = refs.value.find(column => column.column.name === name)
@@ -107,7 +121,7 @@ export default defineComponent({
       refs,
       modified,
       isModified,
-      commit,
+      changes,
       columnCards,
       columnNav,
       scrollToColumn

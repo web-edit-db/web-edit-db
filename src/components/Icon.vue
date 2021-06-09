@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCheck, faChevronLeft, faFile, faFileUpload, faPen, faPlus, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faChevronLeft, faFile, faFileUpload, faPen, faPlus, faSave, faTimes, faTrash, faUndoAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
@@ -24,7 +24,8 @@ library.add(
   faTimes,
   faCheck,
   faChevronLeft,
-  faPlus
+  faPlus,
+  faUndoAlt
 )
 
 export default defineComponent({

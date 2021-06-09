@@ -3,7 +3,9 @@
     <header>
       <span class="name">{{ column.name }}</span>
       <span :class="['status', isModified ? 'text-blue-500' : 'text-green-700']">{{ isModified ? "modified" : "original" }}</span>
-      <span class="controlls"></span>
+      <span class="controlls">
+        <icon icon='undo-alt' @click="revert"/>
+      </span>
     </header>
     <main>
       <form-input
@@ -52,13 +54,14 @@
 <script lang="ts">
 import { computed, defineComponent, ref, unref } from 'vue'
 import isEqual from 'lodash/isEqual'
-import { useColumn } from '@/database'
 import FormInput from '@/components/Form/Input.vue'
+import Icon from '@/components/Icon.vue'
 
 export default defineComponent({
   props: ['column'],
   components: {
-    FormInput
+    FormInput,
+    Icon
   },
   setup (props) {
     const modified = ref({ ...props.column, origName: props.column.name })
@@ -69,12 +72,15 @@ export default defineComponent({
           origName: unref(props.column.name)
         })
     )
-    const { columnToString } = useColumn()
+
+    function revert () {
+      modified.value = { ...props.column, origName: props.column.name }
+    }
 
     return {
-      columnToString,
       modified,
-      isModified
+      isModified,
+      revert
     }
   }
 })
@@ -105,6 +111,20 @@ div header {
     @apply absolute;
     @apply top-1/2 left-1/2;
     @apply transform -translate-x-1/2 -translate-y-1/2;
+  }
+
+  & .controlls {
+    @apply flex;
+    @apply gap-1;
+
+    & fa-icon {
+      @apply h-8 w-8;
+      @apply rounded-md;
+
+      &:hover {
+        @apply bg-gray-200;
+      }
+    }
   }
 }
 </style>
