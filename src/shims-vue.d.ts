@@ -4,3 +4,8 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+declare module '@shopify/draggable/lib/sortable' {
+  import { Sortable } from '@shopify/draggable'
+  export default Sortable
+}

@@ -25,5 +25,6 @@ export default {
 #app > main {
   @apply overflow-y-auto;
   @apply flex-grow;
+  scroll-behavior: smooth;
 }
 </style>

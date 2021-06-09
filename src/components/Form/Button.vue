@@ -46,6 +46,13 @@ export default defineComponent({
         'hover:bg-green-700',
         'focus:ring-green-600',
         'focus:border-green-700'
+      ],
+      white: [
+        'text-black',
+        'bg-white',
+        'hover:bg-gray-200',
+        'focus:ring-gray-300',
+        'focus:border-gray-400'
       ]
     }
   })
@@ -58,6 +65,7 @@ button {
   @apply outline-none;
   @apply px-3 py-2;
   @apply border border-transparent;
+  @apply box-content;
 
   &:focus {
     @apply ring ring-offset-1 ring-opacity-50;

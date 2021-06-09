@@ -12,18 +12,18 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/vue-fontawesome": "^3.0.0-4",
+    "@shopify/draggable": "^1.0.0-beta.12",
     "@tailwindcss/forms": "^0.3.3",
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "@tailwindcss/typography": "^0.4.1",
+    "array-move": "^3.0.1",
     "autoprefixer": "^9",
-    "core-js": "^3.6.5",
     "postcss": "^7",
     "postcss-nested": "4.2.3",
     "register-service-worker": "^1.7.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0",
-    "vuedraggable": "^4.0.1"
+    "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.170",

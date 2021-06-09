@@ -8,6 +8,5 @@ module.exports = {
     }]])
     // no parse sql.js because it is already built for browser
     config.module.noParse(/sql\.js/)
-    config.resolve.alias.set('vuedraggable', 'vuedraggable/src/vuedraggable')
   }
 }

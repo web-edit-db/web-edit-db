@@ -7,25 +7,17 @@ module.exports = {
   purge: { content: ['./public/**/*.html', './src/**/*.vue'] },
   darkMode: false, // or 'media' or 'class'
   theme: {
-    fontFamily: {
-      sans: ['Inter', ...defaultTheme.fontFamily.sans]
-    },
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-
-      black: colors.black,
-      white: colors.white,
-      gray: colors.blueGray,
-      red: colors.red,
-      yellow: colors.amber,
-      green: colors.emerald,
-      blue: colors.blue,
-      indigo: colors.indigo,
-      purple: colors.violet,
-      pink: colors.pink
-    },
-    extend: {}
+    extend: {
+      fontFamily: {
+        sans: ['Inter', ...defaultTheme.fontFamily.sans]
+      },
+      colors: {
+        gray: colors.blueGray
+      },
+      boxShadow: {
+        'inner-md': 'inset 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+      }
+    }
   },
   variants: {
     extend: {}
