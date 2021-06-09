@@ -6,6 +6,8 @@ module.exports = {
       from: path.resolve(__dirname, 'node_modules/sql.js/dist/sql-wasm.wasm'),
       to: path.resolve(args[0][0].to, 'js')
     }]])
+    // no parse sql.js because it is already built for browser
+    config.module.noParse(/sql\.js/)
     config.resolve.alias.set('vuedraggable', 'vuedraggable/src/vuedraggable')
   }
 }
