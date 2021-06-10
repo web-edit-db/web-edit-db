@@ -76,7 +76,7 @@ export default defineComponent({
     const modified = computed(() =>
       order.value.map(key => refs.value[key]?.modified)
     )
-    const isModified = computed(() => refs.value.some((column) => column.status !== 'orignal'))
+    const isModified = computed(() => order.value.some(key => refs.value[key]?.status !== 'orignal'))
 
     watch(
       () => list(props.name),
