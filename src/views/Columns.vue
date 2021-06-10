@@ -3,9 +3,10 @@
     <div ref="columnCards">
       <column-card
         v-for="key in order"
-        :key="columns[key].name"
+        :key="`Column ${columns[key].name}`"
         :column="columns[key]"
         :ref="el => el && (refs[key] = el)"
+        @revert="(modified) => modified.value.new && deleteAdded(key)"
         sortable
       />
       <footer>
@@ -21,23 +22,33 @@
           @click="changes.discard"
           :disabled="!isModified"
         />
+        <i class="mx-auto" />
+        <form-button
+          value="Add column"
+          @click="addColumn"
+        />
       </footer>
     </div>
     <nav ref="columnNav">
-      <form-button v-for="key in order" :key="columns[key].name" :value="columns[key].name" color="white" @click="() => scrollToColumn(columns[key].name)" sortable/>
-      <form-button value="Apply Changes" color="green" :disabled="!isModified" @click="changes.commit" />
-      <form-button value="Discard Changes" color="red" :disabled="!isModified" @apply="changes.discard" />
+      <form-button
+        v-for="key in order"
+        :key="`Button ${columns[key].name}`"
+        :value="refs[key]?.modified.new ? refs[key]?.modified.name : columns[key].name"
+        @click="() => scrollToColumn(columns[key].name)"
+        sortable
+        color="white"
+      />
+      <form-button value="Apply Changes" class="commit" color="green" :disabled="!isModified" @click="changes.commit" />
+      <form-button value="Discard Changes" class="discard" color="red" :disabled="!isModified" @click="changes.discard" />
     </nav>
   </div>
 </template>
 
 <script lang="ts">
 import { Column, useColumn, useTables } from '@/database'
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
 import ColumnCard from '@/components/ColumnCard.vue'
 import FormButton from '@/components/Form/Button.vue'
-import isEqual from 'lodash/isEqual'
-import omit from 'lodash/omit'
 import arrayMove from 'array-move'
 import Sortable from '@shopify/draggable/lib/sortable'
 
@@ -56,8 +67,8 @@ export default defineComponent({
 
     const order = ref<number[]>([])
     const refs = ref<typeof ColumnCard[]>([])
-    const newColumns = ref<Column[]>([])
-    const columns = computed(() => list(props.name))
+    const addedColumns = ref<Partial<Column>[]>([])
+    const columns = computed(() => [...list(props.name), ...addedColumns.value])
     const columnsInOrder = computed(() =>
       order.value.map(key => columns.value[key])
     )
@@ -65,29 +76,24 @@ export default defineComponent({
     const modified = computed(() =>
       order.value.map(key => refs.value[key]?.modified)
     )
-    const isModified = computed(
-      () =>
-        !isEqual(
-          modified.value.map(column => omit(column, 'origName')),
-          columns.value
-        )
-    )
+    const isModified = computed(() => refs.value.some((column) => column.status !== 'orignal'))
 
     watch(
-      () => columns.value,
+      () => list(props.name),
       () => (order.value = Array.from(columns.value.keys())),
       { immediate: true }
     )
 
     const changes = {
       commit () {
-        return update(props.name, modified.value)
+        update(props.name, modified.value)
+        nextTick(() => changes.discard())
       },
       discard () {
+        // clear new columns
+        addedColumns.value = []
         // revert each column
         refs.value.forEach(column => column.revert())
-        // clear new columns
-        newColumns.value = []
         // reset order
         order.value = Array.from(columns.value.keys())
       }
@@ -98,20 +104,65 @@ export default defineComponent({
       if (column) { column.$el.scrollIntoView({ block: 'center' }) }
     }
 
+    function addColumn () {
+      let columnNumber = 0
+      do { columnNumber++ } while (refs.value.find(ref => ref.modified.name === `Column${columnNumber}`))
+      addedColumns.value.push({
+        name: `Column${columnNumber}`,
+        type: 'INTEGER',
+        min: null,
+        max: null,
+        notNull: false,
+        primaryKey: false,
+        unique: false,
+        defaultValue: undefined,
+        foreign: undefined,
+        new: true
+      })
+      order.value.push(order.value.length)
+    }
+
+    function deleteAdded (key:number) {
+      // find the index of the added column
+      const addedColumnIndex = [
+        ...list(props.name).keys(),
+        ...addedColumns.value.keys()
+      ][key]
+      // get the index of the column key within the order array
+      const orderIndex = order.value.indexOf(key)
+
+      addedColumns.value = [
+        ...addedColumns.value.slice(0, addedColumnIndex),
+        ...addedColumns.value.slice(addedColumnIndex + 1, addedColumns.value.length)
+      ]
+      order.value = [
+        ...order.value.slice(0, orderIndex),
+        ...order.value.slice(orderIndex + 1, order.value.length)
+      ].map(value => value - +(value > key))
+    }
+
     onMounted(() => {
-      const sortable = new Sortable(
-        [columnCards.value as HTMLDivElement, columnNav.value as HTMLDivElement],
+      function sorted ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
+        order.value = arrayMove(order.value, oldIndex, newIndex)
+      }
+      const sortableColumns = new Sortable(
+        columnCards.value as HTMLDivElement,
         {
           draggable: '[sortable]',
           distance: 15,
-          mirror: {
-            constrainDimensions: true
-          }
+          mirror: { constrainDimensions: true }
         }
       )
-      sortable.on('sortable:sorted', ({ oldIndex, newIndex }) => {
-        order.value = arrayMove(order.value, oldIndex, newIndex)
-      })
+      sortableColumns.on('sortable:sorted', sorted)
+      const sortableNav = new Sortable(
+        columnNav.value as HTMLDivElement,
+        {
+          draggable: '[sortable]',
+          distance: 15,
+          mirror: { constrainDimensions: true, xAxis: false }
+        }
+      )
+      sortableNav.on('sortable:sorted', sorted)
     })
 
     return {
@@ -124,7 +175,10 @@ export default defineComponent({
       changes,
       columnCards,
       columnNav,
-      scrollToColumn
+      scrollToColumn,
+      addedColumns,
+      addColumn,
+      deleteAdded
     }
   }
 })
@@ -152,6 +206,19 @@ nav {
     @apply text-left;
     @apply select-none;
     @apply text-sm;
+
+    &.commit, &.discard {
+      @apply sticky;
+    }
+
+    &.commit {
+      @apply bottom-15;
+      /* @apply bottom-12; */
+    }
+
+    &.discard {
+      @apply bottom-3;
+    }
   }
 }
 

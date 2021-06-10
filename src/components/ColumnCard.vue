@@ -1,8 +1,14 @@
 <template>
   <div>
     <header>
-      <span class="name">{{ column.name }}</span>
-      <span :class="['status', isModified ? 'text-blue-500' : 'text-green-700']">{{ isModified ? "modified" : "original" }}</span>
+      <span class="name">{{ column.new ? modified.name : column.name }}</span>
+      <span :class="{
+        'text-blue-500': status === 'modified',
+        'text-green-700': status === 'orignal',
+        'text-yellow-600': status === 'new'
+      }">
+        {{ status }}
+      </span>
       <span class="controlls">
         <icon icon='undo-alt' @click="revert"/>
       </span>
@@ -59,11 +65,12 @@ import Icon from '@/components/Icon.vue'
 
 export default defineComponent({
   props: ['column'],
+  emits: ['revert'],
   components: {
     FormInput,
     Icon
   },
-  setup (props) {
+  setup (props, context) {
     const modified = ref({ ...props.column, origName: props.column.name })
     const isModified = computed(
       () =>
@@ -73,14 +80,24 @@ export default defineComponent({
         })
     )
 
+    const status = computed(() => {
+      if (props.column.new) {
+        return 'new'
+      } else if (isModified.value) {
+        return 'modified'
+      } else return 'orignal'
+    })
+
     function revert () {
-      modified.value = { ...props.column, origName: props.column.name }
+      context.emit('revert', modified)
+      modified.value = { origName: props.column.name, ...props.column }
     }
 
     return {
       modified,
       isModified,
-      revert
+      revert,
+      status
     }
   }
 })

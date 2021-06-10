@@ -27,7 +27,7 @@ export default function useTables () {
     if (!database.value) return
     const tempTable = `${table}_red_sqluirrel`
     const { columnToString } = useColumn()
-    const columnsModified = columns.filter(column => (column.origName !== undefined))
+    const columnsModified = columns.filter(column => (column.origName !== undefined && !column.new))
     const sql = []
     sql.push(`CREATE TABLE [${tempTable}] AS SELECT * FROM [${table}];`)
     sql.push(`DROP TABLE [${table}];`)

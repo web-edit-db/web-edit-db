@@ -16,6 +16,9 @@ module.exports = {
       },
       boxShadow: {
         'inner-md': 'inset 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+      },
+      inset: {
+        15: '3.75rem'
       }
     }
   },

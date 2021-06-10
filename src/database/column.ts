@@ -16,7 +16,8 @@ export interface Column {
   foreign?: {
     table: string,
     column: string
-  }
+  },
+  new: boolean
 }
 
 export default function useColumn () {
@@ -55,7 +56,8 @@ export default function useColumn () {
         foreign: foreign && {
           table: foreign.table,
           column: foreign.to
-        }
+        },
+        new: false
       }
     })
     return columns
