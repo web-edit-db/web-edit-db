@@ -6,11 +6,13 @@
         'text-blue-500': status === 'modified',
         'text-green-700': status === 'orignal',
         'text-yellow-600': status === 'new',
+        'text-red-600': status === 'delete',
         'status': true
       }">
         {{ status }}
       </span>
       <span class="controlls">
+        <icon :icon="column.drop ? 'trash-restore' : 'trash'" @click="column.new ? revert() : column = {...column, drop: !column.drop}"/>
         <icon icon='undo-alt' @click="revert"/>
       </span>
     </header>
@@ -108,6 +110,8 @@ export default defineComponent({
     const status = computed(() => {
       if (column.value.new) {
         return 'new'
+      } else if (column.value.drop) {
+        return 'delete'
       } else if (modified.value) {
         return 'modified'
       } else return 'orignal'

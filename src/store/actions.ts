@@ -185,7 +185,12 @@ export default {
   async alterTable ({ state, dispatch }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns?: Column[]}) {
     if (state.database === undefined) return undefined
     if (columns === undefined) columns = state.modifications[tableName].order.map(key => state.modifications[tableName].columns[key]).filter(column => !column.drop)
-    const columnsUpdated = state.modifications[tableName].order.map(key => ({ old: key, new: state.modifications[tableName].columns[key].name }))
+    const columnsUpdated = state.modifications[tableName].order.filter(
+      columnName => !state.modifications[tableName].columns[columnName].drop && !state.modifications[tableName].columns[columnName].new
+    ).map(
+      key => ({ old: key, new: state.modifications[tableName].columns[key].name })
+    )
+    console.log(columnsUpdated)
     // const originalColumns = state.tables[tableName].columns
     const tempTableName = `${tableName}__red_sqluirrel`
     const sql = []
@@ -206,6 +211,7 @@ export default {
           FROM ${tempTableName};`)
     }
     sql.push(`DROP TABLE [${tempTableName}]`)
+    console.log(sql.join('\n\n'))
     try {
       state.database.run(sql.join('\n\n'))
       state.database.run('COMMIT;')
