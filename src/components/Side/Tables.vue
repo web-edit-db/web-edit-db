@@ -9,17 +9,18 @@
 </template>
 
 <script lang="ts">
-import { useTables } from '@/database'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import SideTable from '@/components/Side/Table.vue'
 import Icon from '@/components/Icon.vue'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   components: { SideTable, Icon },
   setup () {
-    const { list } = useTables()
+    const store = useStore()
+    const tables = computed(() => Object.keys(store.state.tables))
 
-    return { tables: list }
+    return { tables }
   }
 })
 </script>

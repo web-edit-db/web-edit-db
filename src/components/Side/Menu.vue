@@ -22,16 +22,30 @@
 </template>
 
 <script lang="ts">
-import { useDatabase } from '@/database'
-import { defineComponent, ref } from 'vue'
 import Icon from '@/components/Icon.vue'
 import SideTables from '@/components/Side/Tables.vue'
+import { computed, defineComponent, ref } from 'vue'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   components: { Icon, SideTables },
   setup () {
-    const { name, loaded, open, create, save } = useDatabase()
+    const store = useStore()
+
     const menuOpen = ref(true)
+
+    const name = computed(() => store.state.name)
+    const loaded = computed(() => !!store.state.database)
+
+    const open = async () => {
+      await store.dispatch('open')
+      await store.dispatch('queryTables')
+    }
+    const create = async () => {
+      await store.dispatch('create')
+      await store.dispatch('queryTables')
+    }
+    const save = () => store.dispatch('save')
 
     return { name, loaded, open, create, save, menuOpen }
   }

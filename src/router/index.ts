@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
-import { useTables } from '@/database'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -34,14 +33,10 @@ let backspacePressed = false
 window.addEventListener('keydown', (event) => (backspacePressed = event.key === 'Backspace'))
 window.addEventListener('keyup', () => (backspacePressed = false))
 
-router.beforeEach((to, _from, next) => {
-  const { list } = useTables()
+router.beforeEach((_to, _from, next) => {
   if (backspacePressed) {
     // backspace navigation so prevent
     next(false)
-  } else if (to.name === 'Table' && !list.value.includes(to.params.name as string)) {
-    // sent to table that doesn't exist anymore
-    next('/')
   } else {
     next()
   }

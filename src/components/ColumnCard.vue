@@ -1,11 +1,12 @@
 <template>
   <div>
     <header>
-      <span class="name">{{ column.new ? modified.name : column.name }}</span>
+      <span class="name">{{ column.new ? column.name : columnName }}</span>
       <span :class="{
         'text-blue-500': status === 'modified',
         'text-green-700': status === 'orignal',
-        'text-yellow-600': status === 'new'
+        'text-yellow-600': status === 'new',
+        'status': true
       }">
         {{ status }}
       </span>
@@ -17,39 +18,55 @@
       <form-input
         type="text"
         label="Name"
-        v-model="modified.name"
+        :modelValue="column.name"
+        @update:modelValue="value => column = {...column, name: value}"
         autocomplete="off"
       />
       <form-input
         type="text"
         label="Type"
-        v-model="modified.type"
+        :modelValue="column.type"
+        @update:modelValue="value => column = {...column, type: value}"
         autocomplete="off"
       />
-      <form-input type="checkbox" label="Not Null" v-model="modified.notNull" />
+      <form-input
+        type="checkbox"
+        label="Not Null"
+        :modelValue="column.notNull"
+        @update:modelValue="value => column = {...column, notNull: value}"
+      />
       <form-input
         type="checkbox"
         label="Primary Key"
-        v-model="modified.primaryKey"
+        :modelValue="column.primaryKey"
+        @update:modelValue="value => column = {...column, primaryKey: value}"
       />
-      <form-input type="checkbox" label="Unique" v-model="modified.unique" />
+      <form-input
+        type="checkbox"
+        label="Unique"
+        :modelValue="column.unique"
+        @update:modelValue="value => column = {...column, unique: value}"
+      />
       <form-input
         type="text"
         label="Default"
-        v-model="modified.defaultValue"
+        :modelValue="column.default.value ?? ''"
+        @update:modelValue="value => column = {...column, default: { value, enabled: column.default.enabled } }"
         autocomplete="off"
       />
       <form-input
         type="number"
         label="Min"
-        v-model="modified.min"
+        :modelValue="column.min"
+        @update:modelValue="value => column = {...column, min: value}"
         autocomplete="off"
         :extraClass="{ half: true }"
       />
       <form-input
         type="number"
         label="Max"
-        v-model="modified.max"
+        :modelValue="column.max"
+        @update:modelValue="value => column = {...column, max: value}"
         autocomplete="off"
         :extraClass="{ half: true }"
       />
@@ -58,46 +75,67 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, unref } from 'vue'
-import isEqual from 'lodash/isEqual'
 import FormInput from '@/components/Form/Input.vue'
 import Icon from '@/components/Icon.vue'
+import type { Column } from '@/store/types'
+import { computed, defineComponent } from 'vue'
+import { useStore } from 'vuex'
+import omit from 'lodash/omit'
 
 export default defineComponent({
-  props: ['column'],
-  emits: ['revert'],
+  props: ['columnName', 'tableName'],
   components: {
     FormInput,
     Icon
   },
-  setup (props, context) {
-    const modified = ref({ ...props.column, origName: props.column.name })
-    const isModified = computed(
-      () =>
-        !isEqual(modified.value, {
-          ...props.column,
-          origName: unref(props.column.name)
+  setup (props) {
+    // const { columnName, tableName } = toRefs(props)
+    const store = useStore()
+    const column = computed<Column>({
+      get () {
+        return store.state.modifications[props.tableName].columns[props.columnName]
+      },
+      set (value) {
+        store.commit('setModifiedColumn', {
+          tableName: props.tableName,
+          columnName: props.columnName,
+          column: value
         })
-    )
+      }
+    })
+    const modified = computed(() => store.getters.columnModifications(props.tableName, props.columnName))
 
     const status = computed(() => {
-      if (props.column.new) {
+      if (column.value.new) {
         return 'new'
-      } else if (isModified.value) {
+      } else if (modified.value) {
         return 'modified'
       } else return 'orignal'
     })
 
-    function revert () {
-      context.emit('revert', modified)
-      modified.value = { origName: props.column.name, ...props.column }
+    const revert = () => {
+      if (column.value.new) {
+        store.commit('setModification', {
+          tableName: props.tableName,
+          modified: {
+            columns: omit(store.state.modifications[props.tableName].columns, props.columnName),
+            order: store.state.modifications[props.tableName].order.filter((key: string) => key !== props.columnName)
+          }
+        })
+      } else {
+        store.commit('setModifiedColumn', {
+          columnName: props.columnName,
+          tableName: props.tableName,
+          column: store.state.tables[props.tableName].columns[props.columnName]
+        })
+      }
     }
 
     return {
       modified,
-      isModified,
       revert,
-      status
+      status,
+      column
     }
   }
 })
@@ -122,7 +160,8 @@ div main label:not(.half):not(.checkbox) {
 
 div header {
   @apply relative;
-  @apply flex justify-between;
+  @apply flex justify-between items-center;
+  @apply mx-2;
 
   & .status {
     @apply absolute;

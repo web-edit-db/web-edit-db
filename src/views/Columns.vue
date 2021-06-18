@@ -3,10 +3,10 @@
     <div ref="columnCards">
       <column-card
         v-for="key in order"
-        :key="`Column ${columns[key].name}`"
-        :column="columns[key]"
-        :ref="el => el && (refs[key] = el)"
-        @revert="(modified) => modified.value.new && deleteAdded(key)"
+        :key="`Column ${key}`"
+        :columnName="key"
+        :tableName="name"
+        :ref="el => columnRefs[key] = el?.$el"
         sortable
       />
       <footer>
@@ -14,43 +14,46 @@
           value="Commit Changes"
           color="green"
           @click="changes.commit"
-          :disabled="!isModified"
+          :disabled="!modified"
         />
         <form-button
           value="Disscard Changes"
           color="red"
           @click="changes.discard"
-          :disabled="!isModified"
+          :disabled="!modified"
         />
         <i class="mx-auto" />
         <form-button
           value="Add column"
-          @click="addColumn"
+          @click="changes.addColumn"
         />
       </footer>
     </div>
     <nav ref="columnNav">
       <form-button
         v-for="key in order"
-        :key="`Button ${columns[key].name}`"
-        :value="refs[key]?.modified.new ? refs[key]?.modified.name : columns[key].name"
-        @click="() => scrollToColumn(columns[key].name)"
+        :key="`Button ${key}`"
+        :value="columns[key].new ? columns[key].name : key"
+        @click="() => focusColumn(key)"
         sortable
         color="white"
       />
-      <form-button value="Apply Changes" class="commit" color="green" :disabled="!isModified" @click="changes.commit" />
-      <form-button value="Discard Changes" class="discard" color="red" :disabled="!isModified" @click="changes.discard" />
+      <form-button value="Apply Changes" class="commit" color="green" :disabled="!modified" @click="changes.commit" />
+      <form-button value="Discard Changes" class="discard" color="red" :disabled="!modified" @click="changes.discard" />
     </nav>
   </div>
 </template>
 
 <script lang="ts">
-import { Column, useColumn, useTables } from '@/database'
-import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
 import ColumnCard from '@/components/ColumnCard.vue'
 import FormButton from '@/components/Form/Button.vue'
-import arrayMove from 'array-move'
+import store from '@/store'
 import Sortable from '@shopify/draggable/lib/sortable'
+import arrayMove from 'array-move'
+import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
+import { useStore } from 'vuex'
+import invoke from 'lodash/invoke'
+import debounce from 'lodash/debounce'
 
 export default defineComponent({
   components: {
@@ -59,89 +62,54 @@ export default defineComponent({
   },
   props: ['name'],
   setup (props) {
-    const { list } = useColumn()
-    const { update } = useTables()
+    const store = useStore()
+
+    const columnRefs = ref<{[key: string]: HTMLDivElement | undefined}>({})
 
     const columnCards = ref<HTMLDivElement>()
     const columnNav = ref<HTMLDivElement>()
 
-    const order = ref<number[]>([])
-    const refs = ref<typeof ColumnCard[]>([])
-    const addedColumns = ref<Partial<Column>[]>([])
-    const columns = computed(() => [...list(props.name), ...addedColumns.value])
-    const columnsInOrder = computed(() =>
-      order.value.map(key => columns.value[key])
-    )
-
-    const modified = computed(() =>
-      order.value.map(key => refs.value[key]?.modified)
-    )
-    const isModified = computed(() => order.value.some(key => refs.value[key]?.status !== 'orignal'))
-
-    watch(
-      () => list(props.name),
-      () => (order.value = Array.from(columns.value.keys())),
-      { immediate: true }
-    )
+    const order = computed<string[]>({
+      get () { return store.state.modifications[props.name]?.order },
+      set (value) {
+        store.commit('setModification', {
+          tableName: props.name,
+          modified: {
+            columns: store.state.modifications[props.name].columns,
+            order: value
+          }
+        })
+      }
+    })
+    const columns = computed(() => store.state.modifications[props.name].columns)
+    const modified = computed(() => store.getters.tableModified(props.name))
 
     const changes = {
       commit () {
-        update(props.name, modified.value)
-        nextTick(() => changes.discard())
+        store.dispatch('alterTable', { tableName: props.name })
       },
-      discard () {
-        // clear new columns
-        addedColumns.value = []
-        // revert each column
-        refs.value.forEach(column => column.revert())
-        // reset order
-        order.value = Array.from(columns.value.keys())
+      async discard () {
+        await store.commit('setModification', {
+          tableName: props.name,
+          modified: {
+            columns: store.state.tables[props.name].columns,
+            order: Object.keys(store.state.tables[props.name].columns)
+          }
+        })
+      },
+      addColumn () {
+        store.dispatch('addModifiedColumn', { tableName: props.name })
       }
     }
 
-    function scrollToColumn (name: string) {
-      const column = refs.value.find(column => column.column.name === name)
-      if (column) { column.$el.scrollIntoView({ block: 'center' }) }
-    }
-
-    function addColumn () {
-      let columnNumber = 0
-      do { columnNumber++ } while (refs.value.find(ref => ref.modified.name === `Column${columnNumber}`))
-      addedColumns.value.push({
-        name: `Column${columnNumber}`,
-        type: 'INTEGER',
-        min: null,
-        max: null,
-        notNull: false,
-        primaryKey: false,
-        unique: false,
-        defaultValue: undefined,
-        foreign: undefined,
-        new: true
-      })
-      order.value.push(order.value.length)
-    }
-
-    function deleteAdded (key:number) {
-      // find the index of the added column
-      const addedColumnIndex = [
-        ...list(props.name).keys(),
-        ...addedColumns.value.keys()
-      ][key]
-      // get the index of the column key within the order array
-      const orderIndex = order.value.indexOf(key)
-
-      addedColumns.value = [
-        ...addedColumns.value.slice(0, addedColumnIndex),
-        ...addedColumns.value.slice(addedColumnIndex + 1, addedColumns.value.length)
-      ]
-      order.value = [
-        ...order.value.slice(0, orderIndex),
-        ...order.value.slice(orderIndex + 1, order.value.length)
-      ].map(value => value - +(value > key))
+    const focusColumn = (columnName: string) => {
+      invoke(columnRefs.value, [columnName, 'focus'], { preventScroll: true })
+      invoke(columnRefs.value, [columnName, 'scrollIntoView'], { behavior: 'smooth', block: 'center' })
     }
 
     onMounted(() => {
+      store.dispatch('queryColumns', props.name)
+
       function sorted ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
         order.value = arrayMove(order.value, oldIndex, newIndex)
       }
@@ -162,23 +130,31 @@ export default defineComponent({
           mirror: { constrainDimensions: true, xAxis: false }
         }
       )
-      sortableNav.on('sortable:sorted', sorted)
+      sortableNav.on('sortable:sorted', ({ oldIndex, newIndex }) => {
+        sorted({ oldIndex, newIndex })
+        debounce(invoke, 500, { maxWait: 100 })(
+          columnRefs.value, [order.value[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }
+        )
+      })
+      sortableNav.on('sortable:stop', ({ newIndex }) => invoke(columnRefs.value, [order.value[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }))
     })
 
     return {
-      columns,
-      columnsInOrder,
       order,
-      refs,
       modified,
-      isModified,
-      changes,
       columnCards,
       columnNav,
-      scrollToColumn,
-      addedColumns,
-      addColumn,
-      deleteAdded
+      changes,
+      columns,
+      focusColumn,
+      columnRefs
+    }
+  },
+  beforeRouteEnter (to, _from, next) {
+    if ((to.params.name as string) in store.state.tables) {
+      next()
+    } else {
+      next('/')
     }
   }
 })
