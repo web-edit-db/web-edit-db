@@ -19,6 +19,6 @@ export function columnToString ({ name, type, min, max, unique, primaryKey, notN
   if (primaryKey) parts.push('PRIMARY KEY')
   if (unique) parts.push('UNIQUE')
   if (notNull) parts.push('NOT NULL')
-  if (default_.enabled) parts.push(`DEFAULT ${default_.value}`)
+  if (default_.enabled && default_.value.length > 0) parts.push(`DEFAULT ${default_.value}`)
   return parts.join(' ')
 }

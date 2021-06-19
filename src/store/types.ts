@@ -10,7 +10,7 @@ export interface Column {
   primaryKey: boolean,
   notNull: boolean,
   default: {
-    value: string | null,
+    value: string,
     enabled: boolean
   },
   foreign: {

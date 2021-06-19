@@ -119,7 +119,7 @@ export default {
         primaryKey: !!column.primaryKey,
         notNull: !!column.notNull,
         default: {
-          value: column.default,
+          value: column.default ?? '',
           enabled: !!column.default
         },
         foreign: {
@@ -138,7 +138,7 @@ export default {
         columns: {
           ...columns,
           ...reduce(state.modifications[tableName]?.columns, (results, column, name) => {
-            return { ...results, [column.name in columns ? column.name : name]: { ...column, new: !(column.name in columns) } }
+            return { ...results, [column.name in columns ? column.name : name]: { ...column, default: { ...column.default, value: column.default.enabled ? column.default.value : '' }, new: !(column.name in columns) } }
           }, {})
         },
         order: uniq([...keys(columns)])

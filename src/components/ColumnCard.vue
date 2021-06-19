@@ -49,13 +49,25 @@
         :modelValue="column.unique"
         @update:modelValue="value => column = {...column, unique: value}"
       />
-      <form-input
-        type="text"
-        label="Default"
-        :modelValue="column.default.value ?? ''"
-        @update:modelValue="value => column = {...column, default: { value, enabled: column.default.enabled } }"
-        autocomplete="off"
-      />
+      <label class="default">
+        <span>Default</span>
+        <!-- <div class="group "> -->
+        <span class="group">
+          <form-input
+            type="checkbox"
+            :modelValue="column.default.enabled"
+            @update:modelValue="value => column = {...column, default: { enabled: value, value: column.default.value } }"
+            autocomplete="off"
+          />
+          <form-input
+            type="text"
+            :modelValue="column.default.value ?? ''"
+            @update:modelValue="value => column = {...column, default: { value, enabled: column.default.enabled } }"
+            autocomplete="off"
+          />
+        </span>
+        <!-- </div> -->
+      </label>
       <form-input
         type="number"
         label="Min"
@@ -184,6 +196,23 @@ div header {
       &:hover {
         @apply bg-gray-200;
       }
+    }
+  }
+}
+
+label.default {
+  @apply flex flex-col;
+  @apply m-2;
+
+  & span.group {
+    @apply flex items-center justify-center;
+
+    & label {
+      @apply m-0;
+    }
+
+    & label.checkbox {
+      @apply mx-1;
     }
   }
 }
