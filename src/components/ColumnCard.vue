@@ -214,6 +214,15 @@ label.default {
     & label.checkbox {
       @apply mx-1;
     }
+
+    & label.text {
+      @apply flex-grow;
+
+      & :deep(input) {
+        @apply w-full;
+        @apply min-w-0;
+      }
+    }
   }
 }
 </style>

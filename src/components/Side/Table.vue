@@ -39,6 +39,7 @@ export default defineComponent({
       two () {
         if (edit.value && tableNameInput.value) {
           store.dispatch('renameTable', { tableName: props.name, newTableName: tableNameInput.value.value })
+          edit.value = false
           router.replace({ params: { name: tableNameInput.value.value } })
         } else if (confirm(`Are you sure you want to delete '${name.value}'`)) {
           if (tables.value.length > 1) {

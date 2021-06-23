@@ -1,4 +1,5 @@
 import { fileOpen, fileSave } from 'browser-fs-access'
+import omit from 'lodash/omit'
 import keys from 'lodash/keys'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
@@ -71,9 +72,9 @@ export default {
       (prev, { name }) => ({ ...prev, [name]: {} }),
       {}
     )
-    await commit('setTables', tables as State['tables'])
+    commit('setTables', tables as State['tables'])
     // set modified preserving modified data for tables that exist
-    await commit('setModifications', { ...tables, ...pick(state.modifications, keys(tables)) })
+    commit('setModifications', { ...tables, ...pick(state.modifications, keys(tables)) })
   },
   async queryColumns ({ state, commit }, tableName: string) {
     if (!state.database) return undefined
@@ -130,28 +131,37 @@ export default {
         drop: false
       }
     }).reduce((previous, column) => ({ ...previous, [column.name]: column }), {}) as State['tables']['']['columns']
-    await commit('setColumns', { tableName, columns })
+    commit('setColumns', { tableName, columns })
     // set modified columns preserving any that are already modified
-    await commit('setModifications', {
+    const payload: State['modifications'] = {
       ...state.modifications,
       [tableName]: {
         columns: {
           ...columns,
           ...reduce(state.modifications[tableName]?.columns, (results, column, name) => {
-            return { ...results, [column.name in columns ? column.name : name]: { ...column, default: { ...column.default, value: column.default.enabled ? column.default.value : '' }, new: !(column.name in columns) } }
+            return {
+              ...results,
+              [column.name in columns ? column.name : name]: {
+                ...column,
+                default: { ...column.default, value: column.default.enabled ? column.default.value : '' },
+                new: !(name in columns || column.name in columns)
+              }
+            }
           }, {})
         },
-        order: uniq([...keys(columns)])
+        order: [],
+        new: false
       }
-    })
+    }
+    payload[tableName].order = uniq([...(state.modifications[tableName].order ?? []), ...keys(columns)]).filter(name => name in payload[tableName].columns)
+    commit('setModifications', payload)
   },
-  addModifiedColumn ({ commit, state }, { tableName, columnName, column }: { tableName: string, columnName: string, column: Partial<Column> }) {
+  async addModifiedColumn ({ commit, state }, { tableName, columnName, column }: { tableName: string, columnName: string, column: Partial<Column> }) {
     if (columnName === undefined) {
       let columnNumber = 0
       do { columnNumber++ } while (Object.keys(state.tables[tableName].columns).includes(`Column ${columnNumber}`))
       columnName = `Column ${columnNumber}`
     }
-
     commit('setModification', {
       tableName,
       modified: {
@@ -182,16 +192,16 @@ export default {
       }
     })
   },
-  async alterTable ({ state, dispatch }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns?: Column[]}) {
+  async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
     if (state.database === undefined) return undefined
-    if (columns === undefined) columns = state.modifications[tableName].order.map(key => state.modifications[tableName].columns[key]).filter(column => !column.drop)
-    const columnsUpdated = state.modifications[tableName].order.filter(
-      columnName => !state.modifications[tableName].columns[columnName].drop && !state.modifications[tableName].columns[columnName].new
-    ).map(
-      key => ({ old: key, new: state.modifications[tableName].columns[key].name })
-    )
-    console.log(columnsUpdated)
-    // const originalColumns = state.tables[tableName].columns
+    if (columns === undefined) {
+      columns = state.modifications[tableName].order.reduce(
+        (previous, columnName) => ({ ...previous, [columnName]: state.modifications[tableName].columns[columnName] }),
+        {}
+      )
+    }
+    const columnsUpdated = Object.entries(columns).filter(([, column]) => !column.drop && !column.new).map(([old, column]) => ({ old, new: column.name }))
+
     const tempTableName = `${tableName}__red_sqluirrel`
     const sql = []
     sql.push('BEGIN TRANSACTION;')
@@ -201,7 +211,7 @@ export default {
     sql.push(`DROP TABLE [${tableName}];`)
     // create the new table with correct name and column structure
     sql.push(`CREATE TABLE [${newTableName ?? tableName}] (
-      ${columns.map(columnToString).join(', ')}
+      ${Object.values(columns).map(columnToString).join(', ')}
     );`)
     // if there are updated columns copy there data across
     if (columnsUpdated.length) {
@@ -219,19 +229,27 @@ export default {
       console.log('has error: ', error)
       state.database.run('ROLLBACK;')
     }
+    if (newTableName) {
+      commit('setModifications', {
+        ...omit(state.modifications, [tableName]),
+        [newTableName]: state.modifications[tableName]
+      })
+    }
     await dispatch('queryTables')
-    await dispatch('queryColumns', tableName)
+    if (!newTableName) await dispatch('queryColumns', tableName)
   },
-  renameTable ({ dispatch, state }, { tableName, newTableName }) {
-    dispatch('alterTable', {
-      tableName,
-      newTableName,
-      columns: Object.values(state.tables[tableName].columns)
-    })
+  async renameTable ({ dispatch, state }, { tableName, newTableName }) {
+    if (tableName !== newTableName) {
+      await dispatch('alterTable', {
+        tableName,
+        newTableName,
+        columns: state.tables[tableName].columns
+      })
+    }
   },
-  dropTable ({ state, dispatch }, tableName) {
+  async dropTable ({ state, dispatch }, tableName) {
     if (!state.database) return
     state.database.run(`DROP TABLE ${tableName}`)
-    dispatch('queryTables')
+    await dispatch('queryTables')
   }
 } as ActionTree<State, State>
