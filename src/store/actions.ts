@@ -3,7 +3,6 @@ import omit from 'lodash/omit'
 import keys from 'lodash/keys'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
-import uniq from 'lodash/uniq'
 import sqljsInit from 'sql.js'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
@@ -138,7 +137,8 @@ export default {
       [tableName]: {
         columns: {
           ...columns,
-          ...reduce(state.modifications[tableName]?.columns, (results, column, name) => {
+          ...reduce(state.modifications[tableName].columns, (results, column, name) => {
+            if (column.drop) return results
             return {
               ...results,
               [column.name in columns ? column.name : name]: {
@@ -205,7 +205,7 @@ export default {
     sql.push(`DROP TABLE [${tableName}];`)
     // create the new table with correct name and column structure
     sql.push(`CREATE TABLE [${newTableName ?? tableName}] (
-      ${Object.values(columns).map(columnToString).join(', ')}
+      ${Object.values(columns).filter(column => !column.drop).map(columnToString).join(', ')}
     );`)
     // if there are updated columns copy there data across
     if (columnsUpdated.length) {
@@ -215,12 +215,10 @@ export default {
           FROM ${tempTableName};`)
     }
     sql.push(`DROP TABLE [${tempTableName}]`)
-    console.log(sql.join('\n\n'))
     try {
       state.database.run(sql.join('\n\n'))
       state.database.run('COMMIT;')
     } catch (error) {
-      console.log('has error: ', error)
       state.database.run('ROLLBACK;')
     }
     if (newTableName) {
