@@ -148,18 +148,15 @@ export default {
               }
             }
           }, {})
-        },
-        order: [],
-        new: false
+        }
       }
     }
-    payload[tableName].order = uniq([...(state.modifications[tableName].order ?? []), ...keys(columns)]).filter(name => name in payload[tableName].columns)
     commit('setModifications', payload)
   },
   async addModifiedColumn ({ commit, state }, { tableName, columnName, column }: { tableName: string, columnName: string, column: Partial<Column> }) {
     if (columnName === undefined) {
       let columnNumber = 0
-      do { columnNumber++ } while (Object.keys(state.tables[tableName].columns).includes(`Column ${columnNumber}`))
+      do { columnNumber++ } while (Object.keys(state.modifications[tableName].columns).includes(`Column ${columnNumber}`))
       columnName = `Column ${columnNumber}`
     }
     commit('setModification', {
@@ -187,19 +184,16 @@ export default {
             drop: false,
             ...column
           }
-        },
-        order: [...state.modifications[tableName].order, columnName]
+        }
       }
     })
   },
+  async revertModifiedColumn ({ commit, state }, { tableName, columnName }) {
+    commit('setModifiedColumn', { tableName, columnName, column: state.tables[tableName].columns[columnName] })
+  },
   async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
     if (state.database === undefined) return undefined
-    if (columns === undefined) {
-      columns = state.modifications[tableName].order.reduce(
-        (previous, columnName) => ({ ...previous, [columnName]: state.modifications[tableName].columns[columnName] }),
-        {}
-      )
-    }
+    if (columns === undefined) columns = state.modifications[tableName].columns
     const columnsUpdated = Object.entries(columns).filter(([, column]) => !column.drop && !column.new).map(([old, column]) => ({ old, new: column.name }))
 
     const tempTableName = `${tableName}__red_sqluirrel`

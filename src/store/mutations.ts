@@ -26,21 +26,4 @@ export default {
   setModifiedColumn (state, { tableName, columnName, column }) {
     state.modifications[tableName].columns[columnName] = cloneDeep(column)
   }
-  // setModifiedOrder (state, { tableName, })
-  // setModifiedOrder (state, { tableName, order }: { order: string[]; tableName: string }) {
-  //   state.modified[tableName].order = order
-  // },
-  // setModifiedColumns (state, { tableName, columns }: { tableName: string, columns: State['modified']['']['columns']}) {
-  //   if (state.modified[tableName]) {
-  //     state.modified[tableName].columns = cloneDeep(columns)
-  //   } else {
-  //     state.modified[tableName] = {
-  //       columns: cloneDeep(columns),
-  //       order: []
-  //     }
-  //   }
-  // },
-  // setModifiedColumn (state, { tableName, columnName, column }) {
-  //   state.modified[tableName].columns[columnName] = cloneDeep(column)
-  // }
 } as MutationTree<State>

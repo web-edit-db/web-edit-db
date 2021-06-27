@@ -36,8 +36,7 @@ export interface State {
     [tableName: string]: {
       columns: {
         [columnName: string]:Column
-      },
-      order: string[]
+      }
     }
   }
 }

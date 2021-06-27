@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div ref="columnCards">
       <column-card
-        v-for="key in order"
+        v-for="column, key in columns"
         :key="`Column ${key}`"
         :columnName="key"
         :tableName="name"
@@ -31,9 +31,9 @@
     </div>
     <nav ref="columnNav">
       <form-button
-        v-for="key in order"
+        v-for="column, key in columns"
         :key="`Button ${key}`"
-        :value="columns[key].new ? columns[key].name : key"
+        :value="column.new ? column.name : key"
         @click="() => focusColumn(key)"
         sortable
         color="white"
@@ -50,7 +50,7 @@ import FormButton from '@/components/Form/Button.vue'
 import store from '@/store'
 import Sortable from '@shopify/draggable/lib/sortable'
 import arrayMove from 'array-move'
-import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import invoke from 'lodash/invoke'
 import debounce from 'lodash/debounce'
@@ -69,19 +69,10 @@ export default defineComponent({
     const columnCards = ref<HTMLDivElement>()
     const columnNav = ref<HTMLDivElement>()
 
-    const order = computed<string[]>({
-      get () { return store.state.modifications[props.name]?.order },
-      set (value) {
-        store.commit('setModification', {
-          tableName: props.name,
-          modified: {
-            columns: store.state.modifications[props.name].columns,
-            order: value
-          }
-        })
-      }
+    const columns = computed({
+      get: () => store.state.modifications[props.name].columns,
+      set: (value) => store.commit('setModification', { tableName: props.name, modified: { columns: value } })
     })
-    const columns = computed(() => store.state.modifications[props.name].columns)
     const modified = computed(() => store.getters.tableModified(props.name))
 
     const changes = {
@@ -92,8 +83,7 @@ export default defineComponent({
         await store.commit('setModification', {
           tableName: props.name,
           modified: {
-            columns: store.state.tables[props.name].columns,
-            order: Object.keys(store.state.tables[props.name].columns)
+            columns: store.state.tables[props.name].columns
           }
         })
       },
@@ -111,7 +101,7 @@ export default defineComponent({
       store.dispatch('queryColumns', props.name)
 
       function sorted ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
-        order.value = arrayMove(order.value, oldIndex, newIndex)
+        columns.value = Object.fromEntries(arrayMove(Object.entries(columns.value), oldIndex, newIndex))
       }
       const sortableColumns = new Sortable(
         columnCards.value as HTMLDivElement,
@@ -133,14 +123,13 @@ export default defineComponent({
       sortableNav.on('sortable:sorted', ({ oldIndex, newIndex }) => {
         sorted({ oldIndex, newIndex })
         debounce(invoke, 500, { maxWait: 100 })(
-          columnRefs.value, [order.value[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }
+          columnRefs.value, [Object.keys(columns.value)[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }
         )
       })
-      sortableNav.on('sortable:stop', ({ newIndex }) => invoke(columnRefs.value, [order.value[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }))
+      sortableNav.on('sortable:stop', ({ newIndex }) => invoke(columnRefs.value, [Object.keys(columns.value)[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }))
     })
 
     return {
-      order,
       modified,
       columnCards,
       columnNav,

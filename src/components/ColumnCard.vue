@@ -134,16 +134,11 @@ export default defineComponent({
         store.commit('setModification', {
           tableName: props.tableName,
           modified: {
-            columns: omit(store.state.modifications[props.tableName].columns, props.columnName),
-            order: store.state.modifications[props.tableName].order.filter((key: string) => key !== props.columnName)
+            columns: omit(store.state.modifications[props.tableName].columns, props.columnName)
           }
         })
       } else {
-        store.commit('setModifiedColumn', {
-          columnName: props.columnName,
-          tableName: props.tableName,
-          column: store.state.tables[props.tableName].columns[props.columnName]
-        })
+        store.dispatch('revertModifiedColumn', { columnName: props.columnName, tableName: props.tableName })
       }
     }
 
