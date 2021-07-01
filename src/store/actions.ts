@@ -14,7 +14,7 @@ const sqljs = sqljsInit({
 export default {
   async create ({ commit }) {
     commit('setDatabaseData', {
-      name: 'unnamed.db',
+      name: prompt('Enter a name for your database', 'unnamed') + '.db',
       database: new (await sqljs).Database()
     })
   },
