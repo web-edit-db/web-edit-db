@@ -1,7 +1,7 @@
 <template>
   <aside :class="{ open: menuOpen }">
     <header>
-      <h3>{{ name || "Database Name" }}</h3>
+      <h3>{{ name || "Open A Database" }}</h3>
       <icon icon="chevron-left" size="lg" @click="menuOpen = !menuOpen"/>
     </header>
     <main v-if="menuOpen">

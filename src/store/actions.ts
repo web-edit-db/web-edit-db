@@ -7,6 +7,7 @@ import sqljsInit from 'sql.js'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
+import { pickBy } from 'lodash'
 
 const sqljs = sqljsInit({
   locateFile: file => `/js/${file}`
@@ -67,13 +68,19 @@ export default {
             name NOT LIKE 'sqlite_%'
       ORDER BY 1
     `)
-    const tables = runStatement<{ name: string }>(statement).reduce(
-      (prev, { name }) => ({ ...prev, [name]: {} }),
+    const tables: State['tables'] = runStatement<{ name: string }>(statement).reduce(
+      (prev, { name }) => ({
+        ...prev,
+        [name]: {
+          columns: {},
+          new: false
+        }
+      }),
       {}
     )
-    commit('setTables', tables as State['tables'])
+    commit('setTables', tables)
     // set modified preserving modified data for tables that exist
-    commit('setModifications', { ...tables, ...pick(state.modifications, keys(tables)) })
+    commit('setModifications', { ...tables, ...pickBy(state.modifications, (modification, name) => name in tables || modification.new) } as State['tables'])
   },
   async queryColumns ({ state, commit }, tableName: string) {
     if (!state.database) return undefined
@@ -148,7 +155,8 @@ export default {
               }
             }
           }, {})
-        }
+        },
+        new: false
       }
     }
     commit('setModifications', payload)
@@ -162,6 +170,7 @@ export default {
     commit('setModification', {
       tableName,
       modified: {
+        ...state.modifications[tableName],
         columns: {
           ...state.modifications[tableName].columns,
           [columnName]: {
@@ -191,6 +200,33 @@ export default {
   async revertModifiedColumn ({ commit, state }, { tableName, columnName }) {
     commit('setModifiedColumn', { tableName, columnName, column: state.tables[tableName].columns[columnName] })
   },
+  async createModification ({ commit, state }, tableName: string | undefined) {
+    let tableNumber = 0
+    if (tableName === undefined) {
+      do {
+        tableNumber++
+        tableName = `Table${tableNumber}`
+      } while (tableName in state.modifications)
+    }
+    commit('setModification', {
+      tableName,
+      modified: {
+        columns: {},
+        new: true
+      }
+    })
+    return tableName
+  },
+  async renameModification ({ commit, state }, { tableName, newTableName }) {
+    commit(
+      'setModifications',
+      reduce(
+        state.modifications,
+        (previous, modification, name) => ({ ...previous, [name === tableName ? newTableName : name]: modification }),
+        {}
+      )
+    )
+  },
   async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
     if (state.database === undefined) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
@@ -219,6 +255,7 @@ export default {
       state.database.run(sql.join('\n\n'))
       state.database.run('COMMIT;')
     } catch (error) {
+      console.log('has error', error)
       state.database.run('ROLLBACK;')
     }
     if (newTableName) {
@@ -229,6 +266,32 @@ export default {
     }
     await dispatch('queryTables')
     if (!newTableName) await dispatch('queryColumns', tableName)
+  },
+  async createTable ({ state, dispatch, commit }, { tableName, columns }: { tableName: string, columns: { [name: string]: Column }}) {
+    if (state.database === undefined) return undefined
+    if (columns === undefined) columns = state.modifications[tableName].columns
+
+    const sql = []
+    sql.push('BEGIN TRANSACTION;')
+    sql.push(`CREATE TABLE [${tableName}] (
+      ${Object.values(columns).filter(column => !column.drop).map(columnToString).join(', ')}
+    );`)
+    try {
+      state.database.run(sql.join('\n\n'))
+      state.database.run('COMMIT;')
+    } catch (error) {
+      console.log('has error', error)
+      state.database.run('ROLLBACK;')
+    }
+    await dispatch('queryTables')
+    await commit('setModification', {
+      tableName,
+      modified: {
+        ...state.modifications[tableName],
+        new: !(tableName in state.tables)
+      }
+    })
+    await dispatch('queryColumns', tableName)
   },
   async renameTable ({ dispatch, state }, { tableName, newTableName }) {
     if (tableName !== newTableName) {

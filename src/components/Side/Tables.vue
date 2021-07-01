@@ -1,7 +1,7 @@
 <template>
   <header>
     <h4>Tables</h4>
-    <icon icon='plus' />
+    <icon icon='plus' @click="createModification" />
   </header>
   <main>
     <side-table v-for="table in tables" :key="table" :name="table"/>
@@ -13,14 +13,19 @@ import { computed, defineComponent } from 'vue'
 import SideTable from '@/components/Side/Table.vue'
 import Icon from '@/components/Icon.vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   components: { SideTable, Icon },
   setup () {
     const store = useStore()
-    const tables = computed(() => Object.keys(store.state.tables))
+    const router = useRouter()
+    const tables = computed(() => Object.keys(store.state.modifications))
 
-    return { tables }
+    function createModification () {
+      if (store.state.database) store.dispatch('createModification').then(name => router.push(`/table/${name}`))
+    }
+    return { tables, createModification }
   }
 })
 </script>

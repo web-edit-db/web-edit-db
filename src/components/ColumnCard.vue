@@ -134,6 +134,7 @@ export default defineComponent({
         store.commit('setModification', {
           tableName: props.tableName,
           modified: {
+            ...store.state.modifications[props.tableName],
             columns: omit(store.state.modifications[props.tableName].columns, props.columnName)
           }
         })

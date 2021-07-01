@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" @keydown.ctrl.enter="changes.commit">
     <div ref="columnCards">
       <column-card
         v-for="column, key in columns"
@@ -11,16 +11,16 @@
       />
       <footer>
         <form-button
-          value="Commit Changes"
+          :value="isNew ? 'Create Table' : 'Commit Changes'"
           color="green"
           @click="changes.commit"
-          :disabled="!modified"
+          :disabled="!isModified"
         />
         <form-button
           value="Disscard Changes"
           color="red"
           @click="changes.discard"
-          :disabled="!modified"
+          :disabled="!isModified"
         />
         <i class="mx-auto" />
         <form-button
@@ -38,8 +38,8 @@
         sortable
         color="white"
       />
-      <form-button value="Apply Changes" class="commit" color="green" :disabled="!modified" @click="changes.commit" />
-      <form-button value="Discard Changes" class="discard" color="red" :disabled="!modified" @click="changes.discard" />
+      <form-button :value="isNew ? 'Create Table' : 'Commit Changes'" class="commit" color="green" :disabled="!isModified" @click="changes.commit" />
+      <form-button value="Discard Changes" class="discard" color="red" :disabled="!isModified" @click="changes.discard" />
     </nav>
   </div>
 </template>
@@ -70,20 +70,26 @@ export default defineComponent({
     const columnNav = ref<HTMLDivElement>()
 
     const columns = computed({
-      get: () => store.state.modifications[props.name].columns,
+      get: () => store.state.modifications[props.name]?.columns,
       set: (value) => store.commit('setModification', { tableName: props.name, modified: { columns: value } })
     })
-    const modified = computed(() => store.getters.tableModified(props.name))
+    const isModified = computed(() => store.getters.tableModified(props.name))
+    const isNew = computed(() => store.state.modifications[props.name]?.new)
 
     const changes = {
       commit () {
-        store.dispatch('alterTable', { tableName: props.name })
+        if (isNew.value) {
+          store.dispatch('createTable', { tableName: props.name })
+        } else {
+          store.dispatch('alterTable', { tableName: props.name })
+        }
       },
       async discard () {
         await store.commit('setModification', {
           tableName: props.name,
           modified: {
-            columns: store.state.tables[props.name].columns
+            ...store.state.modifications[props.name],
+            columns: store.state.tables[props.name]?.columns ?? {}
           }
         })
       },
@@ -98,7 +104,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      store.dispatch('queryColumns', props.name)
+      if (!isNew.value) store.dispatch('queryColumns', props.name)
 
       function sorted ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
         columns.value = Object.fromEntries(arrayMove(Object.entries(columns.value), oldIndex, newIndex))
@@ -130,7 +136,8 @@ export default defineComponent({
     })
 
     return {
-      modified,
+      isModified,
+      isNew,
       columnCards,
       columnNav,
       changes,
@@ -140,7 +147,7 @@ export default defineComponent({
     }
   },
   beforeRouteEnter (to, _from, next) {
-    if ((to.params.name as string) in store.state.tables) {
+    if ((to.params.name as string) in store.state.modifications) {
       next()
     } else {
       next('/')

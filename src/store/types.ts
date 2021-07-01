@@ -21,22 +21,21 @@ export interface Column {
   drop: boolean
 }
 
+interface Table {
+  columns: {
+    [columnName: string]: Column
+  },
+  new: boolean
+}
+
 export interface State {
   name: string | undefined,
   database: Database | undefined,
   handle: FileSystemHandle | undefined,
   tables: {
-    [tableName: string]: {
-      columns: {
-        [columnName: string]: Column
-      }
-    }
+    [tableName: string]: Table
   },
   modifications: {
-    [tableName: string]: {
-      columns: {
-        [columnName: string]:Column
-      }
-    }
+    [tableName: string]: Table
   }
 }

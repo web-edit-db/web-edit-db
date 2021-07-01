@@ -1,7 +1,9 @@
 <template>
   <router-link :to="{name: 'Table', params: { name }}" custom v-slot="{ navigate, isActive }">
     <div @click.self="navigate" @keyup.self.enter="navigate" tabindex="0" >
-      <input type="text" :value="name" :disabled="!edit" ref="tableNameInput" @keyup.enter="() => edit && button.two()">
+      <input type="text" :value="name" :disabled="!edit" ref="tableNameInput" @keyup.enter="() => edit && button.two()" :class="{
+        'text-yellow-500': $store.state.modifications[name].new
+      }">
       <span v-if="isActive">
         <icon :icon="edit ? 'times' : 'pen'" @click="button.one"/>
         <icon :icon="edit ? 'check' : 'trash'" @click="button.two" />
@@ -12,6 +14,7 @@
 
 <script lang="ts">
 import Icon from '@/components/Icon.vue'
+import omit from 'lodash/omit'
 import { computed, defineComponent, nextTick, ref, toRefs, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -30,6 +33,7 @@ export default defineComponent({
     const store = useStore()
 
     const tables = computed<string[]>(() => store.getters.tableNames)
+    const isNew = computed(() => store.state.modifications[name.value]?.new)
 
     const button = {
       one () {
@@ -38,7 +42,10 @@ export default defineComponent({
       },
       two () {
         if (edit.value && tableNameInput.value) {
-          store.dispatch('renameTable', { tableName: props.name, newTableName: tableNameInput.value.value })
+          store.dispatch(
+            isNew.value ? 'renameModification' : 'renameTable',
+            { tableName: props.name, newTableName: tableNameInput.value.value }
+          )
           edit.value = false
           router.replace({ params: { name: tableNameInput.value.value } })
         } else if (confirm(`Are you sure you want to delete '${name.value}'`)) {
@@ -50,7 +57,9 @@ export default defineComponent({
             ]
             router.push(`/table/${nextName}`)
           } else router.push('/') // no tables so push /
-          store.dispatch('dropTable', name.value)
+          if (isNew.value) {
+            store.commit('setModifications', omit(store.state.modifications, name.value))
+          } else store.dispatch('dropTable', name.value)
         }
       }
     }
