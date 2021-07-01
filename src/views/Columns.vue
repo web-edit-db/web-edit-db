@@ -71,7 +71,13 @@ export default defineComponent({
 
     const columns = computed({
       get: () => store.state.modifications[props.name]?.columns,
-      set: (value) => store.commit('setModification', { tableName: props.name, modified: { columns: value } })
+      set: (value) => store.commit('setModification', {
+        tableName: props.name,
+        modified: {
+          ...store.state.modifications[props.name],
+          columns: value
+        }
+      })
     })
     const isModified = computed(() => store.getters.tableModified(props.name))
     const isNew = computed(() => store.state.modifications[props.name]?.new)
