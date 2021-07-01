@@ -1,16 +1,14 @@
 import { fileOpen, fileSave } from 'browser-fs-access'
 import omit from 'lodash/omit'
-import keys from 'lodash/keys'
-import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import sqljsInit from 'sql.js'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
-import { pickBy } from 'lodash'
+import pickBy from 'lodash/pickBy'
 
 const sqljs = sqljsInit({
-  locateFile: file => `/js/${file}`
+  locateFile: file => `${import.meta.env.BASE_URL}js/${file}`
 })
 
 export default {

@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "deploy": "vite build --base /red-squirrel/ --outDir deploy && cp deploy/index.html deploy/404.html && gh-pages -d deploy"
   },
   "dependencies": {
     "@fontsource/inter": "^4.3.0",
