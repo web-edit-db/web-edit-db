@@ -17,6 +17,7 @@ export default {
       name: prompt('Enter a name for your database', 'unnamed') + '.db',
       database: new (await sqljs).Database()
     })
+    commit('setModifications', {})
   },
   async open ({ commit }) {
     // prompt the user for database file

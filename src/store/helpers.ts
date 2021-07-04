@@ -13,12 +13,13 @@ export function runStatement <T extends ParamsObject> (statement: Statement | st
   return results as T[]
 }
 
-export function columnToString ({ name, type, min, max, unique, primaryKey, notNull, default: default_ }: Column): string {
+export function columnToString ({ name, type, min, max, unique, primaryKey, notNull, default: default_, foreign }: Column): string {
   if (min || max) type = type + (min && max ? `(${min}, ${max})` : `(${max || min})`)
   const parts = [`[${name}] ${type}`]
   if (primaryKey) parts.push('PRIMARY KEY')
   if (unique) parts.push('UNIQUE')
   if (notNull) parts.push('NOT NULL')
   if (default_.enabled && default_.value.length > 0) parts.push(`DEFAULT ${default_.value}`)
+  if (foreign.column && foreign.table) parts.push(`REFERENCES ${foreign.table}(${foreign.column})`)
   return parts.join(' ')
 }

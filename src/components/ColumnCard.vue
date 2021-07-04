@@ -84,6 +84,22 @@
         autocomplete="off"
         :extraClass="{ half: true }"
       />
+      <form-input
+        type="select"
+        label="Forigen Table"
+        :options="tableOptions"
+        :modelValue="column.foreign.table"
+        @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, table: (value === '' ? null : value) } }"
+        autocomplete="off"
+      />
+      <form-input
+        type="select"
+        label="Forigen Column"
+        :modelValue="column.foreign.column"
+        :options="columnOptions"
+        @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, column: (value === '' ? null : value) }}"
+        autocomplete="off"
+      />
     </main>
   </div>
 </template>
@@ -92,9 +108,9 @@
 import FormInput from '@/components/Form/Input.vue'
 import Icon from '@/components/Icon.vue'
 import type { Column } from '@/store/types'
-import { computed, defineComponent } from 'vue'
-import { useStore } from 'vuex'
 import omit from 'lodash/omit'
+import { computed, defineComponent, onMounted, watch, watchEffect } from 'vue'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   props: ['columnName', 'tableName'],
@@ -143,11 +159,48 @@ export default defineComponent({
       }
     }
 
+    function chooseTable (forigenTable: string|null) {
+      if (forigenTable === '') {
+        forigenTable = null
+      } else {
+        store.dispatch('queryColumns', forigenTable)
+      }
+      column.value = { ...column.value, foreign: { ...column.value.foreign, table: forigenTable } }
+    }
+    function chooseColumn (forigenColumn: string|null) {
+      if (forigenColumn === '') forigenColumn = null
+      column.value = { ...column.value, foreign: { ...column.value.foreign, column: forigenColumn } }
+    }
+
+    watchEffect(() =>
+      column.value?.foreign?.table &&
+      store.state.tables[column.value.foreign.table]?.columns &&
+      store.dispatch('queryColumns', column.value.foreign.table)
+    )
+
+    const tableOptions = computed(() => [
+      { text: '-', value: null },
+      ...Object.keys(store.state.tables).map(tableName => ({ text: tableName, value: tableName }))
+    ])
+
+    const columnOptions = computed(() => [
+      { text: '-', value: null },
+      ...(
+        column.value?.foreign.table && store.state.tables[column.value.foreign.table]?.columns
+          ? Object.keys(store.state.tables[column.value.foreign.table].columns).map(tableName => ({ text: tableName, value: tableName }))
+          : []
+      )
+    ])
+
     return {
       modified,
       revert,
       status,
-      column
+      column,
+      tableOptions,
+      chooseTable,
+      columnOptions,
+      chooseColumn
     }
   }
 })

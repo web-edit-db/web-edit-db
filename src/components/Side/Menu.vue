@@ -25,12 +25,14 @@
 import Icon from '@/components/Icon.vue'
 import SideTables from '@/components/Side/Tables.vue'
 import { computed, defineComponent, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 export default defineComponent({
   components: { Icon, SideTables },
   setup () {
     const store = useStore()
+    const router = useRouter()
 
     const menuOpen = ref(true)
 
@@ -44,6 +46,7 @@ export default defineComponent({
     const create = async () => {
       await store.dispatch('create')
       await store.dispatch('queryTables')
+      await router.push('/')
     }
     const save = () => store.dispatch('save')
 
