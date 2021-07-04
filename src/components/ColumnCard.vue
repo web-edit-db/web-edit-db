@@ -108,8 +108,9 @@
 import FormInput from '@/components/Form/Input.vue'
 import Icon from '@/components/Icon.vue'
 import type { Column } from '@/store/types'
+import keys from 'lodash/keys'
 import omit from 'lodash/omit'
-import { computed, defineComponent, watch, watchEffect } from 'vue'
+import { computed, defineComponent, watch } from 'vue'
 import { useStore } from 'vuex'
 
 export default defineComponent({
@@ -173,8 +174,19 @@ export default defineComponent({
     }
 
     watch(
-      () => column.value?.foreign.table,
-      () => column.value?.foreign.table && store.dispatch('queryColumns', column.value.foreign.table)
+      () => column.value?.foreign.table && store.state.tables[column.value.foreign.table],
+      () => {
+        const foreign = column.value?.foreign
+        if (foreign.table) {
+          store.dispatch('queryColumns', foreign.table)
+          if (!(foreign.column ?? '' in store.state.tables[foreign.table]?.columns)) {
+            column.value = {
+              ...column.value,
+              foreign: { ...foreign, column: null }
+            }
+          }
+        }
+      }
     )
 
     const tableOptions = computed(() => [
