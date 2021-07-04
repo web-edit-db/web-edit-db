@@ -8,7 +8,7 @@ import { Column, State } from './types'
 import pickBy from 'lodash/pickBy'
 
 const sqljs = sqljsInit({
-  locateFile: file => `${import.meta.env.BASE_URL}js/${file}`
+  locateFile: file => `${import.meta.env.BASE_URL}assets/${file}`
 })
 
 export default {

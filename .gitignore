@@ -24,4 +24,4 @@ pnpm-debug.log*
 *.sw?
 
 stats.html
-public/js/sql-wasm.wasm
+public/assets/sql-wasm.wasm

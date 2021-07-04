@@ -20,7 +20,11 @@
       "esnext",
       "dom",
       "dom.iterable",
-      "scripthost"
+      "scripthost",
+      "WebWorker"
+    ],
+    "types": [
+      "vite-plugin-pwa/client"
     ]
   },
   "include": [
@@ -32,5 +36,5 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }
