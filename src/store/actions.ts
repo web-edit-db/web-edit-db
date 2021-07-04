@@ -143,7 +143,7 @@ export default {
       [tableName]: {
         columns: {
           ...columns,
-          ...reduce(state.modifications[tableName].columns, (results, column, name) => {
+          ...reduce(state.modifications[tableName]?.columns, (results, column, name) => {
             if (column.drop) return results
             return {
               ...results,
