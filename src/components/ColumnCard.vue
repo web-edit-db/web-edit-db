@@ -109,7 +109,7 @@ import FormInput from '@/components/Form/Input.vue'
 import Icon from '@/components/Icon.vue'
 import type { Column } from '@/store/types'
 import omit from 'lodash/omit'
-import { computed, defineComponent, onMounted, watch, watchEffect } from 'vue'
+import { computed, defineComponent, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 
 export default defineComponent({
@@ -123,7 +123,7 @@ export default defineComponent({
     const store = useStore()
     const column = computed<Column>({
       get () {
-        return store.state.modifications[props.tableName].columns[props.columnName]
+        return store.state.modifications[props.tableName]?.columns[props.columnName]
       },
       set (value) {
         store.commit('setModifiedColumn', {
