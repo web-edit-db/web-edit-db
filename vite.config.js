@@ -48,7 +48,6 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,wasm,png,ico,svg}']
-        // workbox options for generateSW
       }
     }),
     visualizer()
