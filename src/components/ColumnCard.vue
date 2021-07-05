@@ -89,7 +89,7 @@
         label="Foreign Table"
         :options="tableOptions"
         :modelValue="column.foreign.table"
-        @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, table: (value === '' ? null : value) } }"
+        @update:modelValue="value => column = { ...column, foreign: { column: (value === '' ? null : column.foreign.column), table: (value === '' ? null : value) } }"
         autocomplete="off"
       />
       <form-input
