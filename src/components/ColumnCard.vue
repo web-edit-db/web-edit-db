@@ -86,7 +86,7 @@
       />
       <form-input
         type="select"
-        label="Forigen Table"
+        label="Foreign Table"
         :options="tableOptions"
         :modelValue="column.foreign.table"
         @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, table: (value === '' ? null : value) } }"
@@ -94,7 +94,7 @@
       />
       <form-input
         type="select"
-        label="Forigen Column"
+        label="Foreign Column"
         :modelValue="column.foreign.column"
         :options="columnOptions"
         @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, column: (value === '' ? null : value) }}"
@@ -108,7 +108,6 @@
 import FormInput from '@/components/Form/Input.vue'
 import Icon from '@/components/Icon.vue'
 import type { Column } from '@/store/types'
-import keys from 'lodash/keys'
 import omit from 'lodash/omit'
 import { computed, defineComponent, watch } from 'vue'
 import { useStore } from 'vuex'
@@ -160,24 +159,24 @@ export default defineComponent({
       }
     }
 
-    function chooseTable (forigenTable: string|null) {
-      if (forigenTable === '') {
-        forigenTable = null
+    function chooseTable (foreignTable: string|null) {
+      if (foreignTable === '') {
+        foreignTable = null
       } else {
-        store.dispatch('queryColumns', forigenTable)
+        store.dispatch('queryColumns', foreignTable)
       }
-      column.value = { ...column.value, foreign: { ...column.value.foreign, table: forigenTable } }
+      column.value = { ...column.value, foreign: { ...column.value.foreign, table: foreignTable } }
     }
-    function chooseColumn (forigenColumn: string|null) {
-      if (forigenColumn === '') forigenColumn = null
-      column.value = { ...column.value, foreign: { ...column.value.foreign, column: forigenColumn } }
+    function chooseColumn (foreignColumn: string|null) {
+      if (foreignColumn === '') foreignColumn = null
+      column.value = { ...column.value, foreign: { ...column.value.foreign, column: foreignColumn } }
     }
 
     watch(
       () => column.value?.foreign.table && store.state.tables[column.value.foreign.table],
       () => {
         const foreign = column.value?.foreign
-        if (foreign.table) {
+        if (foreign?.table) {
           store.dispatch('queryColumns', foreign.table)
           if (!(foreign.column ?? '' in store.state.tables[foreign.table]?.columns)) {
             column.value = {

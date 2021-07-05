@@ -124,6 +124,9 @@ export default defineComponent({
         }
       )
       sortableColumns.on('sortable:sorted', sorted)
+      sortableColumns.on('drag:start', (event) => {
+        if ((event.originalEvent.target as HTMLElement).tagName === 'INPUT') event.cancel()
+      })
       const sortableNav = new Sortable(
         columnNav.value as HTMLDivElement,
         {
