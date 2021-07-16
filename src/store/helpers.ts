@@ -6,7 +6,7 @@ export const SQLITE_EXTENSIONS = ['.db', '.sqlite', '.sqlite3']
 
 export function runStatement <T extends ParamsObject> (statement: Statement | string): Array<T> {
   if (!store.state.database) return []
-  if (typeof statement === 'string') statement = store.state.database.prepare(statement)
+  if (typeof statement === 'string') statement = store.state.database.connection.prepare(statement)
 
   const results = []
   while (statement.step()) results.push(statement.getAsObject())

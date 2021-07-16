@@ -3,13 +3,11 @@ import { MutationTree } from 'vuex'
 import { State } from './types'
 
 export default {
-  setDatabaseData (state, { name, handle, database }) {
-    state.name = name
-    state.handle = handle
-    state.database = database
+  setSqlJs (state, sqlJs: State['sqlJs']) {
+    state.sqlJs = sqlJs
   },
-  setHandle (state, handle) {
-    state.handle = handle
+  setDatabase (state, database: State['database']) {
+    state.database = database
   },
   setTables (state, tables: State['tables']) {
     state.tables = cloneDeep(tables)

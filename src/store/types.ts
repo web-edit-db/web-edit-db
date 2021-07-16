@@ -1,5 +1,5 @@
 import { FileSystemHandle } from 'browser-fs-access'
-import { Database } from 'sql.js'
+import { Database, SqlJsStatic } from 'sql.js'
 
 export interface Column {
   name: string,
@@ -29,9 +29,12 @@ interface Table {
 }
 
 export interface State {
-  name: string | undefined,
-  database: Database | undefined,
-  handle: FileSystemHandle | undefined,
+  sqlJs: SqlJsStatic|null,
+  database: {
+    name: string,
+    connection: Database,
+    handle?: FileSystemHandle
+  }|null,
   tables: {
     [tableName: string]: Table
   },

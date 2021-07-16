@@ -1,45 +1,44 @@
 import { fileOpen, fileSave } from 'browser-fs-access'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-import sqljsInit from 'sql.js'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
 import pickBy from 'lodash/pickBy'
 
-const sqljs = sqljsInit({
-  locateFile: file => `${import.meta.env.BASE_URL}assets/${file}`
-})
-
 export default {
-  async create ({ commit }) {
-    commit('setDatabaseData', {
-      name: prompt('Enter a name for your database', 'unnamed') + '.db',
-      database: new (await sqljs).Database()
-    })
-    commit('setModifications', {})
+  async create ({ commit, state }) {
+    if (state.sqlJs) {
+      commit('setDatabase', {
+        name: prompt('Enter a name for your database', 'unnamed') + '.db',
+        database: new state.sqlJs.Database()
+      })
+      commit('setModifications', {})
+    }
   },
-  async open ({ commit }) {
-    // prompt the user for database file
-    const file = await fileOpen({
-      mimeTypes: ['application/vnd.sqlite3'],
-      extensions: SQLITE_EXTENSIONS
-    })
-    // turn file into array
-    const fileBufferArray = new Uint8Array(await file.arrayBuffer())
-    // commit the changes
-    commit('setDatabaseData', {
-      name: file.handle?.name ?? file.name,
-      handle: file.handle,
-      database: new (await sqljs).Database(fileBufferArray)
-    })
+  async open ({ commit, state }) {
+    if (state.sqlJs) {
+      // prompt the user for database file
+      const file = await fileOpen({
+        mimeTypes: ['application/vnd.sqlite3'],
+        extensions: SQLITE_EXTENSIONS
+      })
+      // turn file into array
+      const fileBufferArray = new Uint8Array(await file.arrayBuffer())
+      // commit the changes
+      commit('setDatabase', {
+        name: file.handle?.name ?? file.name,
+        handle: file.handle,
+        database: new state.sqlJs.Database(fileBufferArray)
+      })
+    }
   },
   async save ({ state, commit }) {
     if (state.database) {
       // create new file from the database
       const file = new File(
-        [state.database.export()],
-        state.name ?? 'database.db',
+        [state.database.connection.export()],
+        state.database.name,
         { type: 'application/vnd.sqlite3' }
       )
 
@@ -50,7 +49,7 @@ export default {
           extensions: SQLITE_EXTENSIONS,
           fileName: file.name
         },
-        state.handle,
+        state.database.handle,
         false
       )
 
@@ -60,7 +59,7 @@ export default {
 
   async queryTables ({ state, commit }) {
     if (!state.database) return undefined
-    const statement = state.database.prepare(`
+    const statement = state.database.connection.prepare(`
     SELECT name
         FROM sqlite_master
       WHERE type = 'table' AND
@@ -83,7 +82,7 @@ export default {
   },
   async queryColumns ({ state, commit }, tableName: string) {
     if (!state.database) return undefined
-    const statement = state.database.prepare(`
+    const statement = state.database.connection.prepare(`
     SELECT info.name AS name,
            info.type AS type,
            info.[notnull] AS [notNull],
@@ -227,7 +226,7 @@ export default {
     )
   },
   async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
-    if (state.database === undefined) return undefined
+    if (!state.database) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
     const columnsUpdated = Object.entries(columns).filter(([, column]) => !column.drop && !column.new).map(([old, column]) => ({ old, new: column.name }))
 
@@ -251,11 +250,11 @@ export default {
     }
     sql.push(`DROP TABLE [${tempTableName}]`)
     try {
-      state.database.run(sql.join('\n\n'))
-      state.database.run('COMMIT;')
+      state.database.connection.run(sql.join('\n\n'))
+      state.database.connection.run('COMMIT;')
     } catch (error) {
       console.log('has error', error)
-      state.database.run('ROLLBACK;')
+      state.database.connection.run('ROLLBACK;')
     }
     if (newTableName) {
       commit('setModifications', {
@@ -267,7 +266,7 @@ export default {
     if (!newTableName) await dispatch('queryColumns', tableName)
   },
   async createTable ({ state, dispatch, commit }, { tableName, columns }: { tableName: string, columns: { [name: string]: Column }}) {
-    if (state.database === undefined) return undefined
+    if (!state.database) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
 
     const sql = []
@@ -276,11 +275,11 @@ export default {
       ${Object.values(columns).filter(column => !column.drop).map(columnToString).join(', ')}
     );`)
     try {
-      state.database.run(sql.join('\n\n'))
-      state.database.run('COMMIT;')
+      state.database.connection.run(sql.join('\n\n'))
+      state.database.connection.run('COMMIT;')
     } catch (error) {
       console.log('has error', error)
-      state.database.run('ROLLBACK;')
+      state.database.connection.run('ROLLBACK;')
     }
     await dispatch('queryTables')
     await commit('setModification', {
@@ -303,7 +302,7 @@ export default {
   },
   async dropTable ({ state, dispatch }, tableName) {
     if (!state.database) return
-    state.database.run(`DROP TABLE ${tableName}`)
+    state.database.connection.run(`DROP TABLE ${tableName}`)
     await dispatch('queryTables')
   }
 } as ActionTree<State, State>
