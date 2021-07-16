@@ -5,6 +5,7 @@ import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
 import pickBy from 'lodash/pickBy'
+import router from '@/router'
 
 export default {
   async create ({ commit, state }) {
@@ -14,9 +15,10 @@ export default {
         database: new state.sqlJs.Database()
       })
       commit('setModifications', {})
+      router.push('/')
     }
   },
-  async open ({ commit, state }) {
+  async open ({ commit, state, dispatch }) {
     if (state.sqlJs) {
       // prompt the user for database file
       const file = await fileOpen({
@@ -25,12 +27,17 @@ export default {
       })
       // turn file into array
       const fileBufferArray = new Uint8Array(await file.arrayBuffer())
+      // create the connection
+      const connection = new state.sqlJs.Database(fileBufferArray)
+
       // commit the changes
       commit('setDatabase', {
-        name: file.handle?.name ?? file.name,
-        handle: file.handle,
-        database: new state.sqlJs.Database(fileBufferArray)
+        connection,
+        name: file.name,
+        handle: file.handle
       })
+      dispatch('queryTables')
+      router.push('/')
     }
   },
   async save ({ state, commit }) {
@@ -53,7 +60,10 @@ export default {
         false
       )
 
-      commit('setHandle', handle)
+      commit('setDatabase', {
+        ...state.database,
+        handle
+      })
     }
   },
 
