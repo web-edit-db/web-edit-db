@@ -6,7 +6,7 @@
       custom
     >
       <h1 @click="navigate">
-        <img src="@/assets/logo.svg">
+        <img src="@/assets/logo.png">
         <span>Web Edit DB</span>
       </h1>
     </router-link>
@@ -56,7 +56,7 @@ export default defineComponent({
 <style scoped lang="postcss">
 nav {
   @apply bg-white;
-  @apply h-14 px-6;
+  @apply h-14 px-3;
   @apply border-b-2 border-purple-500;
   @apply shadow-lg;
   @apply flex justify-between items-center;
@@ -64,13 +64,14 @@ nav {
 
 nav h1 {
   @apply flex items-center;
-  @apply text-xl;
+  @apply text-2xl;
   @apply text-purple-500;
+  @apply font-light;
   @apply select-none;
   @apply cursor-pointer;
 
   & img {
-    @apply h-10;
+    @apply h-14;
   }
 }
 
