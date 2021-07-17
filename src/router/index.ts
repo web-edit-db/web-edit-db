@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
+import store from '@/store'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/table/:name',
     name: 'Table',
     component: () => import('@/views/Columns.vue'),
+    meta: {
+      title: () => `Table - ${router.currentRoute.value.params.name}`
+    },
     props: true
   }
 ]
@@ -28,6 +32,7 @@ const router = createRouter({
   routes
 })
 
+// prevent the user from accidentally leaving the site on backspace key
 let backspacePressed = false
 
 window.addEventListener('keydown', (event) => (backspacePressed = event.key === 'Backspace'))
@@ -41,6 +46,15 @@ router.beforeEach((_to, _from, next) => {
     next()
   }
   backspacePressed = false
+})
+
+// page title control
+router.afterEach((to) => {
+  const titleParts = []
+  if (store.state.database) titleParts.push(store.state.database.name)
+  const titleMeta = (typeof to.meta.title === 'function' ? to.meta.title() : to.meta.title)
+  titleParts.push(titleMeta || to.name)
+  document.title = `${titleParts.join(' / ')} - Web Edit DB`
 })
 
 export default router
