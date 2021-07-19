@@ -10,12 +10,15 @@ import router from '@/router'
 export default {
   async create ({ commit, state }) {
     if (state.sqlJs) {
-      commit('setDatabase', {
-        name: prompt('Enter a name for your database', 'unnamed') + '.db',
-        database: new state.sqlJs.Database()
-      })
-      commit('setModifications', {})
-      router.push('/')
+      const fileName = prompt('Enter a name for your database', 'unnamed')
+      if (fileName) {
+        commit('setDatabase', {
+          name: fileName + '.db',
+          database: new state.sqlJs.Database()
+        })
+        commit('setModifications', {})
+        router.push('/')
+      }
     }
   },
   async open ({ commit, state, dispatch }) {
