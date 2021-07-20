@@ -1,26 +1,29 @@
 <template>
-  <div class="wrapper" @keydown.ctrl.enter="changes.commit">
+  <div
+    class="wrapper"
+    @keydown.ctrl.enter="changes.commit"
+  >
     <div ref="columnCards">
       <column-card
         v-for="column, key in columns"
         :key="`Column ${key}`"
-        :columnName="key"
-        :tableName="name"
         :ref="el => columnRefs[key] = el?.$el"
+        :column-name="key"
+        :table-name="name"
         sortable
       />
       <footer>
         <form-button
           :value="isNew ? 'Create Table' : 'Commit Changes'"
           color="green"
-          @click="changes.commit"
           :disabled="!isModified"
+          @click="changes.commit"
         />
         <form-button
           value="Disscard Changes"
           color="red"
-          @click="changes.discard"
           :disabled="!isModified"
+          @click="changes.discard"
         />
         <i class="mx-auto" />
         <form-button
@@ -34,12 +37,24 @@
         v-for="column, key in columns"
         :key="`Button ${key}`"
         :value="column.new ? column.name : key"
-        @click="() => focusColumn(key)"
         sortable
         color="white"
+        @click="() => focusColumn(key)"
       />
-      <form-button :value="isNew ? 'Create Table' : 'Commit Changes'" class="commit" color="green" :disabled="!isModified" @click="changes.commit" />
-      <form-button value="Discard Changes" class="discard" color="red" :disabled="!isModified" @click="changes.discard" />
+      <form-button
+        :value="isNew ? 'Create Table' : 'Commit Changes'"
+        class="commit"
+        color="green"
+        :disabled="!isModified"
+        @click="changes.commit"
+      />
+      <form-button
+        value="Discard Changes"
+        class="discard"
+        color="red"
+        :disabled="!isModified"
+        @click="changes.discard"
+      />
     </nav>
   </div>
 </template>
@@ -60,7 +75,19 @@ export default defineComponent({
     ColumnCard,
     FormButton
   },
-  props: ['name'],
+  beforeRouteEnter (to, _from, next) {
+    if ((to.params.name as string) in store.state.modifications) {
+      next()
+    } else {
+      next('/')
+    }
+  },
+  props: {
+    name: {
+      type: String,
+      required: true
+    }
+  },
   setup (props) {
     const store = useStore()
 
@@ -153,13 +180,6 @@ export default defineComponent({
       columns,
       focusColumn,
       columnRefs
-    }
-  },
-  beforeRouteEnter (to, _from, next) {
-    if ((to.params.name as string) in store.state.modifications) {
-      next()
-    } else {
-      next('/')
     }
   }
 })
