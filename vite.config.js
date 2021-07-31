@@ -93,7 +93,7 @@ export default defineConfig({
             type: 'image/png'
           }
         ],
-        theme_color: colors.purple[500],
+        theme_color: colors.purple[600],
         background_color: '#ffffff',
         display: 'browser'
       },

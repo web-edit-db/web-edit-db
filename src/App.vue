@@ -142,7 +142,7 @@ export default defineComponent({
   @apply h-0.5;
   @apply w-full;
   @apply max-w-0;
-  @apply bg-purple-600;
+  @apply bg-primary;
   transition: max-width 200ms linear;
 
   &.error {

@@ -1,10 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const colors = require('tailwindcss/colors')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultTheme = require('tailwindcss/defaultTheme')
+const plugin = require('tailwindcss/plugin')
 
 module.exports = {
-  mode: 'jit',
   purge: [
     './public/**/*.html',
     './src/**/*.{js,jsx,ts,tsx,vue}'
@@ -16,7 +14,11 @@ module.exports = {
         sans: ['Inter', ...defaultTheme.fontFamily.sans]
       },
       colors: {
-        gray: colors.blueGray
+        gray: colors.blueGray,
+        primary: {
+          DEFAULT: colors.purple['600'],
+          ...colors.purple
+        }
       },
       boxShadow: {
         'inner-md': 'inset 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -27,9 +29,12 @@ module.exports = {
     }
   },
   variants: {
-    extend: {}
+    extend: {
+      backgroundColor: ['active'],
+      borderColor: ['active']
+    }
   },
   plugins: [
-    require('@tailwindcss/forms')
+    // require('@tailwindcss/forms')
   ]
 }

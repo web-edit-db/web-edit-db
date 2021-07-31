@@ -57,7 +57,7 @@ export default defineComponent({
 nav {
   @apply bg-white;
   @apply h-14 px-3;
-  @apply border-b-2 border-purple-500;
+  @apply border-b-2 border-primary-500;
   @apply shadow-lg;
   @apply flex justify-between items-center;
 }
@@ -65,7 +65,7 @@ nav {
 nav h1 {
   @apply flex items-center;
   @apply text-2xl;
-  @apply text-purple-500;
+  @apply text-primary-500;
   @apply font-light;
   @apply select-none;
   @apply cursor-pointer;
