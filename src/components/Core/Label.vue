@@ -46,21 +46,22 @@ export default defineComponent({
 * {
   @apply shadow;
   @apply rounded-md;
-  @apply outline-none;
-  @apply flex justify-center items-center;
-  @apply border-2;
+  @apply focus:outline-none;
+  @apply flex justify-start items-center;
+  @apply border;
+  @apply leading-none;
 
   /*** size ***/
-  /* sm */ &.sm { @apply px-1 h-7 gap-1; }
-  /* md */ @apply px-2 h-10 gap-2;
-  /* lg */ &.lg { @apply px-3 h-12 gap-3 text-lg; }
+  /* sm */ &.sm { @apply px-1 h-7 gap-0.5; }
+  /* md */ @apply px-2 h-10 gap-1 whitespace-nowrap;
+  /* lg */ &.lg { @apply px-3 h-12 gap-2 text-lg; }
 
   /*** variant ***/
   /* default */
   & {
     @apply text-white;
-    &:hover { @apply bg-gray-700 border-gray-700; }
-    &, &:active { @apply bg-gray-600 border-gray-600; }
+    &:hover { @apply bg-gray-500 border-gray-500; }
+    &, &:active { @apply bg-gray-400 border-gray-400; }
     &:focus { @apply ring-4 ring-gray-400 ring-opacity-50; }
   }
   /* primary */

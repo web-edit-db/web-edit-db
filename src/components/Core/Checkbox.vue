@@ -8,12 +8,15 @@
     :text="$attrs.text"
     :hollow="$attrs.hollow"
     :tabindex="$attrs.disabled ? -1 : 0"
+    v-bind="labelAttrs"
     @keyup.enter="event => event.target.click()"
   >
     <template #default="{ props }">
       <input
         type="checkbox"
         :disabled="$attrs.disabled"
+        :checked="modelValue"
+        @change="update"
       >
       <span class="box">
         <check-icon class="text-black" />
@@ -37,9 +40,23 @@ export default defineComponent({
     VLabel
   },
   inheritAttrs: false,
+  props: {
+    labelAttrs: {
+      type: Object,
+      default: () => ({})
+    },
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
   emits: ['update:modelValue'],
-  setup () {
-    return { }
+  setup (_, { emit }) {
+    return {
+      update: (event: Event & { target: HTMLInputElement }) => {
+        emit('update:modelValue', event.target.checked)
+      }
+    }
   }
 })
 </script>
@@ -96,7 +113,7 @@ label {
   & .box svg { @apply hidden; stroke-width: 2.5; }
   & input:checked + .box svg { @apply block; }
 
-  &.disabled { @apply opacity-75 cursor-not-allowed; }
+  &.disabled { @apply opacity-75 cursor-not-allowed select-none outline-none; }
 
 }
 </style>

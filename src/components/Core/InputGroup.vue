@@ -23,19 +23,34 @@ export default defineComponent({
     vertical: {
       type: Boolean,
       default: false
+    },
+    modelValue: {
+      type: Object,
+      default: () => ({})
+    },
+    modelValueMapping: {
+      type: Array as PropType<('string')[]>,
+      default: () => ([])
     }
   },
-  setup (props, { slots }) {
+  emits: ['update:modelValue'],
+  setup (props, { slots, emit }) {
     return () => h(
       'div',
       { class: { vertical: props.vertical } },
       slots.default?.().map(
-        child => h(child, {
-          size: props.size,
-          variant: child.props?.variant ?? props.variant,
-          hollow: child.props?.hollow ?? props.hollow,
-          disabled: props.disabled || child.props?.disabled
-        })
+        (child, i) => {
+          return h(child, {
+            size: props.size,
+            variant: child.props?.variant ?? props.variant,
+            hollow: child.props?.hollow ?? props.hollow,
+            disabled: props.disabled || child.props?.disabled,
+            modelValue: props.modelValue[props.modelValueMapping[i] ?? i],
+            'onUpdate:modelValue': (typeof props.modelValue !== 'undefined' && ((value?: string|number|boolean) =>
+              emit('update:modelValue', { ...props.modelValue, [props.modelValueMapping[i] ?? i]: value })
+            ))
+          })
+        }
       )
     )
   }
@@ -47,40 +62,20 @@ div {
   @apply flex;
 
   & > :deep(*) {
-    @apply rounded-none border-l border-r;
-    &:focus {
-      @apply z-10;
-    }
-
-    &:first-child {
-      @apply rounded-l-md;
-      @apply border-l-2;
-    }
-
-    &:last-child {
-      @apply rounded-r-md;
-      @apply border-r-2;
-    }
+    @apply rounded-none;
+    &:focus { @apply z-10; }
+    &:first-child { @apply rounded-l-md; }
+    &:last-child { @apply rounded-r-md; }
   }
 
   &.vertical {
     @apply flex-col;
 
     & > :deep(*) {
-      @apply rounded-none border-2 border-t border-b;
-      &:focus {
-        @apply z-10;
-      }
-
-      &:first-child {
-        @apply rounded-t-md;
-        @apply border-t-2;
-      }
-
-      &:last-child {
-        @apply rounded-b-md;
-        @apply border-b-2;
-      }
+      @apply rounded-none;
+      &:focus { @apply z-10; }
+      &:first-child { @apply rounded-t-md; }
+      &:last-child { @apply rounded-b-md; }
     }
   }
 }

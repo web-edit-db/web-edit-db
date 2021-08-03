@@ -1,4 +1,51 @@
 <template>
+  <main class="grid-cols-5">
+    <span class="col-span-full">
+      Number
+    </span>
+    <template
+      v-for="attrs, i in [
+        { size: 'sm' },
+        {},
+        { hollow: true },
+        { size: 'lg' },
+      ]"
+      :key="`${i}-label-outer`"
+    >
+      <template
+        v-for="variant, j in [
+          '',
+          'primary',
+          'success',
+          'error',
+          'warning',
+        ]"
+        :key="`${i}-${j}-label-inner`"
+      >
+        <v-number
+          v-model="testNumbers[0][0]"
+          :variant="variant"
+          v-bind="attrs"
+        />
+      </template>
+    </template>
+    <!-- <v-number /> -->
+  </main>
+  <main>
+    <span class="col-span-full">
+      Label
+    </span>
+    <v-field
+      label="field test"
+      :input="'input'"
+      :issues="[
+        { message: 'error message', type: 'error' },
+        { message: 'warning message', type: 'warning' },
+        { message: 'success message', type: 'success' },
+      ]"
+      required
+    />
+  </main>
   <main class="grid-cols-6">
     <span class="col-span-full">
       Label
@@ -8,7 +55,6 @@
         { size: 'sm' },
         {},
         { hollow: true },
-        { disabled: true },
         { size: 'lg' },
       ]"
       :key="`${i}-label-outer`"
@@ -57,11 +103,15 @@
         :key="`${i}-${j}-group-outer`"
       >
         <v-group
+          v-model="testGroups[i][j]"
           v-bind="attrs"
           :variant="variant"
         >
           <v-checkbox />
-          <v-input placeholder="Hey im in a group" />
+          <v-input
+            placeholder="Hey im in a group"
+          />
+          <v-label text="group" />
         </v-group>
       </template>
     </template>
@@ -75,11 +125,8 @@
     <!-- default -->
     <template
       v-for="attrs, i in [
-        { size: 'sm' },
         {},
-        { hollow: true },
         { disabled: true },
-        { size: 'lg' },
       ]"
       :key="`${i}-checkbox-outer`"
     >
@@ -95,6 +142,7 @@
         :key="`${i}-${j}-checkbox-outer`"
       >
         <v-checkbox
+          v-model="testChecks[i][j]"
           text="Hello, World"
           :variant="variant"
           v-bind="attrs"
@@ -108,11 +156,8 @@
     </span>
     <template
       v-for="attrs, i in [
-        { size: 'sm' },
         {},
-        { hollow: true },
         { disabled: true },
-        { size: 'lg' },
       ]"
       :key="`${i}-button-outer`"
     >
@@ -141,11 +186,9 @@
     </span>
     <template
       v-for="attrs, i in [
-        { size: 'sm' },
         { },
         { placeholder: 'placeholder test!' },
         { disabled: true },
-        { size: 'lg' },
       ]"
       :key="`${i}-input-outer`"
     >
@@ -176,6 +219,8 @@ import VInput from '@/components/Core/Input.vue'
 import VCheckbox from '@/components/Core/Checkbox.vue'
 import VGroup from '@/components/Core/InputGroup.vue'
 import VLabel from '@/components/Core/Label.vue'
+import VField from '@/components/Core/Field.vue'
+import VNumber from '@/components/Core/Number.vue'
 
 export default defineComponent({
   components: {
@@ -183,18 +228,73 @@ export default defineComponent({
     VInput,
     VCheckbox,
     VGroup,
-    VLabel
+    VLabel,
+    VField,
+    VNumber
   },
   setup () {
     const size = ref(10)
     const testInputs = ref([
       ['0-0', '0-1', '0-2', '0-3', '0-4'],
-      ['1-0', '1-1', '1-2', '1-3', '1-4'],
       ['', '', '', '', ''],
-      ['', '', '', '', ''],
-      ['4-0', '4-1', '4-2', '4-3', '4-4']
+      ['2-0', '2-1', '2-2', '2-3', '2-4']
     ])
-    return { size, testInputs }
+    const testChecks = ref([
+      [true, true, true, true],
+      [true, true, true, true]
+    ])
+    const testGroups = ref([
+      [
+        [true, '0-0', undefined],
+        [true, '0-1', undefined],
+        [true, '0-2', undefined],
+        [true, '0-3', undefined],
+        [true, '0-4', undefined]
+      ],
+      [
+        [true, '1-0', undefined],
+        [true, '1-1', undefined],
+        [true, '1-2', undefined],
+        [true, '1-3', undefined],
+        [true, '1-4', undefined]
+      ],
+      [
+        [true, '2-0', undefined],
+        [true, '2-1', undefined],
+        [true, '2-2', undefined],
+        [true, '2-3', undefined],
+        [true, '2-4', undefined]
+      ],
+      [
+        [true, '3-0', undefined],
+        [true, '3-1', undefined],
+        [true, '3-2', undefined],
+        [true, '3-3', undefined],
+        [true, '3-4', undefined]
+      ],
+      [
+        [true, '4-0', undefined],
+        [true, '4-1', undefined],
+        [true, '4-2', undefined],
+        [true, '4-3', undefined],
+        [true, '4-4', undefined]
+      ],
+      [
+        [true, '5-0', undefined],
+        [true, '5-1', undefined],
+        [true, '5-2', undefined],
+        [true, '5-3', undefined],
+        [true, '5-4', undefined]
+      ]
+    ])
+    const testNumbers = [
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0]
+    ]
+    return { size, testInputs, testChecks, testGroups, testNumbers }
   }
 })
 </script>
