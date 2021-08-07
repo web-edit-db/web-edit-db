@@ -20,7 +20,6 @@
       <component
         :is="`v-${input}`"
         v-bind="inputProps"
-        u
         :model-value="modelValue"
         :variant="status"
         @update:modelValue="value => $emit('update:modelValue', value)"
@@ -41,13 +40,15 @@ import { computed, defineComponent, PropType } from 'vue'
 import VCheckbox from './Checkbox.vue'
 import VInput from './Input.vue'
 import VNumber from './Number.vue'
+import VSuggest from './Suggest.vue'
 
 export default defineComponent({
   name: 'VField',
   components: {
     VCheckbox,
     VInput,
-    VNumber
+    VNumber,
+    VSuggest
   },
   props: {
     label: {
@@ -59,7 +60,7 @@ export default defineComponent({
       default: false
     },
     input: {
-      type: String as PropType<'input'|'checkbox'|'number'>,
+      type: String as PropType<'input'|'checkbox'|'number'|'select'>,
       default: 'input'
     },
     inputProps: {
@@ -112,6 +113,8 @@ label.field {
 
   & > span {
     @apply px-1;
+    @apply block;
+    @apply whitespace-pre;
 
     &.issue {
       @apply leading-tight;

@@ -9,7 +9,7 @@
     :hollow="$attrs.hollow"
     :tabindex="$attrs.disabled ? -1 : 0"
     v-bind="labelAttrs"
-    @keyup.enter="event => event.target.click()"
+    @keyup.enter.exact="event => event.target.click()"
   >
     <template #default="{ props }">
       <input
@@ -70,7 +70,7 @@ label {
   }
 
   /***** box *****/
-  & .box {
+  & > .box {
     @apply flex justify-center items-center;
     @apply rounded;
     @apply border-2;
@@ -85,27 +85,27 @@ label {
   /*** variants ***/
   /* default */
   & {
-    &:hover .box { @apply border-gray-700; }
-    & .box, &:active .box { @apply border-gray-600; }
+    &:hover > .box { @apply border-gray-500; }
+    & > .box, &:active > .box { @apply border-gray-400; }
   }
   /* primary */
   &.primary {
-    &:hover .box { @apply border-primary; }
-    & .box, &:active .box { @apply border-primary-600; }
+    &:hover > .box { @apply border-primary-600; }
+    & > .box, &:active > .box { @apply border-primary; }
   }
   /* success */
-  &.success {
-    &:hover .box { @apply border-green-700; }
+  &.success > {
+    &:hover > .box { @apply border-green-700; }
     & .box, &:active .box { @apply border-green-600; }
   }
   /* error */
   &.error {
-    &:hover .box { @apply border-red-700; }
+    &:hover > .box { @apply border-red-700; }
     & .box, &:active .box { @apply border-red-600; }
   }
   /* warning */
   &.warning {
-    &:hover .box { @apply border-yellow-700; }
+    &:hover > .box { @apply border-yellow-700; }
     & .box, &:active .box { @apply border-yellow-600; }
   }
 
@@ -113,7 +113,7 @@ label {
   & .box svg { @apply hidden; stroke-width: 2.5; }
   & input:checked + .box svg { @apply block; }
 
-  &.disabled { @apply opacity-75 cursor-not-allowed select-none outline-none; }
+  &.disabled { @apply opacity-50 cursor-not-allowed select-none outline-none pointer-events-none; }
 
 }
 </style>

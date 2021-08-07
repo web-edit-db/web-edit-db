@@ -43,7 +43,7 @@ input {
   @apply w-full;
 
   &:disabled, &:disabled:hover {
-    @apply opacity-75;
+    @apply opacity-50;
     @apply cursor-not-allowed;
     @apply bg-gray-300;
   }

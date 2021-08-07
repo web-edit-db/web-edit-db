@@ -4,6 +4,10 @@ import { defineComponent, h, PropType } from 'vue'
 export default defineComponent({
   name: 'VGroup',
   props: {
+    tag: {
+      type: String,
+      default: 'div'
+    },
     variant: {
       type: String as PropType<'default' | 'primary' | 'success' | 'error' | 'warning'| 'text'>,
       default: 'default'
@@ -36,7 +40,7 @@ export default defineComponent({
   emits: ['update:modelValue'],
   setup (props, { slots, emit }) {
     return () => h(
-      'div',
+      props.tag,
       { class: { vertical: props.vertical } },
       slots.default?.().map(
         (child, i) => {
@@ -58,7 +62,7 @@ export default defineComponent({
 </script>
 
 <style scoped lang="postcss">
-div {
+* {
   @apply flex;
 
   & > :deep(*) {
@@ -66,6 +70,13 @@ div {
     &:focus { @apply z-10; }
     &:first-child { @apply rounded-l-md; }
     &:last-child { @apply rounded-r-md; }
+  }
+
+  & > :deep(*) {
+    & .rounded-within { @apply rounded-none; }
+    & .rounded-within:focus { @apply z-10; }
+    &:first-child .rounded-within { @apply rounded-l-md; }
+    &:last-child .rounded-within { @apply rounded-r-md; }
   }
 
   &.vertical {
@@ -76,6 +87,13 @@ div {
       &:focus { @apply z-10; }
       &:first-child { @apply rounded-t-md; }
       &:last-child { @apply rounded-b-md; }
+    }
+
+    & > :deep(*) {
+      & .rounded-within { @apply rounded-none; }
+      & .rounded-within:focus { @apply z-10; }
+      &:first-child .rounded-within { @apply rounded-t-md; }
+      &:last-child .rounded-within { @apply rounded-b-md; }
     }
   }
 }

@@ -1,0 +1,8 @@
+export { default as VButton } from './Button.vue'
+export { default as VCheckbox } from './Checkbox.vue'
+export { default as VField } from './Field.vue'
+export { default as VInput } from './Input.vue'
+export { default as VGroup } from './Group.vue'
+export { default as VLabel } from './Label.vue'
+export { default as VNumber } from './Number.vue'
+export { default as VSuggest } from './Suggest.vue'

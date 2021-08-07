@@ -5,8 +5,8 @@
       ref="input"
       :value="modelValue"
       @input="event => add(0)"
-      @keydown.prevent.up="event => add(1)"
-      @keydown.prevent.down="event => add(-1)"
+      @keydown.prevent.up.exact="event => add(1)"
+      @keydown.prevent.down.exact="event => add(-1)"
     />
     <!-- @input="event => $emit('update:ModelValue', +event.target.value || 1)" -->
     <v-button
@@ -28,7 +28,7 @@
 import { defineComponent, PropType, ref } from 'vue'
 import VInput from './Input.vue'
 import VButton from './Button.vue'
-import VInputGroup from './InputGroup.vue'
+import VInputGroup from './Group.vue'
 import { PlusIcon, MinusIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
@@ -69,7 +69,7 @@ export default defineComponent({
             input.value.$el.value = +input.value.$el.value + value
           }
         }
-        emit('update:modelValue', input.value.$el.value ? +input.value.$el.value : null)
+        emit('update:modelValue', input.value.$el.value && !isNaN(+input.value.$el.value) ? +input.value.$el.value : null)
       }
     }
     return { add, input }

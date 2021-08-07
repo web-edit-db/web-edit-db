@@ -1,8 +1,7 @@
 <template>
   <v-label
     tag="button"
-    v-bind="$attrs"
-    @keyup.enter="event => event.target.click()"
+    @keyup.enter.exact="event => event.target.click()"
   >
     <template
       #default="{ props }"
@@ -29,7 +28,7 @@ export default defineComponent({
 
 <style scoped lang="postcss">
 button:disabled, button:disabled:hover {
-  @apply opacity-75;
+  @apply opacity-50;
   @apply cursor-not-allowed;
 }
 </style>
