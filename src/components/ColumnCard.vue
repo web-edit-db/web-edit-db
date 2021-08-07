@@ -1,125 +1,154 @@
 <template>
-  <div>
+  <main class="column-card">
     <header>
-      <span class="name">{{ column.new ? column.name : columnName }}</span>
-      <span :class="{
-        'text-blue-500': status === 'modified',
-        'text-green-700': status === 'orignal',
-        'text-yellow-600': status === 'new',
-        'text-red-600': status === 'delete',
-        'status': true
-      }">
+      <span class="header header-name">
+        {{ column.new ? column.name : columnName }}
+      </span>
+      <span
+        :class="{
+          'text-blue-500': status === 'modified',
+          'text-green-700': status === 'orignal',
+          'text-yellow-600': status === 'new',
+          'text-red-600': status === 'delete',
+          'header header-status': true,
+        }"
+      >
         {{ status }}
       </span>
-      <span class="controlls">
-        <icon :icon="column.drop ? 'trash-restore' : 'trash'" @click="column.new ? revert() : column = {...column, drop: !column.drop}"/>
-        <icon icon='undo-alt' @click="revert"/>
+      <span class="header header-controlls">
+        <v-button
+          variant="text"
+          @click="column.new ? revert() : column = { ...column, drop: !column.drop } "
+        >
+          <component
+            :is="column.drop ? 'trash-off-icon' : 'trash-icon'"
+            class="p-0.5"
+          />
+        </v-button>
       </span>
     </header>
-    <main>
-      <form-input
-        type="text"
-        label="Name"
-        :modelValue="column.name"
-        @update:modelValue="value => column = {...column, name: value}"
-        autocomplete="off"
-      />
-      <form-input
-        type="text"
-        label="Type"
-        :modelValue="column.type"
-        @update:modelValue="value => column = {...column, type: value}"
-        autocomplete="off"
-      />
-      <form-input
-        type="checkbox"
-        label="Not Null"
-        :modelValue="column.notNull"
-        @update:modelValue="value => column = {...column, notNull: value}"
-      />
-      <form-input
-        type="checkbox"
-        label="Primary Key"
-        :modelValue="column.primaryKey"
-        @update:modelValue="value => column = {...column, primaryKey: value}"
-      />
-      <form-input
-        type="checkbox"
-        label="Unique"
-        :modelValue="column.unique"
-        @update:modelValue="value => column = {...column, unique: value}"
-      />
-      <label class="default">
-        <span>Default</span>
-        <!-- <div class="group "> -->
-        <span class="group">
-          <form-input
-            type="checkbox"
-            :modelValue="column.default.enabled"
-            @update:modelValue="value => column = {...column, default: { enabled: value, value: column.default.value } }"
-            autocomplete="off"
-          />
-          <form-input
-            type="text"
-            :modelValue="column.default.value ?? ''"
-            @update:modelValue="value => column = {...column, default: { value, enabled: column.default.enabled } }"
-            autocomplete="off"
-          />
-        </span>
-        <!-- </div> -->
-      </label>
-      <form-input
-        type="number"
-        label="Min"
-        :modelValue="column.min"
-        @update:modelValue="value => column = {...column, min: value}"
-        autocomplete="off"
-        :extraClass="{ half: true }"
-      />
-      <form-input
-        type="number"
-        label="Max"
-        :modelValue="column.max"
-        @update:modelValue="value => column = {...column, max: value}"
-        autocomplete="off"
-        :extraClass="{ half: true }"
-      />
-      <form-input
-        type="select"
-        label="Foreign Table"
-        :options="tableOptions"
-        :modelValue="column.foreign.table"
-        @update:modelValue="value => column = { ...column, foreign: { column: (value === '' ? null : column.foreign.column), table: (value === '' ? null : value) } }"
-        autocomplete="off"
-      />
-      <form-input
-        type="select"
-        label="Foreign Column"
-        :modelValue="column.foreign.column"
-        :options="columnOptions"
-        @update:modelValue="value => column = { ...column, foreign: { ...column.foreign, column: (value === '' ? null : value) }}"
-        autocomplete="off"
-      />
-    </main>
-  </div>
+    <v-field
+      label="Name"
+      class="col-span-6"
+      :model-value="column.name"
+      @update:modelValue="value => column = { ...column, name: value }"
+    />
+    <v-field
+      class="col-span-6"
+      input="suggest"
+      label="Type"
+      :model-value="column.type"
+      :input-props="{
+        options: ['INTEGER', 'TEXT', 'BLOB', 'REAL', 'NUMERIC']
+      }"
+      @update:modelValue="value => column = { ...column, type: value }"
+    />
+    <v-field
+      label="Primary Key"
+      :model-value="column.primaryKey"
+      input="checkbox"
+      :input-props="{
+        text: 'Primary Key'
+      }"
+      class="col-span-2"
+      @update:modelValue="value => column = { ...column, primaryKey: value }"
+    />
+    <v-field
+      label="Not Null"
+      :model-value="column.notNull"
+      input="checkbox"
+      :input-props="{
+        text: 'Not Null'
+      }"
+      class="col-span-2"
+      @update:modelValue="value => column = { ...column, notNull: value }"
+    />
+    <v-field
+      label="Unqiue"
+      :model-value="column.unique"
+      input="checkbox"
+      :input-props="{
+        text: 'Unique'
+      }"
+      class="col-span-2"
+      @update:modelValue="value => column = { ...column, unique: value }"
+    />
+    <v-field
+      label="Min"
+      class="col-span-3"
+      input="number"
+      :model-value="column.min"
+      @update:modelValue="value => column = { ...column, min: value }"
+    />
+    <v-field
+      label="Max"
+      class="col-span-3"
+      input="number"
+      :model-value="column.max"
+      @update:modelValue="value => column = { ...column, max: value }"
+    />
+    <v-field
+      label="Default"
+      class="col-span-6"
+    >
+      <v-group
+        :model-value-mapping="['enabled', 'value']"
+        :model-value="column.default"
+        @update:modelValue="value => column = { ...column, default: value }"
+      >
+        <v-checkbox />
+        <v-input />
+      </v-group>
+    </v-field>
+    <v-field
+      label="Foreign Key"
+      class="col-span-6"
+    >
+      <v-group
+        :model-value="column.foreign"
+        :model-value-mapping="['table', 'column']"
+        @update:modelValue="value => column = { ...column, foreign: value }"
+      >
+        <v-suggest :options="tableOptions" />
+        <v-suggest
+          :options="columnOptions"
+          @focus="column.foreign.table && column.foreign.table in $store.state.tables && $store.dispatch('queryColumns', column.foreign.table)"
+        />
+      </v-group>
+    </v-field>
+  </main>
 </template>
 
 <script lang="ts">
-import FormInput from '@/components/Form/Input.vue'
-import Icon from '@/components/Icon.vue'
+import { VInput, VGroup, VCheckbox, VField, VButton, VSuggest } from '@/components/Core'
 import type { Column } from '@/store/types'
 import omit from 'lodash/omit'
-import { computed, defineComponent, watch } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useStore } from 'vuex'
+import { TrashIcon, TrashOffIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
-  props: ['columnName', 'tableName'],
   components: {
-    FormInput,
-    Icon
+    VInput,
+    VGroup,
+    VCheckbox,
+    VField,
+    VButton,
+    VSuggest,
+    TrashOffIcon,
+    TrashIcon
+  },
+  props: {
+    columnName: {
+      type: String,
+      required: true
+    },
+    tableName: {
+      type: String,
+      required: true
+    }
   },
   setup (props) {
-    // const { columnName, tableName } = toRefs(props)
     const store = useStore()
     const column = computed<Column>({
       get () {
@@ -159,48 +188,42 @@ export default defineComponent({
       }
     }
 
-    function chooseTable (foreignTable: string|null) {
-      if (foreignTable === '') {
-        foreignTable = null
-      } else {
-        store.dispatch('queryColumns', foreignTable)
-      }
-      column.value = { ...column.value, foreign: { ...column.value.foreign, table: foreignTable } }
-    }
-    function chooseColumn (foreignColumn: string|null) {
-      if (foreignColumn === '') foreignColumn = null
-      column.value = { ...column.value, foreign: { ...column.value.foreign, column: foreignColumn } }
-    }
+    // function chooseTable (foreignTable: string|null) {
+    //   if (foreignTable === '') {
+    //     foreignTable = null
+    //   } else {
+    //     store.dispatch('queryColumns', foreignTable)
+    //   }
+    //   column.value = { ...column.value, foreign: { ...column.value.foreign, table: foreignTable } }
+    // }
+    // function chooseColumn (foreignColumn: string|null) {
+    //   if (foreignColumn === '') foreignColumn = null
+    //   column.value = { ...column.value, foreign: { ...column.value.foreign, column: foreignColumn } }
+    // }
 
-    watch(
-      () => column.value?.foreign.table && store.state.tables[column.value.foreign.table],
-      () => {
-        const foreign = column.value?.foreign
-        if (foreign?.table) {
-          store.dispatch('queryColumns', foreign.table)
-          if (!(foreign.column ?? '' in store.state.tables[foreign.table]?.columns)) {
-            column.value = {
-              ...column.value,
-              foreign: { ...foreign, column: null }
-            }
-          }
-        }
-      }
+    // watch(
+    //   () => column.value?.foreign.table && store.state.tables[column.value.foreign.table],
+    //   () => {
+    //     const foreign = column.value?.foreign
+    //     if (foreign?.table) {
+    //       store.dispatch('queryColumns', foreign.table)
+    //       if (!(foreign.column ?? '' in store.state.tables[foreign.table]?.columns)) {
+    //         column.value = {
+    //           ...column.value,
+    //           foreign: { ...foreign, column: null }
+    //         }
+    //       }
+    //     }
+    //   }
+    // )
+
+    const tableOptions = computed(() => Object.keys(store.state.tables))
+
+    const columnOptions = computed(() =>
+      column.value?.foreign.table && store.state.tables[column.value.foreign.table]?.columns
+        ? Object.keys(store.state.tables[column.value.foreign.table].columns)
+        : []
     )
-
-    const tableOptions = computed(() => [
-      { text: '-', value: null },
-      ...Object.keys(store.state.tables).map(tableName => ({ text: tableName, value: tableName }))
-    ])
-
-    const columnOptions = computed(() => [
-      { text: '-', value: null },
-      ...(
-        column.value?.foreign.table && store.state.tables[column.value.foreign.table]?.columns
-          ? Object.keys(store.state.tables[column.value.foreign.table].columns).map(tableName => ({ text: tableName, value: tableName }))
-          : []
-      )
-    ])
 
     return {
       modified,
@@ -208,16 +231,47 @@ export default defineComponent({
       status,
       column,
       tableOptions,
-      chooseTable,
-      columnOptions,
-      chooseColumn
+      columnOptions
     }
   }
 })
 </script>
 
 <style lang="postcss" scoped>
-div {
+.column-card {
+  @apply m-3;
+  @apply p-3;
+  @apply bg-white;
+  @apply shadow-lg;
+  @apply rounded-xl;
+  @apply grid grid-cols-6 lg:grid-cols-12 gap-3;
+  @apply justify-start;
+
+  & header {
+    @apply w-full;
+    @apply flex justify-between;
+    @apply relative;
+    @apply col-span-full;
+    & .header-status { @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  }
+    & .header-controlls { @apply flex gap-2; }
+  }
+}
+  /* & .header-status {
+    @apply col-span-2;
+  } */
+
+  /* & header {
+    @apply relative;
+    @apply flex justify-between items-center;
+
+     & .status {
+       @apply absolute;
+       @apply top-1/2 left-1/2;
+       @apply transform -translate-x-1/2 -translate-y-1/2;
+     }
+  } */
+
+/* .column-card {
   @apply m-3;
   @apply bg-white;
   @apply p-3;
@@ -225,15 +279,11 @@ div {
   @apply shadow-lg;
 }
 
-div main {
+.column-card main {
   @apply grid grid-cols-4 items-end;
 }
 
-div main label:not(.half):not(.checkbox) {
-  @apply col-span-2;
-}
-
-div header {
+.column-card header {
   @apply relative;
   @apply flex justify-between items-center;
   @apply mx-2;
@@ -259,29 +309,12 @@ div header {
   }
 }
 
-label.default {
-  @apply flex flex-col;
+.column-card label {
+  @apply col-span-2;
   @apply m-2;
 
-  & span.group {
-    @apply flex items-center justify-center;
-
-    & label {
-      @apply m-0;
-    }
-
-    & label.checkbox {
-      @apply mx-1;
-    }
-
-    & label.text {
-      @apply flex-grow;
-
-      & :deep(input) {
-        @apply w-full;
-        @apply min-w-0;
-      }
-    }
+  &.half {
+    @apply col-span-1 justify-self-start;
   }
-}
+} */
 </style>

@@ -42,7 +42,7 @@ export default defineComponent({
 aside {
   @apply relative;
   @apply w-56;
-  @apply border-r-2 border-primary-400;
+  @apply border-r-2 border-primary;
 
   @apply bg-white;
   @apply shadow-lg;
@@ -68,7 +68,7 @@ aside .toggle {
     content: '';
     @apply block;
     @apply h-12 w-2;
-    @apply bg-primary-500;
+    @apply bg-primary;
     @apply shadow-lg;
     @apply rounded-full;
     @apply transform;
@@ -105,7 +105,8 @@ aside main {
   }
 
   & a.router-link-active {
-    @apply bg-primary-300;
+    @apply bg-primary;
+    @apply text-white;
   }
 }
 </style>

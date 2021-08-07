@@ -1,7 +1,8 @@
 <template>
   <div
     class="wrapper"
-    @keydown.ctrl.enter="changes.commit"
+    @keyup.ctrl.enter.exact="changes.commit"
+    @keyup.ctrl.esc.exact="changes.discard"
   >
     <div ref="columnCards">
       <column-card
@@ -13,47 +14,43 @@
         sortable
       />
       <footer>
-        <form-button
-          :value="isNew ? 'Create Table' : 'Commit Changes'"
-          color="green"
+        <v-button
+          :text="isNew ? 'Create Table' : 'Commit Changes'"
           :disabled="!isModified"
+          variant="success"
           @click="changes.commit"
         />
-        <form-button
-          value="Disscard Changes"
-          color="red"
+        <v-button
+          text="Disscard Changes"
           :disabled="!isModified"
+          variant="error"
           @click="changes.discard"
         />
         <i class="mx-auto" />
-        <form-button
-          value="Add column"
+        <v-button
+          text="Add column"
+          variant="primary"
           @click="changes.addColumn"
         />
       </footer>
     </div>
     <nav ref="columnNav">
-      <form-button
+      <v-button
         v-for="column, key in columns"
-        :key="`Button ${key}`"
-        :value="column.new ? column.name : key"
+        :key="`scroll-to-column-${key}`"
+        :text="column.new ? column.name : key"
         sortable
-        color="white"
-        @click="() => focusColumn(key)"
+        hollow
       />
-      <form-button
-        :value="isNew ? 'Create Table' : 'Commit Changes'"
-        class="commit"
-        color="green"
+      <v-button
         :disabled="!isModified"
-        @click="changes.commit"
+        :text="isNew ? 'Create Table' : 'Commit Changes'"
+        variant="success"
       />
-      <form-button
-        value="Discard Changes"
-        class="discard"
-        color="red"
+      <v-button
+        text="Disscard Changes"
         :disabled="!isModified"
-        @click="changes.discard"
+        variant="error"
       />
     </nav>
   </div>
@@ -61,7 +58,7 @@
 
 <script lang="ts">
 import ColumnCard from '@/components/ColumnCard.vue'
-import FormButton from '@/components/Form/Button.vue'
+import VButton from '@/components/Core/Button.vue'
 import store from '@/store'
 import Sortable from '@shopify/draggable/lib/sortable'
 import arrayMove from 'array-move'
@@ -73,7 +70,7 @@ import debounce from 'lodash/debounce'
 export default defineComponent({
   components: {
     ColumnCard,
-    FormButton
+    VButton
   },
   beforeRouteEnter (to, _from, next) {
     if ((to.params.name as string) in store.state.modifications) {
@@ -190,6 +187,10 @@ div.wrapper {
   @apply max-w-6xl;
   @apply mx-auto;
   @apply flex;
+
+  & > div {
+    @apply w-full;
+  }
 }
 
 nav {
@@ -199,7 +200,7 @@ nav {
   @apply sticky top-0;
   @apply self-start;
 
-  & button {
+  /* & button {
     @apply shadow-inner-md;
     @apply px-3 py-2 ml-0;
     @apply leading-tight;
@@ -214,21 +215,16 @@ nav {
 
     &.commit {
       @apply bottom-15;
-      /* @apply bottom-12; */
     }
 
     &.discard {
       @apply bottom-3;
     }
-  }
+  } */
 }
 
 footer {
   @apply m-3;
   @apply flex gap-2.5;
-
-  & > button {
-    @apply shadow-md;
-  }
 }
 </style>
