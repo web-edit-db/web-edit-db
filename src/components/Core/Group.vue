@@ -67,6 +67,7 @@ export default defineComponent({
 
   & > :deep(*) {
     @apply rounded-none;
+    @apply flex-grow;
     &:focus { @apply z-10; }
     &:first-child { @apply rounded-l-md; }
     &:last-child { @apply rounded-r-md; }

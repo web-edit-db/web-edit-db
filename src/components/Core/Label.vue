@@ -53,7 +53,7 @@ export default defineComponent({
 
   /*** size ***/
   /* sm */ &.sm { @apply px-1 h-7 gap-0.5; }
-  /* md */ @apply px-2 h-10 gap-1 whitespace-nowrap;
+  /* md */ @apply px-1.5 h-9 gap-1 whitespace-nowrap;
   /* lg */ &.lg { @apply px-3 h-12 gap-2 text-lg; }
 
   /*** variant ***/

@@ -1,8 +1,9 @@
-import type { LoadingSystem, MessageSystem } from './App.vue'
+import type { LoadingSystem, MessageSystem, DialogSystem } from './App.vue'
 
 declare global {
   interface Window {
     $loading: LoadingSystem,
-    $message: MessageSystem
+    $message: MessageSystem,
+    $dialog: DialogSystem
   }
 }

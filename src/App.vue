@@ -1,17 +1,4 @@
 <template>
-  <teleport to="body">
-    <transition-group
-      id="message-manager"
-      tag="div"
-      name="message-manager"
-    >
-      <v-message
-        v-for="message_attrs in message.messages"
-        :key="message_attrs.id"
-        v-bind="{ ...message_attrs, id: undefined }"
-      />
-    </transition-group>
-  </teleport>
   <the-navigation />
   <the-side />
   <main>
@@ -26,16 +13,51 @@
       maxWidth: `${loading.percentage}%`,
     }"
   />
+  <teleport to="body">
+    <transition-group
+      id="message-manager"
+      tag="div"
+      name="message-manager"
+    >
+      <v-message
+        v-for="message_attrs in message.messages"
+        :key="message_attrs.id"
+        v-bind="{ ...message_attrs, id: undefined }"
+      />
+    </transition-group>
+  </teleport>
+  <teleport to="body">
+    <div id="dialog-manager">
+      <v-dialog
+        v-for="dialog_attrs, i in dialog.dialogs"
+        v-show="i === dialog.dialogs.length - 1"
+        :key="dialog_attrs.id"
+        v-bind="{
+          ...dialog_attrs,
+          id: undefined,
+          body: typeof dialog_attrs.body === 'function' ? undefined : dialog_attrs.body
+        }"
+        :mask="true"
+      >
+        <template
+          v-if="typeof dialog_attrs.body === 'function'"
+          #body
+        >
+          <component :is="dialog_attrs.body" />
+        </template>
+      </v-dialog>
+    </div>
+  </teleport>
 </template>
 
 <script lang="ts">
 import TheSide from '@/components/TheSide.vue'
-import { defineComponent, onBeforeUnmount, onMounted, provide, reactive } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, provide, reactive, VNode, VNodeChild } from 'vue'
 import TheNavigation from './components/TheNavigation.vue'
 import initSqlJs from 'sql.js'
 import { useStore } from 'vuex'
 import mean from 'lodash/mean'
-import { VMessage } from '@/components/Core'
+import { VMessage, VDialog } from '@/components/Core'
 
 export interface LoadingSystem {
   ref?: HTMLDivElement
@@ -63,7 +85,41 @@ export interface MessageSystem {
   push(attrs: {
     body: string,
     status: 'primary' | 'success' | 'error' | 'warning'
-  }): void
+  }): void,
+  remove(id: number): void
+}
+
+export interface DialogSystem {
+  dialogs: {
+    id: number,
+    mode?: string,
+    header?: string|(() => VNode),
+    body: string|(() => VNode),
+    negative?: string,
+    positive?: string,
+    onFinish?: () => void,
+    onPositive?: () => void,
+    onNegative?: () => void
+  }[],
+  remove(id: number): void
+  confirm(
+    body: string|(() => VNode),
+    attrs: {
+      header?: string|(() => VNode), negative?: string, positive?: string
+    }
+  ): void,
+  success(
+    body: string|(() => VNode),
+    attrs: {
+      header?: string|(() => VNode), negative?: string, positive?: string
+    }
+  ): void,
+  error(
+    body: string|(() => VNode),
+    attrs: {
+      header?: string|(() => VNode), negative?: string, positive?: string
+    }
+  ): void
 }
 
 const asyncWait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -72,7 +128,8 @@ export default defineComponent({
   components: {
     TheSide,
     TheNavigation,
-    VMessage
+    VMessage,
+    VDialog
   },
   setup () {
     const store = useStore()
@@ -132,16 +189,20 @@ export default defineComponent({
 
     onBeforeUnmount(() => clearInterval(interval))
 
-    // meessage manager
+    // message manager
     const message = reactive<MessageSystem>({
       ref: undefined,
       messages: [],
+      async remove (id) {
+        this.messages = this.messages.filter((message) => message.id !== id)
+      },
       async push (attrs) {
+        const id = (this.messages[this.messages.length - 1]?.id ?? -1) + 1
         this.messages.push({
           ...attrs,
-          id: (this.messages[this.messages.length - 1]?.id ?? -1) + 1
+          id
         })
-        setTimeout(() => this.messages.shift(), 3000)
+        setTimeout(() => this.remove(id), 3000)
       },
       async primary (body) {
         this.push({
@@ -171,9 +232,50 @@ export default defineComponent({
 
     provide('message', message)
 
+    // dialog manager
+    const dialog = reactive<DialogSystem>({
+      dialogs: [],
+      remove (id: number) {
+        this.dialogs = this.dialogs.filter(dialog => dialog.id !== id)
+      },
+      async confirm (body, attrs) {
+        const id = (this.dialogs[this.dialogs.length - 1]?.id ?? -1) + 1
+        this.dialogs.push({
+          id,
+          body,
+          ...attrs,
+          mode: 'confirm',
+          onFinish: () => this.remove(id)
+        })
+      },
+      async success (body, attrs) {
+        const id = (this.dialogs[this.dialogs.length - 1]?.id ?? -1) + 1
+        this.dialogs.push({
+          id,
+          body,
+          ...attrs,
+          mode: 'success',
+          onFinish: () => this.remove(id)
+        })
+      },
+      async error (body, attrs) {
+        const id = (this.dialogs[this.dialogs.length - 1]?.id ?? -1) + 1
+        this.dialogs.push({
+          id,
+          body,
+          ...attrs,
+          mode: 'error',
+          onFinish: () => this.remove(id)
+        })
+      }
+    })
+
+    provide('dialog', dialog)
+
     onMounted(() => {
       window.$loading = loading
       window.$message = message
+      window.$dialog = dialog
     })
 
     loading.start('sql.js')
@@ -191,7 +293,7 @@ export default defineComponent({
         console.error(error)
       })
 
-    return { loading, message }
+    return { loading, message, dialog }
   }
 })
 </script>
@@ -247,6 +349,12 @@ export default defineComponent({
   }
 }
 
+#dialog-manager > div {
+  @apply absolute;
+  @apply top-0;
+  @apply left-0;
+  @apply z-40;
+}
 /* .list-item {
   display: inline-block;
   margin-right: 10px;

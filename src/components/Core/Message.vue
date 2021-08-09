@@ -1,6 +1,7 @@
 <template>
   <v-label
     class="shadow-lg"
+    tag="div"
     :variant="status"
   >
     <message-circle-icon v-if="status === 'primary'" />
@@ -40,9 +41,8 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-label {
+div {
   @apply px-2 gap-3;
   @apply z-30;
-  @apply shadow-xl;
 }
 </style>

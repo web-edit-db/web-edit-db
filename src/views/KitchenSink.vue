@@ -1,5 +1,24 @@
 <template>
   <main>
+    <v-dialog
+      mode="success"
+      body="Well done!"
+    />
+    <v-dialog
+      mode="error"
+      body="You suck!"
+    />
+    <v-dialog
+      mode="confirm"
+      @positive="() => $console.log('hello')"
+    >
+      <template #body>
+        Are you sure?
+        <v-input />
+      </template>
+    </v-dialog>
+  </main>
+  <main>
     <v-message body="Hello, World!" />
     <v-message
       status="success"

@@ -6,20 +6,31 @@ import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
 import pickBy from 'lodash/pickBy'
 import router from '@/router'
+import { h, ref } from 'vue'
+import { VInput } from '@/components/Core'
 
 export default {
   async create ({ commit, state }) {
     if (state.sqlJs) {
-      const fileName = prompt('Enter a name for your database', 'unnamed')
-      if (fileName) {
-        commit('setDatabase', {
-          name: fileName + '.db',
-          database: new state.sqlJs.Database()
-        })
-        commit('setModifications', {})
-        window.$message.success(`Created new database '${state.database?.name}'`)
-        router.push('/')
-      }
+      const fileName = ref('Unnamed.db')
+      // display an confirm dialog with an input
+      await window.$dialog.confirm(
+        () => h(VInput, { modelValue: fileName.value, 'onUpdate:modelValue': (value: string) => (fileName.value = value) }),
+        {
+          header: 'Enter database name',
+          onPositive: () => {
+            if (fileName.value && state.sqlJs) {
+              commit('setDatabase', {
+                name: fileName.value,
+                database: new state.sqlJs.Database()
+              })
+              commit('setModifications', {})
+              window.$message.success(`Created new database '${state.database?.name}'`)
+              router.push('/')
+            }
+          }
+        }
+      )
     }
   },
   async open ({ commit, state, dispatch }) {
