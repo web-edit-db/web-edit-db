@@ -24,15 +24,16 @@ const routes: Array<RouteRecordRaw> = [
       title: () => `Table - ${router.currentRoute.value.params.name}`
     },
     props: true
-  },
-  ...import.meta.env.DEV ? [
-    {
-      path: '/ks',
-      name: 'KitchenSink',
-      component: () => import('@/views/KitchenSink.vue')
-    }
-  ] : []
+  }
 ]
+
+if (import.meta.env.DEV) {
+  routes.push({
+    path: '/ks',
+    name: 'KitchenSink',
+    component: () => import('@/views/KitchenSink.vue')
+  })
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

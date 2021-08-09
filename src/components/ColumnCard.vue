@@ -247,6 +247,10 @@ export default defineComponent({
   @apply grid grid-cols-6 lg:grid-cols-12 gap-3;
   @apply justify-start;
 
+  &:focus {
+    @apply ring-primary ring-opacity-50 ring-4;
+  }
+
   & header {
     @apply w-full;
     @apply flex justify-between;

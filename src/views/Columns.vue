@@ -41,6 +41,7 @@
         :text="column.new ? column.name : key"
         sortable
         hollow
+        @click="() => focusColumn(key)"
       />
       <v-button
         :disabled="!isModified"
