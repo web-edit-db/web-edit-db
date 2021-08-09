@@ -17,6 +17,7 @@ export default {
           database: new state.sqlJs.Database()
         })
         commit('setModifications', {})
+        window.$message.success(`Created new database '${state.database?.name}'`)
         router.push('/')
       }
     }
@@ -40,6 +41,7 @@ export default {
         handle: file.handle
       })
       dispatch('queryTables')
+      window.$message.success(`Opened database '${state.database?.name}'`)
       router.push('/')
     }
   },
@@ -67,6 +69,7 @@ export default {
         ...state.database,
         handle
       })
+      window.$message.success('Saved successfully')
     }
   },
 

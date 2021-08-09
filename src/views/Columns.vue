@@ -46,11 +46,13 @@
         :disabled="!isModified"
         :text="isNew ? 'Create Table' : 'Commit Changes'"
         variant="success"
+        @click="changes.commit"
       />
       <v-button
         text="Disscard Changes"
         :disabled="!isModified"
         variant="error"
+        @click="changes.discard"
       />
     </nav>
   </div>

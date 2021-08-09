@@ -1,4 +1,23 @@
 <template>
+  <main>
+    <v-message body="Hello, World!" />
+    <v-message
+      status="success"
+      body="Hello, World!"
+    />
+    <v-message
+      status="error"
+      body="Hello, World!"
+    />
+    <v-message
+      status="warning"
+      body="Hello, World!"
+    />
+    <v-message
+      status="info"
+      body="Hello, World!"
+    />
+  </main>
   <main class="grid-cols-5">
     <span class="col-span-full">
       Number
@@ -214,23 +233,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import VButton from '@/components/Core/Button.vue'
-import VInput from '@/components/Core/Input.vue'
-import VCheckbox from '@/components/Core/Checkbox.vue'
-import VGroup from '@/components/Core/InputGroup.vue'
-import VLabel from '@/components/Core/Label.vue'
-import VField from '@/components/Core/Field.vue'
-import VNumber from '@/components/Core/Number.vue'
+import * as componentsAll from '@/components/Core'
 
 export default defineComponent({
   components: {
-    VButton,
-    VInput,
-    VCheckbox,
-    VGroup,
-    VLabel,
-    VField,
-    VNumber
+    ...componentsAll
   },
   setup () {
     const size = ref(10)
