@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import TheSide from '@/components/TheSide.vue'
-import { defineComponent, onBeforeUnmount, onMounted, provide, reactive, VNode, VNodeChild } from 'vue'
+import { defineComponent, ExtractPropTypes, onBeforeUnmount, onMounted, provide, reactive, VNode } from 'vue'
 import TheNavigation from './components/TheNavigation.vue'
 import initSqlJs from 'sql.js'
 import { useStore } from 'vuex'
@@ -104,21 +104,15 @@ export interface DialogSystem {
   remove(id: number): void
   confirm(
     body: string|(() => VNode),
-    attrs: {
-      header?: string|(() => VNode), negative?: string, positive?: string
-    }
+    attrs: ExtractPropTypes<typeof VDialog.props>
   ): void,
   success(
     body: string|(() => VNode),
-    attrs: {
-      header?: string|(() => VNode), negative?: string, positive?: string
-    }
+    attrs: ExtractPropTypes<typeof VDialog.props>
   ): void,
   error(
     body: string|(() => VNode),
-    attrs: {
-      header?: string|(() => VNode), negative?: string, positive?: string
-    }
+    attrs: ExtractPropTypes<typeof VDialog.props>
   ): void
 }
 

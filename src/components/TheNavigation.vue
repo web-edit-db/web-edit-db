@@ -6,7 +6,10 @@
       custom
     >
       <h1 @click="navigate">
-        <img src="@/assets/logo.png">
+        <img
+          src="@/assets/logo.png"
+          class="p-1.5"
+        >
         <span>Web Edit DB</span>
       </h1>
     </router-link>
@@ -61,9 +64,9 @@ export default defineComponent({
     const sqlJsReady = computed(() => !!store.state.sqlJs)
     const databaseReady = computed(() => !!store.state.sqlJs && !!store.state.database)
 
-    const openDatabase = () => store.dispatch('open')
-    const newDatabase = () => store.dispatch('create')
-    const saveDatabase = () => store.dispatch('save')
+    const openDatabase = () => store.dispatch('openDatabase')
+    const newDatabase = () => store.dispatch('createDatabase')
+    const saveDatabase = () => store.dispatch('saveDatabase')
 
     return { sqlJsReady, databaseReady, openDatabase, newDatabase, saveDatabase }
   }

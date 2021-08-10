@@ -10,7 +10,7 @@ import { h, ref } from 'vue'
 import { VInput } from '@/components/Core'
 
 export default {
-  async create ({ commit, state }) {
+  async createDatabase ({ commit, state }) {
     if (state.sqlJs) {
       const fileName = ref('Unnamed.db')
       // display an confirm dialog with an input
@@ -33,7 +33,7 @@ export default {
       )
     }
   },
-  async open ({ commit, state, dispatch }) {
+  async openDatabase ({ commit, state, dispatch }) {
     if (state.sqlJs) {
       // prompt the user for database file
       const file = await fileOpen({
@@ -56,7 +56,7 @@ export default {
       router.push('/')
     }
   },
-  async save ({ state, commit }) {
+  async saveDatabase ({ state, commit }) {
     if (state.database) {
       // create new file from the database
       const file = new File(

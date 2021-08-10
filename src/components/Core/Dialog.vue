@@ -3,7 +3,8 @@
     :class="{
       mask
     }"
-    @click.self="$emit('finish')"
+    @click.self="$emit('negative') || $emit('finish')"
+    @keydown.esc="$emit('negative') || $emit('finish')"
   >
     <v-label
       tag="div"
@@ -18,10 +19,13 @@
         <span>
           {{ header ?? mode }}
         </span>
-        <x-icon
+        <v-button
+          variant="text"
           class="close"
           @click="$emit('negative') || $emit('finish')"
-        />
+        >
+          <x-icon />
+        </v-button>
       </header>
       <main>
         <slot name="body">
@@ -34,9 +38,10 @@
           :text="negative ?? 'cancel'"
           @click="$emit('negative') || $emit('finish')"
         />
+        <!-- :variant="" -->
         <v-button
-          :variant="mode === 'confirm' ? 'success' : mode"
-          :text="positive ?? mode === 'confirm' ? 'Ok' : 'Got it'"
+          :variant="positiveVariant ?? (mode === 'confirm' ? 'success' : mode)"
+          :text="positive ?? (mode === 'confirm' ? 'Ok' : 'Got it')"
           @click="$emit('positive') || $emit('finish')"
         />
       </footer>
@@ -80,6 +85,10 @@ export default defineComponent({
       type: String,
       default: null
     },
+    positiveVariant: {
+      type: String as PropType<'default' | 'primary' | 'success' | 'error' | 'warning'| 'text'>,
+      default: null
+    },
     mask: {
       type: Boolean,
       default: false
@@ -107,11 +116,7 @@ export default defineComponent({
     @apply flex gap-2 items-center text-xl leading-none;
 
     & .close {
-      @apply cursor-pointer ml-auto;
-
-      &:hover {
-        @apply bg-white rounded;
-      }
+      @apply ml-auto;
     }
   }
 

@@ -2,14 +2,24 @@
   <aside :class="{ closed: !open }">
     <main>
       <header>
-        Tables
+        <span>
+          Tables
+        </span>
+        <v-button
+          :disabled="!$store.state.database"
+          variant="text"
+          size="sm"
+          @click="() => $store.dispatch('createModification').then(name => $router.push(`/table/${name}`))"
+        >
+          <plus-icon />
+        </v-button>
       </header>
       <router-link
         v-for="table, tableName in tables"
         :key="tableName"
         :to="{ name: 'Table', params: { name: tableName } }"
       >
-        {{ tableName }}
+        {{ tableName }} <span v-if="table?.new">(not real)</span>
       </router-link>
     </main>
     <div
@@ -22,8 +32,14 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
+import { VButton } from '@/components/Core'
+import { PlusIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
+  components: {
+    VButton,
+    PlusIcon
+  },
   setup () {
     const store = useStore()
 
@@ -96,6 +112,7 @@ aside main {
   & header {
     @apply font-medium;
     @apply text-lg;
+    @apply flex justify-between items-center;
   }
 
   & a {

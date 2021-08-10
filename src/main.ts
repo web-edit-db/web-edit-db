@@ -8,4 +8,8 @@ import store from './store'
 
 registerSW({})
 
-createApp(App).use(store).use(router).mount('#app')
+const app = createApp(App)
+if (import.meta.env.DEV) app.config.globalProperties.$console = console
+app.use(store)
+app.use(router)
+app.mount('#app')

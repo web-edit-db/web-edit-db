@@ -5,6 +5,27 @@
     @keyup.ctrl.esc.exact="changes.discard"
   >
     <div ref="columnCards">
+      <header>
+        <h1>
+          {{ name }}
+        </h1>
+        <span>
+          <v-button
+            variant="primary"
+            @click="renameTable"
+          >
+            <edit-icon />
+            Rename table
+          </v-button>
+          <v-button
+            variant="error"
+            @click="deleteTable"
+          >
+            <trash-icon />
+            {{ isNew ? 'Discard Table' : 'Delete table' }}
+          </v-button>
+        </span>
+      </header>
       <column-card
         v-for="column, key in columns"
         :key="`Column ${key}`"
@@ -65,15 +86,21 @@ import VButton from '@/components/Core/Button.vue'
 import store from '@/store'
 import Sortable from '@shopify/draggable/lib/sortable'
 import arrayMove from 'array-move'
-import { computed, defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, h, inject, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
+import { EditIcon, TrashIcon } from 'vue-tabler-icons'
 import invoke from 'lodash/invoke'
 import debounce from 'lodash/debounce'
+import { DialogSystem } from '@/App.vue'
+import { useRouter } from 'vue-router'
+import { VInput } from '@/components/Core'
 
 export default defineComponent({
   components: {
     ColumnCard,
-    VButton
+    VButton,
+    EditIcon,
+    TrashIcon
   },
   beforeRouteEnter (to, _from, next) {
     if ((to.params.name as string) in store.state.modifications) {
@@ -90,6 +117,9 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore()
+    const router = useRouter()
+
+    const dialog = inject<DialogSystem>('dialog')
 
     const columnRefs = ref<{[key: string]: HTMLDivElement | undefined}>({})
 
@@ -171,6 +201,63 @@ export default defineComponent({
       sortableNav.on('sortable:stop', ({ newIndex }) => invoke(columnRefs.value, [Object.keys(columns.value)[newIndex], 'scrollIntoView'], { behavior: 'smooth', block: 'center' }))
     })
 
+    function deleteTable () {
+      if (dialog) {
+        dialog.confirm(
+          'Do you really want to delete?',
+          {
+            positive: 'Delete',
+            positiveVariant: 'error',
+            onPositive () {
+              const tables = computed(() => store.getters.tableNames)
+              if (tables.value.length > 1) {
+                // there are other tables so push to next table
+                // get the next table name
+                const nextName = tables.value[
+                  (tables.value.indexOf(props.name) + 1) % tables.value.length
+                ]
+                router.push(`/table/${nextName}`)
+              } else router.push('/') // no tables so push /
+              if (isNew.value) {
+                store.commit(
+                  'setModifications',
+                  Object.fromEntries(
+                    Object.entries(
+                      store.state.modifications
+                    ).filter(
+                      obj => obj[0] !== props.name
+                    )
+                  )
+                )
+              } else {
+                store.dispatch('dropTable', props.name)
+              }
+            }
+          }
+        )
+      }
+    }
+    function renameTable () {
+      if (dialog) {
+        const newTableName = ref(props.name)
+        dialog.confirm(
+          () => h(VInput, {
+            modelValue: newTableName.value,
+            'onUpdate:modelValue': (value: string) => (newTableName.value = value)
+          }),
+          {
+            onPositive () {
+              store.dispatch(
+                isNew.value ? 'renameModification' : 'renameTable',
+                { tableName: props.name, newTableName: newTableName.value }
+              )
+              router.replace({ params: { name: newTableName.value } })
+            }
+          }
+        )
+      }
+    }
+
     return {
       isModified,
       isNew,
@@ -179,7 +266,9 @@ export default defineComponent({
       changes,
       columns,
       focusColumn,
-      columnRefs
+      columnRefs,
+      deleteTable,
+      renameTable
     }
   }
 })
@@ -202,32 +291,23 @@ nav {
   @apply gap-3;
   @apply sticky top-0;
   @apply self-start;
-
-  /* & button {
-    @apply shadow-inner-md;
-    @apply px-3 py-2 ml-0;
-    @apply leading-tight;
-    @apply w-36;
-    @apply text-left;
-    @apply select-none;
-    @apply text-sm;
-
-    &.commit, &.discard {
-      @apply sticky;
-    }
-
-    &.commit {
-      @apply bottom-15;
-    }
-
-    &.discard {
-      @apply bottom-3;
-    }
-  } */
 }
 
 footer {
   @apply m-3;
   @apply flex gap-2.5;
+}
+
+header {
+  @apply flex justify-between items-center;
+  @apply p-3;
+
+  & h1 {
+    @apply text-2xl;
+  }
+
+  & span {
+    @apply flex gap-3;
+  }
 }
 </style>
