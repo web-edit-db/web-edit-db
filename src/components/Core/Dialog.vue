@@ -16,6 +16,7 @@
         <circle-check-icon v-if="mode === 'success'" />
         <alert-circle-icon v-if="mode === 'confirm'" />
         <circle-x-icon v-if="mode === 'error'" />
+        <message-circle-icon v-if="mode === 'prompt'" />
         <span>
           {{ header ?? mode }}
         </span>
@@ -31,18 +32,31 @@
         <slot name="body">
           {{ body }}
         </slot>
+        <v-input
+          v-if="mode === 'prompt'"
+          v-model="inputValue"
+          variant="primary"
+        />
       </main>
       <footer>
         <v-button
-          v-if="negative || mode === 'confirm'"
+          v-if="negative || ['prompt', 'confirm'].includes(mode)"
           :text="negative ?? 'cancel'"
           @click="$emit('negative') || $emit('finish')"
         />
         <!-- :variant="" -->
         <v-button
-          :variant="positiveVariant ?? (mode === 'confirm' ? 'success' : mode)"
-          :text="positive ?? (mode === 'confirm' ? 'Ok' : 'Got it')"
-          @click="$emit('positive') || $emit('finish')"
+          :variant="
+            positiveVariant ??
+              (
+                ['confirm', 'prompt'].includes(mode)
+                  ? 'success'
+                  : mode
+              )
+          "
+          class="col-start-2"
+          :text="positive ?? (['prompt', 'confirm'].includes(mode) ? 'Ok' : 'Got it')"
+          @click="$emit('positive', inputValue) || $emit('finish')"
         />
       </footer>
     </v-label>
@@ -51,22 +65,24 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue'
-import { VLabel, VButton } from './'
-import { CircleCheckIcon, AlertCircleIcon, CircleXIcon, XIcon } from 'vue-tabler-icons'
+import { computed, defineComponent, PropType, ref } from 'vue'
+import { VLabel, VButton, VInput } from './'
+import { CircleCheckIcon, AlertCircleIcon, CircleXIcon, XIcon, MessageCircleIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
   components: {
     VLabel,
     VButton,
+    VInput,
     CircleCheckIcon,
     AlertCircleIcon,
     CircleXIcon,
-    XIcon
+    XIcon,
+    MessageCircleIcon
   },
   props: {
     mode: {
-      type: String as PropType<'success' | 'confirm' | 'error'>,
+      type: String as PropType<'success' | 'confirm' | 'error' | 'prompt'>,
       required: true
     },
     header: {
@@ -92,6 +108,10 @@ export default defineComponent({
     mask: {
       type: Boolean,
       default: false
+    },
+    initialPrompt: {
+      type: String,
+      default: ''
     }
   },
   emits: [
@@ -100,8 +120,14 @@ export default defineComponent({
     'finish'
   ],
   setup (props) {
-    const variant = computed(() => props.mode === 'confirm' ? 'warning' : props.mode)
-    return { variant }
+    const variant = computed(
+      () => props.mode === 'confirm'
+        ? 'warning'
+        : props.mode === 'prompt'
+          ? 'primary'
+          : props.mode)
+    const inputValue = ref(props.initialPrompt)
+    return { variant, inputValue }
   }
 })
 </script>
@@ -111,6 +137,10 @@ export default defineComponent({
   @apply flex flex-col items-stretch gap-4;
   @apply p-5 h-auto w-96;
   @apply border-4;
+
+  &:hover {
+    @apply bg-white;
+  }
 
   & header {
     @apply flex gap-2 items-center text-xl leading-none;
@@ -126,7 +156,7 @@ export default defineComponent({
   }
 
   & footer {
-    @apply flex gap-2 justify-end;
+    @apply grid grid-cols-2 gap-2 self-end grid-flow-row;
   }
 }
 

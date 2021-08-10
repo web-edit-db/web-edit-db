@@ -113,6 +113,10 @@ export interface DialogSystem {
   error(
     body: string|(() => VNode),
     attrs: ExtractPropTypes<typeof VDialog.props>
+  ): void,
+  prompt(
+    body: string,
+    attrs: ExtractPropTypes<typeof VDialog.props>
   ): void
 }
 
@@ -259,6 +263,16 @@ export default defineComponent({
           body,
           ...attrs,
           mode: 'error',
+          onFinish: () => this.remove(id)
+        })
+      },
+      async prompt (body, attrs) {
+        const id = (this.dialogs[this.dialogs.length - 1]?.id ?? -1) + 1
+        this.dialogs.push({
+          id,
+          body,
+          ...attrs,
+          mode: 'prompt',
           onFinish: () => this.remove(id)
         })
       }

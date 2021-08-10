@@ -239,19 +239,17 @@ export default defineComponent({
     }
     function renameTable () {
       if (dialog) {
-        const newTableName = ref(props.name)
-        dialog.confirm(
-          () => h(VInput, {
-            modelValue: newTableName.value,
-            'onUpdate:modelValue': (value: string) => (newTableName.value = value)
-          }),
+        dialog.prompt(
+          'Enter new name',
           {
-            onPositive () {
+            title: 'Rename table',
+            initialPrompt: props.name,
+            onPositive (newTableName: string) {
               store.dispatch(
                 isNew.value ? 'renameModification' : 'renameTable',
-                { tableName: props.name, newTableName: newTableName.value }
+                { tableName: props.name, newTableName }
               )
-              router.replace({ params: { name: newTableName.value } })
+              router.replace({ params: { name: newTableName } })
             }
           }
         )

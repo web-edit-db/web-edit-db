@@ -1,27 +1,24 @@
+import router from '@/router'
 import { fileOpen, fileSave } from 'browser-fs-access'
 import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
 import { Column, State } from './types'
-import pickBy from 'lodash/pickBy'
-import router from '@/router'
-import { h, ref } from 'vue'
-import { VInput } from '@/components/Core'
 
 export default {
   async createDatabase ({ commit, state }) {
     if (state.sqlJs) {
-      const fileName = ref('Unnamed.db')
-      // display an confirm dialog with an input
-      await window.$dialog.confirm(
-        () => h(VInput, { modelValue: fileName.value, 'onUpdate:modelValue': (value: string) => (fileName.value = value) }),
+      await window.$dialog.prompt(
+        'Enter the name for your database',
         {
-          header: 'Enter database name',
-          onPositive: () => {
-            if (fileName.value && state.sqlJs) {
+          header: 'Database name',
+          initialPrompt: 'no-name.db',
+          onPositive: (fileName: string) => {
+            if (fileName && state.sqlJs) {
               commit('setDatabase', {
-                name: fileName.value,
+                name: fileName,
                 connection: new state.sqlJs.Database()
               })
               commit('setModifications', {})

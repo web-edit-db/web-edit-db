@@ -1,5 +1,21 @@
 <template>
   <main>
+    <div class="flex items-center gap-3">
+      <v-label
+        size="sm"
+        variant="text"
+        text="database name"
+      />
+      <span class="text-primary-600 font-bold text-2xl">/</span>
+      <v-button
+        size="sm"
+        variant="text"
+        text="home"
+      />
+    </div>
+  </main>
+  <main>
+    <span class="col-span-4">Dialog</span>
     <v-dialog
       mode="success"
       body="Well done!"
@@ -16,8 +32,12 @@
         <v-input />
       </template>
     </v-dialog>
+    <v-dialog
+      mode="prompt"
+    />
   </main>
   <main>
+    <span class="col-span-5">Message</span>
     <v-message body="Hello, World!" />
     <v-message
       status="success"

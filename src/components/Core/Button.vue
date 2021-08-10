@@ -27,6 +27,10 @@ export default defineComponent({
 </script>
 
 <style scoped lang="postcss">
+button {
+  @apply justify-center;
+}
+
 button:disabled, button:disabled:hover {
   @apply opacity-50;
   @apply cursor-not-allowed;
