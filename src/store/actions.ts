@@ -22,7 +22,7 @@ export default {
             if (fileName.value && state.sqlJs) {
               commit('setDatabase', {
                 name: fileName.value,
-                database: new state.sqlJs.Database()
+                connection: new state.sqlJs.Database()
               })
               commit('setModifications', {})
               window.$message.success(`Created new database '${state.database?.name}'`)
