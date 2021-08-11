@@ -34,6 +34,7 @@
         </slot>
         <v-input
           v-if="mode === 'prompt'"
+          ref="inputRef"
           v-model="inputValue"
           variant="primary"
         />
@@ -41,11 +42,13 @@
       <footer>
         <v-button
           v-if="negative || ['prompt', 'confirm'].includes(mode)"
+          ref="negativeRef"
           :text="negative ?? 'cancel'"
           @click="$emit('negative') || $emit('finish')"
         />
         <!-- :variant="" -->
         <v-button
+          ref="positive"
           :variant="
             positiveVariant ??
               (
@@ -65,9 +68,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue'
-import { VLabel, VButton, VInput } from './'
-import { CircleCheckIcon, AlertCircleIcon, CircleXIcon, XIcon, MessageCircleIcon } from 'vue-tabler-icons'
+import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
+import { AlertCircleIcon, CircleCheckIcon, CircleXIcon, MessageCircleIcon, XIcon } from 'vue-tabler-icons'
+import { VButton, VInput, VLabel } from './'
 
 export default defineComponent({
   components: {
@@ -127,7 +130,19 @@ export default defineComponent({
           ? 'primary'
           : props.mode)
     const inputValue = ref(props.initialPrompt)
-    return { variant, inputValue }
+
+    const inputRef = ref<typeof VInput>()
+    const negataveRef = ref<typeof VButton>()
+    const positiveRef = ref<typeof VButton>()
+
+    onMounted(() => {
+      // when mounted grap focus
+      const target = inputRef.value ?? negataveRef.value ?? positiveRef.value
+      console.log(target)
+      if (target) target.$el.focus()
+    })
+
+    return { variant, inputValue, inputRef, negataveRef, positiveRef }
   }
 })
 </script>

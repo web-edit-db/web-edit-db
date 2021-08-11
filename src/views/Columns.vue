@@ -277,6 +277,7 @@ div.wrapper {
   @apply max-w-6xl;
   @apply mx-auto;
   @apply flex;
+  @apply px-4;
 
   & > div {
     @apply w-full;

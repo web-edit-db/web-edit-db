@@ -13,7 +13,7 @@
         <span>Web Edit DB</span>
       </h1>
     </router-link>
-    <div>database name / home</div>
+    <the-breadcrumbs />
     <div class="controlls">
       <v-button
         :disabled="!sqlJsReady"
@@ -55,10 +55,17 @@
 import { computed, defineComponent } from 'vue'
 import { useStore } from 'vuex'
 import VButton from '@/components/Core/Button.vue'
+import TheBreadcrumbs from '@/components/TheBreadcrumbs.vue'
 import { DatabaseImportIcon, DatabaseIcon, DatabaseExportIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
-  components: { VButton, DatabaseImportIcon, DatabaseIcon, DatabaseExportIcon },
+  components: {
+    VButton,
+    DatabaseImportIcon,
+    DatabaseIcon,
+    DatabaseExportIcon,
+    TheBreadcrumbs
+  },
   setup () {
     const store = useStore()
     const sqlJsReady = computed(() => !!store.state.sqlJs)
