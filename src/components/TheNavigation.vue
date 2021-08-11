@@ -47,16 +47,23 @@
           save
         </span>
       </v-button>
+      <v-button
+        variant="text"
+        @click="showInfo"
+      >
+        <info-circle-icon />
+      </v-button>
     </div>
   </nav>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, inject } from 'vue'
 import { useStore } from 'vuex'
 import VButton from '@/components/Core/Button.vue'
 import TheBreadcrumbs from '@/components/TheBreadcrumbs.vue'
-import { DatabaseImportIcon, DatabaseIcon, DatabaseExportIcon } from 'vue-tabler-icons'
+import { DatabaseImportIcon, DatabaseIcon, DatabaseExportIcon, InfoCircleIcon } from 'vue-tabler-icons'
+import { DialogSystem } from '@/App.vue'
 
 export default defineComponent({
   components: {
@@ -64,10 +71,12 @@ export default defineComponent({
     DatabaseImportIcon,
     DatabaseIcon,
     DatabaseExportIcon,
+    InfoCircleIcon,
     TheBreadcrumbs
   },
   setup () {
     const store = useStore()
+    const dialog = inject<DialogSystem>('dialog')
     const sqlJsReady = computed(() => !!store.state.sqlJs)
     const databaseReady = computed(() => !!store.state.sqlJs && !!store.state.database)
 
@@ -75,7 +84,16 @@ export default defineComponent({
     const newDatabase = () => store.dispatch('createDatabase')
     const saveDatabase = () => store.dispatch('saveDatabase')
 
-    return { sqlJsReady, databaseReady, openDatabase, newDatabase, saveDatabase }
+    function showInfo () {
+      if (dialog && store.state.sqlJs) {
+        const version = new store.state.sqlJs.Database({}).exec('SELECT sqlite_version()')[0].values[0][0]
+        dialog.success(`SQLite version v${version}`, {
+          header: 'SQLite Version'
+        })
+      }
+    }
+
+    return { sqlJsReady, databaseReady, openDatabase, newDatabase, saveDatabase, showInfo }
   }
 })
 </script>

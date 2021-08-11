@@ -138,7 +138,6 @@ export default defineComponent({
     onMounted(() => {
       // when mounted grap focus
       const target = inputRef.value ?? negataveRef.value ?? positiveRef.value
-      console.log(target)
       if (target) target.$el.focus()
     })
 
