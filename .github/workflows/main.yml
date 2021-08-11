@@ -24,4 +24,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           folder: dist
+          branch: gh-pages
           repository-name: web-edit-db/web-edit-db.github.io
