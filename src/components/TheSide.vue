@@ -19,7 +19,7 @@
         :key="tableName"
         :to="{ name: 'Table', params: { name: tableName } }"
       >
-        <span class="overflow-hidden ellipsis">
+        <span class="overflow-hidden ellipsis block">
           {{ tableName }} <span v-if="table?.new">(not real)</span>
         </span>
       </router-link>
