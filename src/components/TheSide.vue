@@ -19,7 +19,9 @@
         :key="tableName"
         :to="{ name: 'Table', params: { name: tableName } }"
       >
-        {{ tableName }} <span v-if="table?.new">(not real)</span>
+        <span class="overflow-hidden ellipsis">
+          {{ tableName }} <span v-if="table?.new">(not real)</span>
+        </span>
       </router-link>
     </main>
     <div
@@ -107,7 +109,8 @@ aside .toggle {
 aside main {
   @apply flex flex-col;
   @apply p-3 gap-2;
-  @apply overflow-x-auto;
+  max-height: calc(100vh - theme('spacing.14'));
+  @apply overflow-y-auto;
 
   & header {
     @apply font-medium;

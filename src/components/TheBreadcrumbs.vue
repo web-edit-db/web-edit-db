@@ -20,6 +20,7 @@
         variant="text"
         size="sm"
         :text="$route.params.name"
+        class="table-name"
       />
     </template>
   </div>
@@ -79,5 +80,9 @@ export default defineComponent({
 <style lang="postcss" scoped>
 div {
   @apply flex items-center gap-2;
+}
+
+.table-name {
+  @apply block max-w-sm overflow-hidden ellipsis;
 }
 </style>

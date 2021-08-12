@@ -35,6 +35,14 @@ module.exports = {
     }
   },
   plugins: [
-    // require('@tailwindcss/forms')
+    plugin(function ({ addUtilities }) {
+      const newUtilities = {
+        '.ellipsis': {
+          'text-overflow': 'ellipsis'
+        }
+      }
+
+      addUtilities(newUtilities, ['responsive', 'hover'])
+    })
   ]
 }

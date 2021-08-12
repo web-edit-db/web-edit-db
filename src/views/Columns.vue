@@ -290,6 +290,14 @@ nav {
   @apply gap-3;
   @apply sticky top-0;
   @apply self-start;
+
+  & button {
+    @apply w-36;
+    @apply overflow-hidden;
+    @apply block;
+    @apply ellipsis;
+    @apply text-left;
+  }
 }
 
 footer {
@@ -303,6 +311,9 @@ header {
 
   & h1 {
     @apply text-2xl;
+    @apply overflow-hidden;
+    @apply max-w-lg;
+    @apply ellipsis;
   }
 
   & span {

@@ -1,7 +1,7 @@
 <template>
   <main class="column-card">
     <header>
-      <span class="header header-name">
+      <span class="header header-name w-96 overflow-hidden ellipsis">
         {{ column.new ? column.name : columnName }}
       </span>
       <span
@@ -253,7 +253,7 @@ export default defineComponent({
 
   & header {
     @apply w-full;
-    @apply flex justify-between;
+    @apply flex justify-between items-center;
     @apply relative;
     @apply col-span-full;
     & .header-status { @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  }
