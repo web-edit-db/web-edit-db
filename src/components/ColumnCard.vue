@@ -121,7 +121,7 @@
 
 <script lang="ts">
 import { VInput, VGroup, VCheckbox, VField, VButton, VSuggest } from '@/components/Core'
-import type { Column } from '@/store/types'
+import type { Column, State } from '@/store/types'
 import omit from 'lodash/omit'
 import { computed, defineComponent } from 'vue'
 import { useStore } from 'vuex'
@@ -149,7 +149,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const store = useStore()
+    const store = useStore<State>()
     const column = computed<Column>({
       get () {
         return store.state.modifications[props.tableName]?.columns[props.columnName]

@@ -64,6 +64,7 @@ import VButton from '@/components/Core/Button.vue'
 import TheBreadcrumbs from '@/components/TheBreadcrumbs.vue'
 import { DatabaseImportIcon, DatabaseIcon, DatabaseExportIcon, InfoCircleIcon } from 'vue-tabler-icons'
 import { DialogSystem } from '@/App.vue'
+import { State } from '@/store/types'
 
 export default defineComponent({
   components: {
@@ -75,7 +76,7 @@ export default defineComponent({
     TheBreadcrumbs
   },
   setup () {
-    const store = useStore()
+    const store = useStore<State>()
     const dialog = inject<DialogSystem>('dialog')
     const sqlJsReady = computed(() => !!store.state.sqlJs)
     const databaseReady = computed(() => !!store.state.sqlJs && !!store.state.database)
@@ -86,7 +87,7 @@ export default defineComponent({
 
     function showInfo () {
       if (dialog && store.state.sqlJs) {
-        const version = new store.state.sqlJs.Database({}).exec('SELECT sqlite_version()')[0].values[0][0]
+        const version = new store.state.sqlJs.Database().exec('SELECT sqlite_version()')[0].values[0][0]
         dialog.success(`SQLite version v${version}`, {
           header: 'SQLite Version'
         })

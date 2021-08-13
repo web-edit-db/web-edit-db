@@ -58,6 +58,7 @@ import initSqlJs from 'sql.js'
 import { useStore } from 'vuex'
 import mean from 'lodash/mean'
 import { VMessage, VDialog } from '@/components/Core'
+import { State } from './store/types'
 
 export interface LoadingSystem {
   ref?: HTMLDivElement
@@ -130,7 +131,7 @@ export default defineComponent({
     VDialog
   },
   setup () {
-    const store = useStore()
+    const store = useStore<State>()
 
     // loading bar manager
     const loading = reactive<LoadingSystem>({
@@ -289,7 +290,20 @@ export default defineComponent({
     loading.start('sql.js')
     initSqlJs({ locateFile: (url) => `/assets/${url}` })
       .then((sqlJs) => {
+        console.log('gotSqlJs')
+        const preserved: (Pick<State, 'modifications'> & { database: { name: string, connection: string }}) | null = JSON.parse(sessionStorage.getItem('vuex-tab-preserve') ?? 'null')
+        if (preserved) {
+          store.replaceState({
+            ...store.state,
+            ...preserved,
+            database: {
+              ...preserved.database,
+              connection: new sqlJs.Database(Uint8Array.from(preserved.database.connection.split(',') as unknown as number[])) // convert database back
+            }
+          })
+        }
         store.commit('setSqlJs', sqlJs)
+        store.dispatch('queryTables')
         loading.finish('sql.js')
       })
       .catch((error) => {
