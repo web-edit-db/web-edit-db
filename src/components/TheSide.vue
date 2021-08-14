@@ -17,11 +17,37 @@
       <router-link
         v-for="table, tableName in tables"
         :key="tableName"
+        v-slot="props"
         :to="{ name: 'Table', params: { name: tableName } }"
       >
         <span class="overflow-hidden ellipsis block">
           {{ tableName }} <span v-if="table?.new">(not real)</span>
         </span>
+        <v-group
+          v-if="props.isActive"
+          class="ml-4 mt-2"
+          variant="primary"
+          size="sm"
+          :vertical="true"
+        >
+          <!-- size="sm" -->
+          <v-button
+            style="justify-content: space-between;"
+            tag="router-link"
+            :to="{ name: 'TableColumns' }"
+          >
+            <span>Columns</span>
+            <layout-columns-icon />
+          </v-button>
+          <v-button
+            style="justify-content: space-between;"
+            tag="router-link"
+            :to="{ name: 'TableData' }"
+          >
+            <span>Data</span>
+            <layout-rows-icon />
+          </v-button>
+        </v-group>
       </router-link>
     </main>
     <div
@@ -34,16 +60,20 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
-import { VButton } from '@/components/Core'
-import { PlusIcon } from 'vue-tabler-icons'
+import { VButton, VGroup } from '@/components/Core'
+import { PlusIcon, LayoutColumnsIcon, LayoutRowsIcon } from 'vue-tabler-icons'
+import { State } from '@/store/types'
 
 export default defineComponent({
   components: {
     VButton,
-    PlusIcon
+    VGroup,
+    PlusIcon,
+    LayoutColumnsIcon,
+    LayoutRowsIcon
   },
   setup () {
-    const store = useStore()
+    const store = useStore<State>()
 
     // all the current tables
     const tables = computed(() => store.state.modifications)
@@ -122,6 +152,11 @@ aside main {
     @apply px-3 py-2;
     @apply rounded-lg;
     @apply bg-gray-100;
+    @apply text-lg;
+
+    & button {
+      @apply justify-start;
+    }
   }
 
   & a.router-link-active {

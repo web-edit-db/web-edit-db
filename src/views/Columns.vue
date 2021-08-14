@@ -83,17 +83,15 @@
 <script lang="ts">
 import ColumnCard from '@/components/ColumnCard.vue'
 import VButton from '@/components/Core/Button.vue'
-import store from '@/store'
 import Sortable from '@shopify/draggable/lib/sortable'
 import arrayMove from 'array-move'
-import { computed, defineComponent, h, inject, onMounted, ref } from 'vue'
+import { computed, defineComponent, inject, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { EditIcon, TrashIcon } from 'vue-tabler-icons'
 import invoke from 'lodash/invoke'
 import debounce from 'lodash/debounce'
 import { DialogSystem } from '@/App.vue'
 import { useRouter } from 'vue-router'
-import { VInput } from '@/components/Core'
 
 export default defineComponent({
   components: {
@@ -101,13 +99,6 @@ export default defineComponent({
     VButton,
     EditIcon,
     TrashIcon
-  },
-  beforeRouteEnter (to, _from, next) {
-    if ((to.params.name as string) in store.state.modifications) {
-      next()
-    } else {
-      next('/')
-    }
   },
   props: {
     name: {

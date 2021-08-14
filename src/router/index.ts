@@ -19,11 +19,27 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/table/:name',
     name: 'Table',
-    component: () => import('@/views/Columns.vue'),
-    meta: {
-      title: () => `Table - ${router.currentRoute.value.params.name}`
-    },
-    props: true
+    component: () => import('@/views/Tables.vue'),
+    children: [
+      {
+        path: 'data',
+        name: 'TableData',
+        meta: {
+          title: () => `Table - ${router.currentRoute.value.params.name} - Data`
+        },
+        component: () => import('@/views/Data.vue'),
+        props: true
+      },
+      {
+        path: 'columns',
+        name: 'TableColumns',
+        meta: {
+          title: () => `Table - ${router.currentRoute.value.params.name} - Columns`
+        },
+        component: () => import('@/views/Columns.vue'),
+        props: true
+      }
+    ]
   }
 ]
 
@@ -54,6 +70,27 @@ router.beforeEach((_to, _from, next) => {
     next()
   }
   backspacePressed = false
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.name?.toString().startsWith('Table')) {
+    // handle Table routes (Table, TableColumns, TableData)
+    if (!((to.params.name as string) in store.state.modifications)) {
+      // if the user went to a table that doesn't exist
+      // send the user home
+      next('/')
+    } else
+    if (to.name === 'Table') {
+      next({
+        ...to,
+        name: (from.name !== 'Table' && from.name?.toString().startsWith('Table')) ? from.name : 'TableColumns'
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 // page title control

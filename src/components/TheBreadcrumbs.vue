@@ -12,14 +12,21 @@
     <v-button
       variant="text"
       size="sm"
-      :text="$route.name"
+      :text="$route.name?.startsWith('Table') ? 'Table' : $route.name"
     />
-    <template v-if="$route.name === 'Table'">
+    <template v-if="$route.name?.startsWith('Table')">
       <separator />
       <v-button
         variant="text"
         size="sm"
         :text="$route.params.name"
+        class="table-name"
+      />
+      <separator />
+      <v-button
+        variant="text"
+        size="sm"
+        :text="$route.name.substring(5)"
         class="table-name"
       />
     </template>
@@ -30,20 +37,19 @@
 import { computed, defineComponent, h, inject } from 'vue'
 import { useStore } from 'vuex'
 import {
-  VLabel,
   VButton
 } from '@/components/Core'
 import { DialogSystem } from '@/App.vue'
 import { useRoute, useRouter } from 'vue-router'
+import { State } from '@/store/types'
 
 export default defineComponent({
   components: {
     separator: () => h('span', { class: 'text-2xl text-primary' }, '/'),
-    VLabel,
     VButton
   },
   setup () {
-    const store = useStore()
+    const store = useStore<State>()
     const router = useRouter()
     const route = useRoute()
     const dialog = inject<DialogSystem>('dialog')
@@ -53,7 +59,7 @@ export default defineComponent({
       if (dialog) {
         dialog.prompt('', {
           title: 'Rename database',
-          initialPrompt: store.state.database.name,
+          initialPrompt: store.state.database?.name,
           onPositive: (name: string) => {
             store.commit(
               'setDatabase',

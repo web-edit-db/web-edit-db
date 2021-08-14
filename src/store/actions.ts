@@ -17,13 +17,13 @@ export default {
           initialPrompt: 'no-name.db',
           onPositive: (fileName: string) => {
             if (fileName && state.sqlJs) {
+              router.push('/')
               commit('setDatabase', {
                 name: fileName,
                 connection: new state.sqlJs.Database()
               })
               commit('setModifications', {})
               window.$message.success(`Created new database '${state.database?.name}'`)
-              router.push('/')
             }
           }
         }
@@ -37,6 +37,7 @@ export default {
         mimeTypes: ['application/vnd.sqlite3'],
         extensions: SQLITE_EXTENSIONS
       })
+      router.push('/')
       // turn file into array
       const fileBufferArray = new Uint8Array(await file.arrayBuffer())
       // create the connection
@@ -50,7 +51,6 @@ export default {
       })
       dispatch('queryTables')
       window.$message.success(`Opened database '${state.database?.name}'`)
-      router.push('/')
     }
   },
   async saveDatabase ({ state, commit }) {
