@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, h, PropType } from 'vue'
+import { defineComponent, h, PropType, Comment } from 'vue'
 
 export default defineComponent({
   name: 'VGroup',
@@ -9,7 +9,9 @@ export default defineComponent({
       default: 'div'
     },
     variant: {
-      type: String as PropType<'default' | 'primary' | 'success' | 'error' | 'warning'| 'text'>,
+      type: String as PropType<
+        'default' | 'primary' | 'success' | 'error' | 'warning' | 'text'
+      >,
       default: 'default'
     },
     size: {
@@ -33,30 +35,53 @@ export default defineComponent({
       default: () => ({})
     },
     modelValueMapping: {
-      type: Array as PropType<('string')[]>,
-      default: () => ([])
+      type: Array as PropType<'string'[]>,
+      default: () => []
     }
   },
   emits: ['update:modelValue'],
   setup (props, { slots, emit }) {
-    return () => h(
-      props.tag,
-      { class: { vertical: props.vertical } },
-      slots.default?.().map(
-        (child, i) => {
-          return h(child, {
-            size: props.size,
-            variant: child.props?.variant ?? props.variant,
-            hollow: child.props?.hollow ?? props.hollow,
-            disabled: props.disabled || child.props?.disabled,
-            modelValue: props.modelValue[props.modelValueMapping[i] ?? i],
-            'onUpdate:modelValue': (typeof props.modelValue !== 'undefined' && ((value?: string|number|boolean) =>
-              emit('update:modelValue', { ...props.modelValue, [props.modelValueMapping[i] ?? i]: value })
-            ))
-          })
-        }
+    return () => {
+      // const childCount = slots.default?.().filter(child => child.type !== Comment).length || 1
+      // console.log(slots.default?.().length, childCount)
+      let offset = 0
+      return h(
+        props.tag,
+        { class: { vertical: props.vertical, group: true } },
+          slots.default?.().map((child, i) => {
+            if (child.type === Comment) {
+              offset++
+              return child
+            } else {
+              const index = i - offset
+              return h(child, {
+                size: props.size,
+                variant: child.props?.variant ?? props.variant,
+                hollow: child.props?.hollow ?? props.hollow,
+                disabled: props.disabled || child.props?.disabled,
+                modelValue: props.modelValue[props.modelValueMapping[index] ?? i],
+                'onUpdate:modelValue': typeof props.modelValue !== 'undefined' &&
+                ((value?: string|number|boolean) => emit('update:modelValue', {
+                  ...props.modelValue,
+                  [props.modelValueMapping[index] ?? index]: value
+                })),
+                class: (
+                  index === 0
+                    ? 'group-item-start'
+                    : index === (slots.default?.().length || 1) - offset
+                      ? 'group-item-end'
+                      : 'group-item'
+                ) + (
+                  props.vertical
+                    ? '-vertical'
+                    : ''
+                )
+              })
+            }
+          }
+          )
       )
-    )
+    }
   }
 })
 </script>
@@ -68,16 +93,37 @@ export default defineComponent({
   & > :deep(*) {
     @apply rounded-none;
     @apply flex-grow;
-    &:focus { @apply z-10; }
-    &:first-child { @apply rounded-l-md; }
-    &:last-child { @apply rounded-r-md; }
+    &:focus {
+      @apply z-10;
+    }
+    &:first-child {
+      @apply rounded-l-md;
+    }
+    &:last-child {
+      @apply rounded-r-md;
+    }
   }
 
+  &:not(:only-child) {
+    &.group-item-start > :deep(*):last-child { @apply rounded-none; }
+    &.group-item-end > :deep(*):first-child { @apply rounded-none; }
+    &.group-item > :deep(*), &.group-item-vertical > :deep(*) { @apply rounded-none; }
+    &.group-item-start-vertical > :deep(*) { @apply rounded-b-none; }
+    &.group-item-end-vertical > :deep(*) { @apply rounded-t-none; }
+  }
   & > :deep(*) {
-    & .rounded-within { @apply rounded-none; }
-    & .rounded-within:focus { @apply z-10; }
-    &:first-child .rounded-within { @apply rounded-l-md; }
-    &:last-child .rounded-within { @apply rounded-r-md; }
+    & .rounded-within {
+      @apply rounded-none;
+    }
+    & .rounded-within:focus {
+      @apply z-10;
+    }
+    &:first-child .rounded-within {
+      @apply rounded-l-md;
+    }
+    &:last-child .rounded-within {
+      @apply rounded-r-md;
+    }
   }
 
   &.vertical {
@@ -85,16 +131,42 @@ export default defineComponent({
 
     & > :deep(*) {
       @apply rounded-none;
-      &:focus { @apply z-10; }
-      &:first-child { @apply rounded-t-md; }
-      &:last-child { @apply rounded-b-md; }
+      &:focus {
+        @apply z-10;
+      }
+      &:first-child {
+        @apply rounded-t-md;
+      }
+      &:last-child {
+        @apply rounded-b-md;
+      }
     }
 
     & > :deep(*) {
-      & .rounded-within { @apply rounded-none; }
-      & .rounded-within:focus { @apply z-10; }
-      &:first-child .rounded-within { @apply rounded-t-md; }
-      &:last-child .rounded-within { @apply rounded-b-md; }
+      & .rounded-within {
+        @apply rounded-none;
+      }
+      & .rounded-within:focus {
+        @apply z-10;
+      }
+      &:first-child .rounded-within {
+        @apply rounded-t-md;
+      }
+      &:last-child .rounded-within {
+        @apply rounded-b-md;
+      }
+    }
+
+    &.group-item-start-vertical > :deep(*):last-child {
+      @apply rounded-none;
+    }
+
+    &.group-item-end-vertical > :deep(*):first-child {
+      @apply rounded-none;
+    }
+
+    &.group-item-vertical > :deep(*) {
+      @apply rounded-none;
     }
   }
 }
