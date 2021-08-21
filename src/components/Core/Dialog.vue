@@ -73,6 +73,7 @@ import { AlertCircleIcon, CircleCheckIcon, CircleXIcon, MessageCircleIcon, XIcon
 import { VButton, VInput, VLabel } from './'
 
 export default defineComponent({
+  name: 'VDialog',
   components: {
     VLabel,
     VButton,

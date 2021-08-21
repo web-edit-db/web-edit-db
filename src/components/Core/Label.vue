@@ -17,6 +17,7 @@
 import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
+  name: 'VLabel',
   props: {
     tag: {
       type: String,

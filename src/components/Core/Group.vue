@@ -42,8 +42,6 @@ export default defineComponent({
   emits: ['update:modelValue'],
   setup (props, { slots, emit }) {
     return () => {
-      // const childCount = slots.default?.().filter(child => child.type !== Comment).length || 1
-      // console.log(slots.default?.().length, childCount)
       let offset = 0
       return h(
         props.tag,

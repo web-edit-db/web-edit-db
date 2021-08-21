@@ -19,6 +19,7 @@ import { VLabel } from './'
 import { CircleCheckIcon, AlertCircleIcon, InfoCircleIcon, CircleXIcon, MessageCircleIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
+  name: 'VMessage',
   components: {
     VLabel,
     CircleCheckIcon,

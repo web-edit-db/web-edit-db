@@ -3,7 +3,7 @@
     <v-input
       v-bind="{ variant, size }"
       ref="input"
-      :value="modelValue"
+      :value="modelValue || value"
       @input="event => add(0)"
       @keydown.prevent.up.exact="event => add(1)"
       @keydown.prevent.down.exact="event => add(-1)"
@@ -32,6 +32,7 @@ import VInputGroup from './Group.vue'
 import { PlusIcon, MinusIcon } from 'vue-tabler-icons'
 
 export default defineComponent({
+  name: 'VNumber',
   components: {
     VInput,
     VButton,
@@ -54,7 +55,11 @@ export default defineComponent({
     },
     modelValue: {
       type: Number,
-      default: 1
+      default: null
+    },
+    value: {
+      type: Number,
+      default: null
     }
   },
   emits: ['update:modelValue'],
