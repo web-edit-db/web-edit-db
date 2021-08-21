@@ -334,6 +334,7 @@ export default defineComponent({
 
 #app > main {
   @apply overflow-y-auto;
+  @apply ml-6;
 }
 
 #app > #loading-bar {

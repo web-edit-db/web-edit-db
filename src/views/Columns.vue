@@ -158,8 +158,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      if (!isNew.value) store.dispatch('queryColumns', props.name)
-
       function sorted ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
         columns.value = Object.fromEntries(arrayMove(Object.entries(columns.value), oldIndex, newIndex))
       }

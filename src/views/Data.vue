@@ -1,35 +1,35 @@
 <template>
-  <table>
-    <tr>
-      <td />
-      <th
-        v-for="columnName in columnNames"
-        :key="columnName"
-      >
-        {{ columnName }}
-      </th>
-    </tr>
-    <tr
-      v-for="rowData, rowIndex in dataRows"
-      :key="rowIndex"
-    >
-      <th>{{ rowIndex }}</th>
-      <td
-        v-for="cellData, cellIndex in rowData"
-        :key="cellIndex"
-      >
-        {{ cellData }}
-      </td>
-    </tr>
-  </table>
+  <table-data-table
+    v-model:selected="selected"
+    :headers="columnNames"
+    :rows="dataRows"
+  />
+  <table-data-editor
+    :selected="selected.row !== -1 && selected.col !== -1 ? {
+      value: dataRows[selected.row][selected.col],
+      row: selected.row,
+      column: columnNames[selected.col],
+    } : null"
+  />
+  <!-- type: $store.state.tables[columnNames[selected.col]].type -->
+  <!-- :selected="dataRows?.[selected.row][selected.col]"
+    :row="selected.row"
+    :column="columnNames?.[selected.col]"
+    :type="$store.state.tables?.[columnNames[selected.col]].type" -->
 </template>
 
 <script lang="ts">
 import { useStore } from 'vuex'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { State } from '@/store/types'
+import TableDataTable from '@/components/TableDataTable.vue'
+import TableDataEditor from '@/components/TableDataEditor.vue'
 
 export default defineComponent({
+  components: {
+    TableDataTable,
+    TableDataEditor
+  },
   props: {
     name: {
       type: String,
@@ -38,7 +38,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore<State>()
-    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM ${props.name}`))
+    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM ${props.name} LIMIT 100`))
     const columnNames = computed(() => statment.value?.getColumnNames())
     const dataRows = computed(() => {
       if (statment.value) {
@@ -52,22 +52,25 @@ export default defineComponent({
       }
       return undefined
     })
-    return { columnNames, dataRows }
+
+    const selected = ref({ row: -1, col: -1 })
+    return { columnNames, dataRows, selected }
   }
 })
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
+#app > main {
+  /* @apply flex; */
+  @apply grid;
+  grid-template-columns: 1fr theme('spacing.72');
+  grid-template-rows: 1fr;
+  @apply items-stretch;
+  @apply overflow-x-auto;
+  /* @apply justify-between; */
 
-tr:nth-child(even) {
-  @apply bg-white;
-}
-
-td {
-  @apply max-w-sm overflow-hidden ellipsis whitespace-nowrap;
-}
-
-td, th {
-  @apply px-4 py-2;
+  /* & > .table {
+    @apply flex-grow;
+  } */
 }
 </style>
