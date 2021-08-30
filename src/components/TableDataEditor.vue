@@ -50,11 +50,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, triggerRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useStore } from 'vuex'
-import { VInput, VNumber, VGroup, VButton } from '@/components/Core'
+import { VButton, VGroup, VInput, VNumber } from '@/components/Core'
 import { State } from '@/store/types'
+import { Statement } from 'sql.js'
+import { computed, ComputedRef, defineComponent, inject, PropType, triggerRef } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   components: {
@@ -77,7 +78,7 @@ export default defineComponent({
   setup (props) {
     const store = useStore<State>()
     const route = useRoute()
-    const router = useRouter()
+    const statment = inject<ComputedRef<Statement>>('statment')
     const tableName = computed(() => route.params.name as string)
 
     const currentValue = computed({
@@ -150,11 +151,12 @@ export default defineComponent({
         }
       })
     }
-    const commit = () => {
-      store.dispatch(
+    const commit = async () => {
+      await store.dispatch(
         'alterTableData',
         { tableName: tableName.value }
       )
+      if (statment) triggerRef(statment)
     }
     return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit }
   }

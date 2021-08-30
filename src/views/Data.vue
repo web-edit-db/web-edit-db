@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import { useStore } from 'vuex'
-import { computed, defineComponent, ref } from 'vue'
-import { State } from '@/store/types'
-import TableDataTable from '@/components/TableDataTable.vue'
 import TableDataEditor from '@/components/TableDataEditor.vue'
+import TableDataTable from '@/components/TableDataTable.vue'
+import { State } from '@/store/types'
+import { computed, defineComponent, provide, ref } from 'vue'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   components: {
@@ -47,6 +47,7 @@ export default defineComponent({
       }
       return undefined
     })
+    provide('statment', statment)
 
     const selected = ref({ row: -1, col: -1 })
     return { columnNames, dataRows, selected }
