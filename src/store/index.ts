@@ -6,7 +6,7 @@ import { State } from './types'
 
 export default createStore<State>({
   state: {
-    sqljs: null,
+    sqlJs: null,
     database: null,
     tables: {},
     modifications: {}

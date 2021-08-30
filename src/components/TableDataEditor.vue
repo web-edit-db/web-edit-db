@@ -4,32 +4,57 @@
       <h1>
         {{ tableName }}.{{ selected.column }} @ row {{ selected.row }}
       </h1>
-      <v-group
+      <component
+        :is="`v-${inputType}`"
+        v-model="currentValue"
+        :placeholder="currentValue === null ? 'null' : ''"
         variant="primary"
-      >
-        <component
-          :is="`v-${inputType}`"
-          :value="selected.value"
-        />
-        <v-button
-          v-if="!column?.notNull"
-          text="Set Null"
-        />
-      </v-group>
+      />
+      <v-button
+        v-if="!column?.notNull"
+        text="Set Null"
+        variant="primary"
+        @click="currentValue = null"
+      />
+      <v-button
+        v-if="!selected?.new"
+        text="Revert changes"
+        variant="error"
+        :disabled="currentValue === selected.value"
+        @click="currentValue = undefined"
+      />
     </template>
     <template v-else>
       <h1>
         Select a cell to edit it
       </h1>
     </template>
+    <!-- <section> -->
+    <v-button
+      v-if="!selected?.new"
+      class="mt-auto"
+      text="Commit changes"
+      variant="success"
+      :disabled="!tableHasChanges"
+      @click="commit"
+    />
+    <v-button
+      v-if="!selected?.new"
+      text="Disscard changes"
+      variant="error"
+      :disabled="!tableHasChanges"
+      @click="revertTableChanges"
+    />
+    <!-- </section> -->
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, defineComponent, PropType, ref, triggerRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { VInput, VNumber, VGroup, VButton } from '@/components/Core'
+import { State } from '@/store/types'
 
 export default defineComponent({
   components: {
@@ -43,22 +68,55 @@ export default defineComponent({
       type: Object as PropType<{
         value: string | number | boolean,
         row: number,
-        column: string
-      }>,
+        column: string,
+        new: boolean
+      }| null>,
       default: () => null
     }
   },
   setup (props) {
-    const store = useStore()
+    const store = useStore<State>()
     const route = useRoute()
-    const column = computed(() => store.state.tables[
-        route.params.name as string
-    ].columns?.[
-        props.selected?.column
-    ])
+    const router = useRouter()
+    const tableName = computed(() => route.params.name as string)
+
+    const currentValue = computed({
+      get () {
+        const updates = store.state.modifications[tableName.value]?.data?.updates
+        if (props.selected && updates?.[props.selected.row]?.[props.selected.column] !== undefined) {
+          return updates?.[props.selected.row]?.[props.selected.column]
+        } else if (props.selected) {
+          return props.selected.value
+        } else {
+          return undefined
+        }
+      },
+      set (value) {
+        store.commit('setModifiedDataUpdate', {
+          tableName: tableName.value,
+          columnName: props.selected?.column,
+          rowNumber: props.selected?.row,
+          updateValue:
+            props.selected?.value === value
+              ? undefined
+              : value
+        })
+      }
+    })
+
+    const column = computed(() => {
+      if (props.selected?.column !== undefined) {
+        return store.state.tables[
+          tableName.value
+        ].columns?.[props.selected?.column]
+      } else {
+        return undefined
+      }
+    }
+    )
     const inputType = computed(() => {
       // See https://www.sqlite.org/datatype3.html 3.1. Determination Of Column Affinity
-      const type = column.value?.type.toUpperCase()
+      const type = column.value?.type?.toUpperCase()
       if (type === undefined) {
         return undefined
       } else if (type.includes('INT')) {
@@ -78,8 +136,27 @@ export default defineComponent({
         return 'input'
       }
     })
-    const tableName = computed(() => route.params.name)
-    return { inputType, tableName, column }
+
+    const tableHasChanges = computed(() => {
+      const data = store.state.modifications[tableName.value].data
+      return data.new.length > 0 || Object.values(data.updates).some(value => Object.values(value).some(value => value !== undefined))
+    })
+    const revertTableChanges = () => {
+      store.commit('setModifiedData', {
+        tableName: tableName.value,
+        dataValue: {
+          updates: {},
+          new: []
+        }
+      })
+    }
+    const commit = () => {
+      store.dispatch(
+        'alterTableData',
+        { tableName: tableName.value }
+      )
+    }
+    return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit }
   }
 })
 </script>

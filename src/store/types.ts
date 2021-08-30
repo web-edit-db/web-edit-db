@@ -21,11 +21,24 @@ export interface Column {
   drop: boolean
 }
 
-interface Table {
+export interface Table {
   columns: {
     [columnName: string]: Column
   },
   new: boolean
+}
+
+export interface TableModification extends Table {
+  data: {
+    updates: {
+      [row: number]: {
+        [column: string]: string|number|boolean|null|undefined
+      }
+    },
+    new: {
+      [column: string]: string|number|null
+    }[]
+  },
 }
 
 export interface State {
@@ -39,6 +52,6 @@ export interface State {
     [tableName: string]: Table
   },
   modifications: {
-    [tableName: string]: Table
+    [tableName: string]: TableModification
   }
 }

@@ -11,11 +11,6 @@
       column: columnNames[selected.col],
     } : null"
   />
-  <!-- type: $store.state.tables[columnNames[selected.col]].type -->
-  <!-- :selected="dataRows?.[selected.row][selected.col]"
-    :row="selected.row"
-    :column="columnNames?.[selected.col]"
-    :type="$store.state.tables?.[columnNames[selected.col]].type" -->
 </template>
 
 <script lang="ts">
@@ -38,7 +33,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore<State>()
-    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM ${props.name} LIMIT 100`))
+    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM ${props.name}`))
     const columnNames = computed(() => statment.value?.getColumnNames())
     const dataRows = computed(() => {
       if (statment.value) {

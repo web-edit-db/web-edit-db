@@ -5,7 +5,7 @@ import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 import { ActionTree } from 'vuex'
 import { columnToString, runStatement, SQLITE_EXTENSIONS } from './helpers'
-import { Column, State } from './types'
+import { Column, State, TableModification } from './types'
 
 export default {
   async createDatabase ({ commit, state }) {
@@ -95,6 +95,10 @@ export default {
         ...prev,
         [name]: {
           columns: {},
+          data: {
+            updates: {},
+            new: []
+          },
           new: false
         }
       }),
@@ -178,11 +182,14 @@ export default {
             }
           }, {})
         },
+        data: state.modifications[tableName]?.data,
         new: false
       }
     }
     commit('setModifications', payload)
   },
+
+  // modifications
   async addModifiedColumn ({ commit, state }, { tableName, columnName, column }: { tableName: string, columnName: string, column: Partial<Column> }) {
     if (columnName === undefined) {
       let columnNumber = 0
@@ -234,6 +241,7 @@ export default {
       tableName,
       modified: {
         columns: {},
+        data: {},
         new: true
       }
     })
@@ -249,6 +257,8 @@ export default {
       )
     )
   },
+
+  // table
   async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
     if (!state.database) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
@@ -328,5 +338,29 @@ export default {
     if (!state.database) return
     state.database.connection.run(`DROP TABLE ${tableName}`)
     await dispatch('queryTables')
+  },
+  async alterTableData ({ state, commit }, { tableName, data }: { tableName: string, data?: TableModification['data'] }) {
+    if (!state.database) return undefined
+    if (data === undefined) data = state.modifications[tableName].data
+    const sql = []
+    sql.push('BEGIN TRANSACTION;')
+    for (const rowId in data.updates) {
+      sql.push(
+        `UPDATE ${tableName} SET ${Object.entries(
+          data.updates[rowId]
+        ).map(
+          ([column, value]) => `[${column}] = ${typeof value === 'string' ? ('"' + value + '"') : value}`
+        ).join(', ')} WHERE ROWID = ${+rowId + 1};`
+      )
+    }
+    console.log(sql.join('\n\n'))
+    try {
+      state.database.connection.run(sql.join('\n\n'))
+      state.database.connection.run('COMMIT;')
+      commit('setModifiedData', { tableName, dataValue: { updates: {}, new: [] } })
+    } catch (error) {
+      console.log('has error', error)
+      state.database.connection.run('ROLLBACK;')
+    }
   }
 } as ActionTree<State, State>

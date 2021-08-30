@@ -6,6 +6,7 @@
       end,
       highlight,
       selected,
+      modified,
       null: value === null
     }"
   >
@@ -41,6 +42,10 @@ export default defineComponent({
     selected: {
       type: Boolean,
       default: false
+    },
+    modified: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {
@@ -71,10 +76,10 @@ div {
     @apply mx-0.5;
     @apply text-center;
     @apply sticky;
+    @apply z-20;
 
     &.top {
       @apply top-0;
-      @apply z-10;
     }
 
     &.left {
@@ -100,6 +105,10 @@ div {
 
   &.highlight {
     @apply bg-gray-200;
+  }
+
+  &.modified, &.modified.selected {
+    @apply bg-primary-300;
   }
 
   &.selected {

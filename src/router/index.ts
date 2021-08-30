@@ -83,7 +83,11 @@ router.beforeEach((to, from, next) => {
     if (to.name === 'Table') {
       next({
         ...to,
-        name: (from.name !== 'Table' && from.name?.toString().startsWith('Table')) ? from.name : 'TableColumns'
+        name: (
+          from.name !== 'Table' &&
+          from.name?.toString().startsWith('Table') &&
+          !store.state.modifications[to.params.name as string].new
+        ) ? from.name : 'TableColumns'
       })
     } else {
       next()

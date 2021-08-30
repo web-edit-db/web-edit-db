@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, h, PropType, Comment } from 'vue'
+import { defineComponent, h, PropType, Comment, mergeProps, cloneVNode } from 'vue'
+import { VNode } from '@vue/runtime-core'
 
 export default defineComponent({
   name: 'VGroup',
@@ -57,12 +58,20 @@ export default defineComponent({
                 variant: child.props?.variant ?? props.variant,
                 hollow: child.props?.hollow ?? props.hollow,
                 disabled: props.disabled || child.props?.disabled,
-                modelValue: props.modelValue[props.modelValueMapping[index] ?? i],
-                'onUpdate:modelValue': typeof props.modelValue !== 'undefined' &&
-                ((value?: string|number|boolean) => emit('update:modelValue', {
-                  ...props.modelValue,
-                  [props.modelValueMapping[index] ?? index]: value
-                })),
+                modelValue:
+                  child.props?.modelValue ??
+                  child.props?.['model-value'] ??
+                  props.modelValue[props.modelValueMapping[index] ?? i],
+                'onUpdate:modelValue':
+                  child.props?.['onUpdate:modelValue'] ??
+                  (typeof props.modelValue !== 'undefined' &&
+                    (
+                      (value?: string|number|boolean) => emit('update:modelValue', {
+                        ...props.modelValue,
+                        [props.modelValueMapping[index] ?? index]: value
+                      })
+                    )
+                  ),
                 class: (
                   index === 0
                     ? 'group-item-start'

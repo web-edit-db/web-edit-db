@@ -1,14 +1,13 @@
 <template>
   <v-input-group>
     <v-input
-      v-bind="{ variant, size }"
+      v-bind="{ variant, size, placeholder }"
       ref="input"
-      :value="modelValue || value"
+      :value="modelValue ?? value"
       @input="event => add(0)"
       @keydown.prevent.up.exact="event => add(1)"
       @keydown.prevent.down.exact="event => add(-1)"
     />
-    <!-- @input="event => $emit('update:ModelValue', +event.target.value || 1)" -->
     <v-button
       v-bind="{ variant, size, hollow }"
       @click="add(-1)"
@@ -60,6 +59,10 @@ export default defineComponent({
     value: {
       type: Number,
       default: null
+    },
+    placeholder: {
+      type: String,
+      default: ''
     }
   },
   emits: ['update:modelValue'],

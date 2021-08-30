@@ -1,6 +1,6 @@
 <template>
   <div
-    :style="`--cols: ${headers.length + 1}; --rows: ${rows.length}`"
+    :style="`--cols: ${headers.length + 1}; --rows: ${rows.length + 1}`"
     class="table"
     @mouseleave="hovering = selected"
   >
@@ -30,25 +30,34 @@
         :key="cellId"
         :start="cellId === 0"
         :end="cellId === row.length - 1"
-        :value="cell"
-        :highlight="hovering.col === cellId && hovering.row === rowId"
-        :selected="selected.col === cellId && selected.row === rowId"
+        :value="
+          updates?.[rowId]?.[headers[cellId]] !== undefined
+            ? updates?.[rowId ]?.[headers[cellId]]
+            : cell"
+        :highlight="hovering.col === cellId && hovering.row === (rowId)"
+        :selected="selected.col === cellId && selected.row === (rowId)"
+        :modified="
+          updates?.[rowId]?.[headers[cellId]] !== undefined
+            && updates[rowId][headers[cellId]] !== cell
+        "
         @mouseover="hovering = { col: cellId, row: rowId }"
         @mousedown="$emit('update:selected', { col: cellId, row: rowId })"
       />
-      <!-- <span class="absolute">{{ selected == { col: cellId, row: rowId } }} {{ selected }} {{ { col: cellId, row: rowId } }}</span> -->
     </template>
     <span
       class="w-full"
-      :style="`grid-row: 1 / ${rows.length}; grid-column: -1;`"
+      :style="`grid-row: 1 / ${rows.length + 2}; grid-column: -1;`"
       @mouseover.self="hovering = selected"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue'
+import { computed, defineComponent, PropType, ref } from 'vue'
 import TableDataCell from '@/components/TableDataCell.vue'
+import { useStore } from 'vuex'
+import { State } from '@/store/types'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -70,8 +79,12 @@ export default defineComponent({
   },
   emits: ['update:selected'],
   setup () {
+    const store = useStore<State>()
+    const route = useRoute()
     const hovering = ref<{ row: number, col: number }>({ row: -1, col: -1 })
-    return { hovering }
+    const updates = computed(() => store.state.modifications[route.params.name as string]?.data?.updates)
+
+    return { hovering, updates }
   }
 })
 </script>
