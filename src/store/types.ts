@@ -36,7 +36,7 @@ export interface TableModification extends Table {
       }
     },
     new: {
-      [column: string]: string|number|null
+      [column: string]: string|number|boolean|null|undefined
     }[]
   },
 }

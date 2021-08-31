@@ -29,23 +29,24 @@
         Select a cell to edit it
       </h1>
     </template>
-    <!-- <section> -->
     <v-button
-      v-if="!selected?.new"
-      class="mt-auto"
+      class="mt-auto mb-2"
+      text="Add row"
+      variant="primary"
+      @click="addRow"
+    />
+    <v-button
       text="Commit changes"
       variant="success"
       :disabled="!tableHasChanges"
       @click="commit"
     />
     <v-button
-      v-if="!selected?.new"
       text="Disscard changes"
       variant="error"
       :disabled="!tableHasChanges"
       @click="revertTableChanges"
     />
-    <!-- </section> -->
   </div>
 </template>
 
@@ -83,8 +84,10 @@ export default defineComponent({
 
     const currentValue = computed({
       get () {
-        const updates = store.state.modifications[tableName.value]?.data?.updates
-        if (props.selected && updates?.[props.selected.row]?.[props.selected.column] !== undefined) {
+        const updates = store.state.modifications[tableName.value].data.updates
+        if (props.selected?.new) {
+          return store.state.modifications[tableName.value]?.data.new[props.selected?.row]?.[props.selected?.column] ?? null
+        } else if (props.selected && updates?.[props.selected.row]?.[props.selected.column] !== undefined) {
           return updates?.[props.selected.row]?.[props.selected.column]
         } else if (props.selected) {
           return props.selected.value
@@ -93,15 +96,18 @@ export default defineComponent({
         }
       },
       set (value) {
-        store.commit('setModifiedDataUpdate', {
-          tableName: tableName.value,
-          columnName: props.selected?.column,
-          rowNumber: props.selected?.row,
-          updateValue:
-            props.selected?.value === value
-              ? undefined
-              : value
-        })
+        store.commit(
+          props.selected?.new ? 'setModifiedDataNew' : 'setModifiedDataUpdate',
+          {
+            tableName: tableName.value,
+            columnName: props.selected?.column,
+            [props.selected?.new ? 'newIndex' : 'rowNumber']: props.selected?.row,
+            updateValue:
+              props.selected?.value === value && !props.selected?.new
+                ? undefined
+                : value
+          }
+        )
       }
     })
 
@@ -151,6 +157,12 @@ export default defineComponent({
         }
       })
     }
+    const addRow = () => {
+      store.commit('setModifiedDataNew', {
+        tableName: tableName.value,
+        newIndex: store.state.modifications[tableName.value].data.new.length
+      })
+    }
     const commit = async () => {
       await store.dispatch(
         'alterTableData',
@@ -158,7 +170,7 @@ export default defineComponent({
       )
       if (statment) triggerRef(statment)
     }
-    return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit }
+    return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit, addRow }
   }
 })
 </script>

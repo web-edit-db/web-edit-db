@@ -15,38 +15,43 @@
       @mouseover="hovering = selected"
     />
     <template
-      v-for="row, rowId in rows"
+      v-for="{ value: row, new: isNew}, rowId in allRows"
       :key="rowId"
     >
       <table-data-cell
         :header="true"
-        :value="rowId"
+        :value="isNew ? `+${rowId - rows.length + 1}` : (rowId + 1)"
         :highlight="hovering.row === rowId"
         class="left col-start-1"
         @mouseover="hovering = selected"
       />
+
       <table-data-cell
-        v-for="cell, cellId in row"
-        :key="cellId"
+        v-for="column, cellId in headers"
+        :key="`${rowId}-${cellId}`"
         :start="cellId === 0"
-        :end="cellId === row.length - 1"
+        :end="cellId === headers.length - 1"
         :value="
-          updates?.[rowId]?.[headers[cellId]] !== undefined
-            ? updates?.[rowId ]?.[headers[cellId]]
-            : cell"
+          updates?.[rowId]?.[column] !== undefined
+            ? updates?.[rowId ]?.[column]
+            : (row[column] ?? null)"
         :highlight="hovering.col === cellId && hovering.row === (rowId)"
-        :selected="selected.col === cellId && selected.row === (rowId)"
+        :selected="
+          selected.new === isNew
+            && selected.col === cellId
+            && selected.row === (isNew ? (rowId - rows.length) : rowId)
+        "
         :modified="
           updates?.[rowId]?.[headers[cellId]] !== undefined
-            && updates[rowId][headers[cellId]] !== cell
+            && updates[rowId][headers[cellId]] !== row[column]
         "
         @mouseover="hovering = { col: cellId, row: rowId }"
-        @mousedown="$emit('update:selected', { col: cellId, row: rowId })"
+        @mousedown="$emit('update:selected', { new: isNew, col: cellId, row: rowId })"
       />
     </template>
     <span
       class="w-full"
-      :style="`grid-row: 1 / ${rows.length + 2}; grid-column: -1;`"
+      :style="`grid-row: 1 / ${allRows.length + 2}; grid-column: -1;`"
       @mouseover.self="hovering = selected"
     />
   </div>
@@ -69,7 +74,7 @@ export default defineComponent({
       default: () => []
     },
     rows: {
-      type: Array as PropType<(string|number)[][]>,
+      type: Array as PropType<(string|number|boolean|null)[][]>,
       default: () => []
     },
     selected: {
@@ -78,13 +83,18 @@ export default defineComponent({
     }
   },
   emits: ['update:selected'],
-  setup () {
+  setup (props) {
     const store = useStore<State>()
     const route = useRoute()
     const hovering = ref<{ row: number, col: number }>({ row: -1, col: -1 })
-    const updates = computed(() => store.state.modifications[route.params.name as string]?.data?.updates)
+    const updates = computed(() => store.state.modifications[route.params.name as string].data?.updates)
+    const newRows = computed(() => store.state.modifications[route.params.name as string]?.data.new ?? [])
+    const allRows = computed(() => [
+      ...props.rows.map(value => ({ value: value, new: false })),
+      ...newRows.value.map(value => ({ value: value, new: true }))
+    ])
 
-    return { hovering, updates }
+    return { hovering, updates, newRows, allRows }
   }
 })
 </script>

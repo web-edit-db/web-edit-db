@@ -6,8 +6,8 @@
   />
   <table-data-editor
     :selected="selected.row !== -1 && selected.col !== -1 ? {
-      value: dataRows[selected.row][selected.col],
-      row: selected.row,
+      ...selected,
+      value: dataRows?.[selected.row]?.[columnNames[selected.col]],
       column: columnNames[selected.col],
     } : null"
   />
@@ -33,14 +33,14 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore<State>()
-    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM ${props.name}`))
+    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM [${props.name}]`))
     const columnNames = computed(() => statment.value?.getColumnNames())
     const dataRows = computed(() => {
       if (statment.value) {
         const output = []
         while (statment.value.step()) {
           const rowObject = statment.value.getAsObject()
-          output.push(columnNames.value?.map(columnName => rowObject[columnName]))
+          output.push(rowObject)
         }
         statment.value.reset()
         return output

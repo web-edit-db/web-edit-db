@@ -346,14 +346,19 @@ export default {
     sql.push('BEGIN TRANSACTION;')
     for (const rowId in data.updates) {
       sql.push(
-        `UPDATE ${tableName} SET ${Object.entries(
+        `UPDATE [${tableName}] SET ${Object.entries(
           data.updates[rowId]
         ).map(
           ([column, value]) => `[${column}] = ${typeof value === 'string' ? ('"' + value + '"') : value}`
         ).join(', ')} WHERE ROWID = ${+rowId + 1};`
       )
     }
-    console.log(sql.join('\n\n'))
+    for (const newId in data.new) {
+      sql.push(`
+        INSERT INTO [${tableName}] (${Object.keys(data.new[newId]).join(', ')})
+          VALUES (${Object.values(data.new[newId]).map(value => `${typeof value === 'string' ? ('"' + value + '"') : value}`).join(', ')})
+      `)
+    }
     try {
       state.database.connection.run(sql.join('\n\n'))
       state.database.connection.run('COMMIT;')

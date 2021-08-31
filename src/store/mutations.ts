@@ -65,6 +65,27 @@ const mutations: MutationTree<State> = {
       state.modifications[tableName].data.updates[rowNumber] = {}
     }
     state.modifications[tableName].data.updates[rowNumber][columnName] = updateValue
+  },
+  setModifiedDataNew (
+    state,
+    {
+      tableName,
+      columnName,
+      newIndex,
+      updateValue
+    }: {
+      tableName: string;
+      columnName?: string;
+      newIndex: number;
+      updateValue?: string | number | boolean | null;
+    }
+  ) {
+    if (!state.modifications[tableName].data.new[newIndex]) {
+      state.modifications[tableName].data.new[newIndex] = Object.fromEntries(
+        Object.keys(state.tables[tableName].columns).map(column => ([column, null]))
+      )
+    }
+    if (columnName) state.modifications[tableName].data.new[newIndex][columnName] = updateValue
   }
 }
 
