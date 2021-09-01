@@ -2,7 +2,7 @@
   <div class="data-editor">
     <template v-if="selected">
       <h1>
-        {{ tableName }}.{{ selected.column }} @ row {{ selected.row }}
+        {{ tableName }}.{{ selected.column }} @ row {{ selected.new ? '+' : '' }} {{ selected.row + 1 }}
       </h1>
       <component
         :is="`v-${inputType}`"

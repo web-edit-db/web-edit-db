@@ -241,7 +241,10 @@ export default {
       tableName,
       modified: {
         columns: {},
-        data: {},
+        data: {
+          updates: {},
+          new: []
+        },
         new: true
       }
     })
