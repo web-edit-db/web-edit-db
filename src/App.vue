@@ -59,6 +59,7 @@ import { useStore } from 'vuex'
 import mean from 'lodash/mean'
 import { VMessage, VDialog } from '@/components/Core'
 import { State } from './store/types'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 export interface LoadingSystem {
   ref?: HTMLDivElement
@@ -313,6 +314,22 @@ export default defineComponent({
         )
         console.error(error)
       })
+
+    const { updateServiceWorker } = useRegisterSW({
+      onOfflineReady: () => message.success('Web Edit DB works offline!'),
+      onNeedRefresh () {
+        dialog.confirm(
+          'There is a new version of Web Edit DB!',
+          {
+            header: 'Update',
+            onPositive () {
+              updateServiceWorker()
+            },
+            positive: 'Reload'
+          }
+        )
+      }
+    })
 
     return { loading, message, dialog }
   }
