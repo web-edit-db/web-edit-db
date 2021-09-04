@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="breadcrumbs z-30">
     <template v-if="databaseName">
       <v-button
         variant="text"
@@ -9,26 +9,90 @@
       />
       <separator />
     </template>
-    <v-button
-      variant="text"
-      size="sm"
-      :text="$route.name?.startsWith('Table') ? 'Table' : $route.name"
-    />
+    <v-dropdown
+      :hidden-wrapper-attrs="{
+        class: 'min-w-full'
+      }"
+    >
+      <v-button
+        variant="text"
+        class="items-center"
+        size="sm"
+        :text="$route.name?.startsWith('Table') ? `Table - ${$route.params.name}` : $route.name"
+      />
+      <template #hidden>
+        <v-group :vertical="true">
+          <v-button
+            tag="router-link"
+            text="Home"
+            to="/"
+          />
+          <v-dropdown
+            trigger="hover"
+            :hidden-wrapper-attrs="{
+              style: 'left: 100%; top: 0;',
+              class: 'max-h-40 overflow-y-auto overflow-x-hidden'
+            }"
+          >
+            <v-button
+              text="Table"
+              class="w-full rounded-t-none"
+              style="justify-content: start;"
+            />
+            <template #hidden>
+              <v-group
+                :vertical="true"
+              >
+                <v-button
+                  v-for="table in tableNames"
+                  :key="table"
+                  tag="router-link"
+                  :text="table"
+                  :to="{ name: 'Table', params: { name: table } }"
+                />
+              </v-group>
+            </template>
+          </v-dropdown>
+        </v-group>
+      </template>
+    </v-dropdown>
     <template v-if="$route.name?.startsWith('Table')">
       <separator />
-      <v-button
-        variant="text"
-        size="sm"
-        :text="$route.params.name"
-        class="table-name"
-      />
-      <separator />
-      <v-button
-        variant="text"
-        size="sm"
-        :text="$route.name.substring(5)"
-        class="table-name"
-      />
+      <div>
+        <v-dropdown>
+          <v-button
+            variant="text"
+            size="sm"
+            :text="$route.name.substring(5)"
+            class="table-name"
+          />
+          <template
+            #hidden
+          >
+            <v-group
+              :vertical="true"
+            >
+              <v-button
+                tag="router-link"
+                size="sm"
+                text="Columns"
+                :to="{
+                  name: 'TableColumns'
+                }"
+              />
+              <v-button
+                v-if="!$store.state.modifications[$route.params?.name]?.new"
+                tag="router-link"
+                size="sm"
+                text="Data"
+                :to="{
+                  name: 'TableData'
+                }"
+              />
+            </v-group>
+          </template>
+        </v-dropdown>
+      </div>
     </template>
   </div>
 </template>
@@ -37,7 +101,9 @@
 import { computed, defineComponent, h, inject } from 'vue'
 import { useStore } from 'vuex'
 import {
-  VButton
+  VButton,
+  VDropdown,
+  VGroup
 } from '@/components/Core'
 import { DialogSystem } from '@/App.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -46,7 +112,9 @@ import { State } from '@/store/types'
 export default defineComponent({
   components: {
     separator: () => h('span', { class: 'text-2xl text-primary' }, '/'),
-    VButton
+    VButton,
+    VDropdown,
+    VGroup
   },
   setup () {
     const store = useStore<State>()
@@ -74,17 +142,19 @@ export default defineComponent({
         })
       }
     }
+    const tableNames = computed(() => Object.keys(store.state.modifications))
 
     return {
       databaseName,
-      renameDatabase
+      renameDatabase,
+      tableNames
     }
   }
 })
 </script>
 
 <style lang="postcss" scoped>
-div {
+.breadcrumbs {
   @apply flex items-center gap-2;
 }
 
