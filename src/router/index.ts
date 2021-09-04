@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'data',
         name: 'TableData',
         meta: {
-          title: () => `Table - ${router.currentRoute.value.params.name} - Data`
+          title: () => `Table - ${router.currentRoute.value.params.name} / Data`
         },
         component: () => import('@/views/Data.vue'),
         props: true
@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'columns',
         name: 'TableColumns',
         meta: {
-          title: () => `Table - ${router.currentRoute.value.params.name} - Columns`
+          title: () => `Table - ${router.currentRoute.value.params.name} / Columns`
         },
         component: () => import('@/views/Columns.vue'),
         props: true
