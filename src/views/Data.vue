@@ -1,16 +1,18 @@
 <template>
-  <table-data-table
-    v-model:selected="selected"
-    :headers="columnNames"
-    :rows="dataRows"
-  />
-  <table-data-editor
-    :selected="selected.row !== -1 && selected.col !== -1 ? {
-      ...selected,
-      value: dataRows?.[selected.row]?.[columnNames[selected.col]],
-      column: columnNames[selected.col],
-    } : null"
-  />
+  <main>
+    <table-data-table
+      v-model:selected="selected"
+      :headers="columnNames"
+      :rows="dataRows"
+    />
+    <table-data-editor
+      :selected="selected.row !== -1 && selected.col !== -1 ? {
+        ...selected,
+        value: dataRows?.[selected.row]?.[columnNames[selected.col]],
+        column: columnNames[selected.col],
+      } : null"
+    />
+  </main>
 </template>
 
 <script lang="ts">
@@ -55,18 +57,13 @@ export default defineComponent({
 })
 </script>
 
-<style lang="postcss">
-#app > main {
-  /* @apply flex; */
+<style lang="postcss" scoped>
+main {
   @apply grid;
   grid-template-columns: 1fr theme('spacing.72');
   grid-template-rows: 1fr;
   @apply items-stretch;
   @apply overflow-x-auto;
-  /* @apply justify-between; */
-
-  /* & > .table {
-    @apply flex-grow;
-  } */
+  @apply max-h-full;
 }
 </style>
