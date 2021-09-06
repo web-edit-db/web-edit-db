@@ -86,6 +86,19 @@ const mutations: MutationTree<State> = {
       )
     }
     if (columnName) state.modifications[tableName].data.new[newIndex][columnName] = updateValue
+  },
+  deleteModifiedDataNew (state, { tableName, newIndex }: { tableName: string, newIndex: number }) {
+    state.modifications[tableName].data.new.splice(newIndex, 1)
+  },
+  setModifiedDataDelete (state, { tableName, rowNumber }: { tableName: string, rowNumber: number }) {
+    if (state.modifications[tableName].data.delete.includes(rowNumber)) {
+      state.modifications[tableName].data.delete.splice(
+        state.modifications[tableName].data.delete.indexOf(rowNumber),
+        1
+      )
+    } else {
+      state.modifications[tableName].data.delete.push(rowNumber)
+    }
   }
 }
 

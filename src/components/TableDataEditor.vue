@@ -30,7 +30,14 @@
       </h1>
     </template>
     <v-button
-      class="mt-auto mb-2"
+      class="mt-auto"
+      :text="rowDeleted ? 'Restore row' : 'Delete row'"
+      variant="error"
+      :disabled="!selected"
+      @click="deleteRow"
+    />
+    <v-button
+      class="mb-2"
       text="Add row"
       variant="primary"
       @click="addRow"
@@ -101,7 +108,7 @@ export default defineComponent({
           {
             tableName: tableName.value,
             columnName: props.selected?.column,
-            [props.selected?.new ? 'newIndex' : 'rowNumber']: props.selected?.row,
+            [props.selected?.new ? 'newIndex' : 'rowNumber']: (props.selected?.row ?? 1) - (props.selected?.new ? 1 : 0),
             updateValue:
               props.selected?.value === value && !props.selected?.new
                 ? undefined
@@ -146,14 +153,15 @@ export default defineComponent({
 
     const tableHasChanges = computed(() => {
       const data = store.state.modifications[tableName.value].data
-      return data.new.length > 0 || Object.values(data.updates).some(value => Object.values(value).some(value => value !== undefined))
+      return data.new.length > 0 || data.delete.length > 0 || Object.values(data.updates).some(value => Object.values(value).some(value => value !== undefined))
     })
     const revertTableChanges = () => {
       store.commit('setModifiedData', {
         tableName: tableName.value,
         dataValue: {
           updates: {},
-          new: []
+          new: [],
+          delete: []
         }
       })
     }
@@ -163,6 +171,27 @@ export default defineComponent({
         newIndex: store.state.modifications[tableName.value].data.new.length
       })
     }
+    const deleteRow = () => {
+      if (props.selected && props.selected.new) {
+        store.commit('deleteModifiedDataNew', {
+          tableName: tableName.value,
+          newIndex: props.selected.row - 1
+        })
+      } else if (props.selected) {
+        store.commit(
+          'setModifiedDataDelete',
+          {
+            tableName: tableName.value,
+            rowNumber: props.selected.row
+          }
+        )
+      }
+    }
+    const rowDeleted = computed(
+      () => props.selected &&
+       !props.selected.new &&
+        store.state.modifications[tableName.value].data.delete.includes(props.selected?.row)
+    )
     const commit = async () => {
       await store.dispatch(
         'alterTableData',
@@ -170,7 +199,7 @@ export default defineComponent({
       )
       if (statment) triggerRef(statment)
     }
-    return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit, addRow }
+    return { inputType, tableName, column, currentValue, tableHasChanges, revertTableChanges, commit, addRow, deleteRow, rowDeleted }
   }
 })
 </script>

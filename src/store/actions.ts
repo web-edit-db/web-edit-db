@@ -97,7 +97,8 @@ export default {
           columns: {},
           data: {
             updates: {},
-            new: []
+            new: [],
+            delete: []
           },
           new: false
         }
@@ -243,7 +244,8 @@ export default {
         columns: {},
         data: {
           updates: {},
-          new: []
+          new: [],
+          delete: []
         },
         new: true
       }
@@ -345,9 +347,11 @@ export default {
   async alterTableData ({ state, commit }, { tableName, data }: { tableName: string, data?: TableModification['data'] }) {
     if (!state.database) return undefined
     if (data === undefined) data = state.modifications[tableName].data
+    if (data === undefined) return undefined
     const sql = []
     sql.push('BEGIN TRANSACTION;')
-    for (const rowId in data.updates) {
+    const filteredUpdates = Object.keys(data.updates).filter(key => !data?.delete.includes(+key))
+    for (const rowId in filteredUpdates) {
       sql.push(
         `UPDATE [${tableName}] SET ${Object.entries(
           data.updates[rowId]
@@ -359,13 +363,17 @@ export default {
     for (const newId in data.new) {
       sql.push(`
         INSERT INTO [${tableName}] (${Object.keys(data.new[newId]).join(', ')})
-          VALUES (${Object.values(data.new[newId]).map(value => `${typeof value === 'string' ? ('"' + value + '"') : value}`).join(', ')})
+          VALUES (${Object.values(data.new[newId]).map(value => `${typeof value === 'string' ? ('"' + value + '"') : value}`).join(', ')});
       `)
     }
+    for (const rowId in data.delete) {
+      sql.push(`DELETE FROM [${tableName}] WHERE ROWID = ${data.delete[rowId] + 1};`)
+    }
+    console.log(sql.join('\n\n'))
     try {
       state.database.connection.run(sql.join('\n\n'))
       state.database.connection.run('COMMIT;')
-      commit('setModifiedData', { tableName, dataValue: { updates: {}, new: [] } })
+      commit('setModifiedData', { tableName, dataValue: { updates: {}, new: [], delete: [] } })
     } catch (error) {
       console.log('has error', error)
       state.database.connection.run('ROLLBACK;')

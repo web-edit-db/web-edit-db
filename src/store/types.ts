@@ -37,7 +37,8 @@ export interface TableModification extends Table {
     },
     new: {
       [column: string]: string|number|boolean|null|undefined
-    }[]
+    }[],
+    delete: number[]
   },
 }
 

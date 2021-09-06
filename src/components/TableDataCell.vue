@@ -7,6 +7,7 @@
       highlight,
       selected,
       modified,
+      deleted,
       null: value === null
     }"
   >
@@ -46,6 +47,10 @@ export default defineComponent({
     modified: {
       type: Boolean,
       default: false
+    },
+    deleted: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {
@@ -72,7 +77,8 @@ div {
 
   &.header {
     @apply rounded-lg;
-    @apply bg-white border-2 border-primary;
+    @apply bg-white;
+    @apply border-2 border-primary;
     @apply mx-0.5;
     @apply text-center;
     @apply sticky;
@@ -111,10 +117,15 @@ div {
     @apply bg-primary-300;
   }
 
+  &.deleted, &.deleted.selected {
+    @apply bg-red-300;
+  }
+
   &.selected {
     @apply border-primary;
     @apply bg-gray-200;
     @apply z-10;
   }
+
 }
 </style>

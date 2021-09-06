@@ -21,11 +21,10 @@
       <table-data-cell
         :header="true"
         :value="isNew ? `+${rowId - rows.length + 1}` : (rowId + 1)"
-        :highlight="hovering.row === rowId"
+        :highlight="hovering.row === (isNew ? (rowId - rows.length + 1) : rowId)"
         class="left col-start-1"
         @mouseover="hovering = selected"
       />
-
       <table-data-cell
         v-for="column, cellId in headers"
         :key="`${rowId}-${cellId}`"
@@ -35,18 +34,19 @@
           updates?.[rowId]?.[column] !== undefined
             ? updates?.[rowId ]?.[column]
             : (row[column] ?? null)"
-        :highlight="hovering.col === cellId && hovering.row === (rowId)"
+        :highlight="hovering.col === cellId && hovering.row === (isNew ? (rowId - rows.length + 1) : rowId)"
         :selected="
           selected.new === isNew
             && selected.col === cellId
-            && selected.row === (isNew ? (rowId - rows.length) : rowId)
+            && selected.row === (isNew ? (rowId - rows.length + 1) : rowId)
         "
         :modified="
           updates?.[rowId]?.[headers[cellId]] !== undefined
             && updates[rowId][headers[cellId]] !== row[column]
         "
-        @mouseover="hovering = { col: cellId, row: rowId }"
-        @mousedown="$emit('update:selected', { new: isNew, col: cellId, row: rowId })"
+        :deleted="!isNew && deletedRows.includes(rowId)"
+        @mouseover="hovering = { col: cellId, row: (isNew ? (rowId - rows.length + 1) : rowId) }"
+        @mousedown="$emit('update:selected', { new: isNew, col: cellId, row: isNew ? (rowId - rows.length + 1) : rowId })"
       />
     </template>
     <span
@@ -87,14 +87,15 @@ export default defineComponent({
     const store = useStore<State>()
     const route = useRoute()
     const hovering = ref<{ row: number, col: number }>({ row: -1, col: -1 })
-    const updates = computed(() => store.state.modifications[route.params.name as string].data?.updates)
+    const updates = computed(() => store.state.modifications[route.params.name as string]?.data.updates)
     const newRows = computed(() => store.state.modifications[route.params.name as string]?.data.new ?? [])
     const allRows = computed(() => [
       ...props.rows.map(value => ({ value: value, new: false })),
       ...newRows.value.map(value => ({ value: value, new: true }))
     ])
+    const deletedRows = computed(() => store.state.modifications[route.params.name as string].data.delete)
 
-    return { hovering, updates, newRows, allRows }
+    return { hovering, updates, newRows, allRows, deletedRows }
   }
 })
 </script>
