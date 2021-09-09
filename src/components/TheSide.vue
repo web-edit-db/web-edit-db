@@ -40,6 +40,7 @@
             <layout-columns-icon />
           </v-button>
           <v-button
+            v-if="!table?.new"
             style="justify-content: space-between;"
             tag="router-link"
             :to="{ name: 'TableData' }"
