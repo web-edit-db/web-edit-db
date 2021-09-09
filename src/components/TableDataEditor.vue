@@ -78,7 +78,8 @@ export default defineComponent({
         value: string | number | boolean,
         row: number,
         column: string,
-        new: boolean
+        new: boolean,
+        rowId: number
       }| null>,
       default: () => null
     }
@@ -93,9 +94,9 @@ export default defineComponent({
       get () {
         const updates = store.state.modifications[tableName.value].data.updates
         if (props.selected?.new) {
-          return store.state.modifications[tableName.value]?.data.new[props.selected?.row]?.[props.selected?.column] ?? null
-        } else if (props.selected && updates?.[props.selected.row]?.[props.selected.column] !== undefined) {
-          return updates?.[props.selected.row]?.[props.selected.column]
+          return store.state.modifications[tableName.value]?.data.new[props.selected?.rowId]?.[props.selected?.column] ?? null
+        } else if (props.selected && updates?.[props.selected.rowId]?.[props.selected.column] !== undefined) {
+          return updates?.[props.selected.rowId]?.[props.selected.column]
         } else if (props.selected) {
           return props.selected.value
         } else {
@@ -108,7 +109,7 @@ export default defineComponent({
           {
             tableName: tableName.value,
             columnName: props.selected?.column,
-            [props.selected?.new ? 'newIndex' : 'rowNumber']: (props.selected?.row ?? 1) - (props.selected?.new ? 1 : 0),
+            [props.selected?.new ? 'newIndex' : 'rowNumber']: (props.selected?.rowId),
             updateValue:
               props.selected?.value === value && !props.selected?.new
                 ? undefined
@@ -182,7 +183,7 @@ export default defineComponent({
           'setModifiedDataDelete',
           {
             tableName: tableName.value,
-            rowNumber: props.selected.row
+            rowNumber: props.selected.rowId
           }
         )
       }

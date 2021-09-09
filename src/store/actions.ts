@@ -285,9 +285,10 @@ export default {
       sql.push(`INSERT INTO [${newTableName ?? tableName}] (
         ${columnsUpdated.map(column => `[${column.new}]`).join(', ')}
       ) SELECT ${columnsUpdated.map(column => `[${column.old}]`).join(', ')}
-          FROM ${tempTableName};`)
+          FROM [${tempTableName}];`)
     }
     sql.push(`DROP TABLE [${tempTableName}]`)
+    console.log(sql.join('\n\n'))
     try {
       state.database.connection.run(sql.join('\n\n'))
       state.database.connection.run('COMMIT;')
@@ -350,14 +351,14 @@ export default {
     if (data === undefined) return undefined
     const sql = []
     sql.push('BEGIN TRANSACTION;')
-    const filteredUpdates = Object.keys(data.updates).filter(key => !data?.delete.includes(+key))
-    for (const rowId in filteredUpdates) {
+    const filteredUpdates = Object.keys(data.updates).filter(key => !data?.delete.includes(+key)).map(key => +key)
+    for (const filteredUpdatesId in filteredUpdates) {
       sql.push(
         `UPDATE [${tableName}] SET ${Object.entries(
-          data.updates[rowId]
+          data.updates[+filteredUpdates[filteredUpdatesId]]
         ).map(
           ([column, value]) => `[${column}] = ${typeof value === 'string' ? ('"' + value + '"') : value}`
-        ).join(', ')} WHERE ROWID = ${+rowId + 1};`
+        ).join(', ')} WHERE ROWID = ${+filteredUpdates[filteredUpdatesId] + 1};`
       )
     }
     for (const newId in data.new) {
@@ -367,9 +368,9 @@ export default {
       `)
     }
     for (const rowId in data.delete) {
-      sql.push(`DELETE FROM [${tableName}] WHERE ROWID = ${data.delete[rowId] + 1};`)
+      sql.push(`DELETE FROM [${tableName}] WHERE ROWID = ${data.delete[rowId]};`)
     }
-    console.log(sql.join('\n\n'))
+    console.log(sql.join('\n'))
     try {
       state.database.connection.run(sql.join('\n\n'))
       state.database.connection.run('COMMIT;')

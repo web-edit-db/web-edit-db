@@ -4,6 +4,7 @@
       v-model:selected="selected"
       :headers="columnNames"
       :rows="dataRows"
+      :row-id="rowId"
     />
     <table-data-editor
       :selected="selected.row !== -1 && selected.col !== -1 ? {
@@ -35,8 +36,9 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore<State>()
-    const statment = computed(() => store.state.database?.connection.prepare(`SELECT * FROM [${props.name}]`))
-    const columnNames = computed(() => statment.value?.getColumnNames())
+    const statment = computed(() => store.state.database?.connection.prepare(`SELECT ROWID, * FROM [${props.name}]`))
+    const rowId = computed(() => statment.value?.getColumnNames()[0])
+    const columnNames = computed(() => statment.value?.getColumnNames().slice(1))
     const dataRows = computed(() => {
       if (statment.value) {
         const output = []
@@ -52,7 +54,7 @@ export default defineComponent({
     provide('statment', statment)
 
     const selected = ref({ row: -1, col: -1 })
-    return { columnNames, dataRows, selected }
+    return { columnNames, dataRows, selected, rowId }
   }
 })
 </script>

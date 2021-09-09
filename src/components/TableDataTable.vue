@@ -15,38 +15,46 @@
       @mouseover="hovering = selected"
     />
     <template
-      v-for="{ value: row, new: isNew}, rowId in allRows"
-      :key="rowId"
+      v-for="{ value: row, new: isNew}, rowIndex in allRows"
+      :key="rowIndex"
     >
       <table-data-cell
         :header="true"
-        :value="isNew ? `+${rowId - rows.length + 1}` : (rowId + 1)"
-        :highlight="hovering.row === (isNew ? (rowId - rows.length + 1) : rowId)"
+        :value="isNew ? `+${rowIndex - rows.length + 1}` : (rowIndex + 1)"
+        :highlight="hovering.row === (isNew ? (rowIndex - rows.length + 1) : rowIndex)"
         class="left col-start-1"
         @mouseover="hovering = selected"
       />
       <table-data-cell
         v-for="column, cellId in headers"
-        :key="`${rowId}-${cellId}`"
+        :key="`${rowIndex}-${cellId}`"
         :start="cellId === 0"
         :end="cellId === headers.length - 1"
         :value="
-          updates?.[rowId]?.[column] !== undefined
-            ? updates?.[rowId ]?.[column]
+          updates?.[row[rowId]]?.[column] !== undefined
+            ? updates?.[row[rowId]]?.[column]
             : (row[column] ?? null)"
-        :highlight="hovering.col === cellId && hovering.row === (isNew ? (rowId - rows.length + 1) : rowId)"
+        :highlight="hovering.col === cellId && hovering.row === (isNew ? (rowIndex - rows.length + 1) : rowIndex)"
         :selected="
           selected.new === isNew
             && selected.col === cellId
-            && selected.row === (isNew ? (rowId - rows.length + 1) : rowId)
+            && selected.row === (isNew ? (rowIndex - rows.length + 1) : rowIndex)
         "
         :modified="
-          updates?.[rowId]?.[headers[cellId]] !== undefined
-            && updates[rowId][headers[cellId]] !== row[column]
+          updates?.[row[rowId]]?.[headers[cellId]] !== undefined
+            && updates[row[rowId]][headers[cellId]] !== row[column]
         "
-        :deleted="!isNew && deletedRows.includes(rowId)"
-        @mouseover="hovering = { col: cellId, row: (isNew ? (rowId - rows.length + 1) : rowId) }"
-        @mousedown="$emit('update:selected', { new: isNew, col: cellId, row: isNew ? (rowId - rows.length + 1) : rowId })"
+        :deleted="!isNew && deletedRows.includes(row[rowId])"
+        @mouseover="hovering = { col: cellId, row: (isNew ? (rowIndex - rows.length + 1) : rowIndex) }"
+        @mousedown="$emit(
+          'update:selected',
+          {
+            new: isNew,
+            col: cellId,
+            row: isNew ? (rowIndex - rows.length + 1) : rowIndex,
+            rowId: row[rowId]
+          }
+        )"
       />
     </template>
     <span
@@ -78,8 +86,12 @@ export default defineComponent({
       default: () => []
     },
     selected: {
-      type: Object as PropType<{row: number, col: number}>,
+      type: Object as PropType<{row: number, col: number }>,
       default: () => null
+    },
+    rowId: {
+      type: String,
+      required: true
     }
   },
   emits: ['update:selected'],
