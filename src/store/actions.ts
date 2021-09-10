@@ -352,13 +352,16 @@ export default {
     const sql = []
     sql.push('BEGIN TRANSACTION;')
     const filteredUpdates = Object.keys(data.updates).filter(key => !data?.delete.includes(+key)).map(key => +key)
+    for (const rowId in data.delete) {
+      sql.push(`DELETE FROM [${tableName}] WHERE ROWID = ${data.delete[rowId]};`)
+    }
     for (const filteredUpdatesId in filteredUpdates) {
       sql.push(
         `UPDATE [${tableName}] SET ${Object.entries(
           data.updates[+filteredUpdates[filteredUpdatesId]]
         ).map(
           ([column, value]) => `[${column}] = ${typeof value === 'string' ? ('"' + value + '"') : value}`
-        ).join(', ')} WHERE ROWID = ${+filteredUpdates[filteredUpdatesId] + 1};`
+        ).join(', ')} WHERE ROWID = ${filteredUpdates[filteredUpdatesId]};`
       )
     }
     for (const newId in data.new) {
@@ -366,9 +369,6 @@ export default {
         INSERT INTO [${tableName}] (${Object.keys(data.new[newId]).join(', ')})
           VALUES (${Object.values(data.new[newId]).map(value => `${typeof value === 'string' ? ('"' + value + '"') : value}`).join(', ')});
       `)
-    }
-    for (const rowId in data.delete) {
-      sql.push(`DELETE FROM [${tableName}] WHERE ROWID = ${data.delete[rowId]};`)
     }
     console.log(sql.join('\n'))
     try {

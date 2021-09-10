@@ -52,7 +52,6 @@
             new: isNew,
             col: cellId,
             row: isNew ? (rowIndex - rows.length + 1) : rowIndex,
-            rowId: row[rowId]
           }
         )"
       />

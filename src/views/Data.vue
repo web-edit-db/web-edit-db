@@ -7,11 +7,15 @@
       :row-id="rowId"
     />
     <table-data-editor
-      :selected="selected.row !== -1 && selected.col !== -1 ? {
-        ...selected,
-        value: dataRows?.[selected.row]?.[columnNames[selected.col]],
-        column: columnNames[selected.col],
-      } : null"
+      :selected="
+        selected.row !== -1 && selected.col !== -1
+          ? {
+            ...selected,
+            value: dataRows?.[selected.row]?.[columnNames[selected.col]],
+            column: columnNames[selected.col],
+            rowId: dataRows?.[selected.row]?.[rowId],
+          }
+          : null"
     />
   </main>
 </template>
