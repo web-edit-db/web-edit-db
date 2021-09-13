@@ -209,6 +209,7 @@ export default defineComponent({
 .data-editor {
   @apply bg-white;
   @apply border-2 border-primary;
+  @apply shadow-lg;
   @apply rounded-xl;
   @apply m-2;
   @apply sticky top-2;

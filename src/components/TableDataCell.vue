@@ -69,6 +69,7 @@ div {
   @apply whitespace-nowrap;
   @apply overflow-hidden ellipsis;
   @apply cursor-pointer;
+  @apply shadow-md;
   max-width: 15rem;
 
   &.null {
@@ -77,7 +78,6 @@ div {
 
   &.header {
     @apply rounded-lg;
-    @apply bg-white;
     @apply border-2 border-primary;
     @apply mx-0.5;
     @apply text-center;
