@@ -1,12 +1,25 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import Home from '../views/Home.vue'
+import Home from '@/views/Home.vue'
+import Graph from '@/views/Graph.vue'
 import store from '@/store'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    beforeEnter (to, from, next) {
+      if (store.state.database) {
+        next('/graph')
+      } else {
+        next()
+      }
+    }
+  },
+  {
+    path: '/graph',
+    name: 'Graph',
+    component: Graph
   },
   {
     path: '/about',

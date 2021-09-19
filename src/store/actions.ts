@@ -17,7 +17,7 @@ export default {
           initialPrompt: 'no-name.db',
           onPositive: (fileName: string) => {
             if (fileName && state.sqlJs) {
-              router.push('/')
+              router.push('/graph')
               commit('setDatabase', {
                 name: fileName,
                 connection: new state.sqlJs.Database()
@@ -37,7 +37,7 @@ export default {
         mimeTypes: ['application/vnd.sqlite3'],
         extensions: SQLITE_EXTENSIONS
       })
-      router.push('/')
+      router.push('/graph')
       // turn file into array
       const fileBufferArray = new Uint8Array(await file.arrayBuffer())
       // create the connection
