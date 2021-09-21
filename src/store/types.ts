@@ -42,6 +42,10 @@ export interface TableModification extends Table {
   },
 }
 
+export interface Graph{
+  [tableName: string]: { x: number, y: number }
+}
+
 export interface State {
   sqlJs: SqlJsStatic|null,
   database: {
@@ -54,5 +58,6 @@ export interface State {
   },
   modifications: {
     [tableName: string]: TableModification
-  }
+  },
+  graph: Graph
 }

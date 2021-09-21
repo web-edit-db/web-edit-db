@@ -9,7 +9,8 @@ export default createStore<State>({
     sqlJs: null,
     database: null,
     tables: {},
-    modifications: {}
+    modifications: {},
+    graph: {}
   },
   mutations,
   actions,

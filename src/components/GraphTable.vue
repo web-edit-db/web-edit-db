@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue'
+import { computed, defineComponent, inject, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import GraphTableColumn from './GraphTableColumn.vue'
 import { gridSnap } from '@/helpers'
+import { State } from '@/store/types'
 
 export default defineComponent({
   components: {
@@ -35,27 +36,26 @@ export default defineComponent({
     tableName: {
       type: String,
       required: true
-    },
-    position: {
-      type: Object as PropType<{ x: number, y: number }>,
-      required: true
     }
   },
-  emits: ['update:position'],
-  setup (props, { emit }) {
-    const store = useStore()
+  setup (props) {
+    const store = useStore<State>()
 
+    const view = inject<{
+      zoom: number
+    }>('view')
     const columns = computed(() => store.state.modifications[props.tableName].columns)
+    const position = computed(() => store.state.graph[props.tableName] ?? { x: 0, y: 0 })
 
     let previousPosition = { x: 0, y: 0 }
     const mouseMove = (event: MouseEvent) => {
-      const moveX = gridSnap(event.clientX - previousPosition.x)
-      const moveY = gridSnap(event.clientY - previousPosition.y)
+      const moveX = gridSnap((event.clientX - previousPosition.x) / (view?.zoom ?? 1))
+      const moveY = gridSnap((event.clientY - previousPosition.y) / (view?.zoom ?? 1))
       const newPosition = {
-        x: props.position.x + moveX,
-        y: props.position.y + moveY
+        x: position.value.x + moveX,
+        y: position.value.y + moveY
       }
-      emit('update:position', newPosition)
+      store.commit('setGraphTablePosition', { tableName: props.tableName, position: newPosition })
       previousPosition = { x: gridSnap(event.clientX), y: gridSnap(event.clientY) }
     }
     const mouseUp = () => {
@@ -70,7 +70,7 @@ export default defineComponent({
 
     onMounted(() => store.dispatch('queryColumns', props.tableName))
 
-    return { columns, mouseDown }
+    return { columns, mouseDown, position }
   }
 })
 </script>
@@ -78,13 +78,13 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .graph-table {
   @apply absolute;
-  @apply p-2 gap-3;
+  @apply p-2 gap-2;
   @apply bg-primary text-white;
   @apply shadow;
   @apply rounded-lg;
   @apply flex flex-col;
-  @apply w-48;
   @apply select-none;
+  width: 200px;
 }
 
 .graph-table header {

@@ -99,6 +99,9 @@ const mutations: MutationTree<State> = {
     } else {
       state.modifications[tableName].data.delete.push(rowNumber)
     }
+  },
+  setGraphTablePosition (state, { tableName, position }: { tableName: string, position: { x: number, y: number } }) {
+    state.graph[tableName] = position
   }
 }
 
