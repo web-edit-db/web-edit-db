@@ -1,9 +1,11 @@
 <template>
-  <path
-    :d="svgPath"
-    stroke="red"
-    fill="none"
-  />
+  <teleport to="#graph-path-layer">
+    <path
+      :d="svgPath"
+      stroke="red"
+      fill="none"
+    />
+  </teleport>
 </template>
 
 <script lang="ts">

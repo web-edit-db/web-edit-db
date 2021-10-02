@@ -55,11 +55,8 @@
           @mousedown="controlls.target = null"
         />
       </g>
+      <g id="graph-path-layer" />
       <graph-tables />
-      <graph-path
-        :start="{ x: graphConfig.cell * -250, y: graphConfig.cell * -250 }"
-        :end="{ x: graphConfig.cell * 250, y: graphConfig.cell * 250 }"
-      />
     </g>
   </svg>
 </template>
@@ -100,7 +97,9 @@ export default defineComponent({
     const store = useStore<State>()
 
     const tablePositions = ref({} as { [tableName: string]: Point })
+    const tableColumnPositions = ref({ } as { [tableName: string]: { [columnName: string]: Point } })
     provide('tablePositions', tablePositions)
+    provide('tableColumnPositions', tableColumnPositions)
 
     const svgRef = ref<SVGSVGElement>()
 
@@ -191,7 +190,8 @@ export default defineComponent({
       graphConfig,
       svgRef,
       controlls,
-      view
+      view,
+      tableColumnPositions
     }
   }
 })

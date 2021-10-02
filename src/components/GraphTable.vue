@@ -18,6 +18,7 @@
         v-for="column, columnName in columns"
         :key="columnName"
         :column-name="columnName"
+        :table-name="tableName"
       />
     </div>
   </foreignObject>
@@ -25,15 +26,17 @@
 
 <script lang="ts">
 import { State } from '@/store/types'
-import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, inject, onMounted, Ref, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import GraphTableColumn from '@/components/GraphTableColumn.vue'
 import { Controlls, Point } from './GraphRoot.vue'
 import { graphConfig } from '@/helpers'
+import GraphPath from './GraphPath.vue'
 
 export default defineComponent({
   components: {
-    GraphTableColumn
+    GraphTableColumn,
+    GraphPath
   },
   props: {
     tableName: {
@@ -43,7 +46,7 @@ export default defineComponent({
   },
   setup (props) {
     const store = useStore<State>()
-    const columns = computed(() => store.state.modifications[props.tableName].columns)
+    const columns = computed(() => store.state.modifications[props.tableName]?.columns ?? {})
 
     const controlls = inject<Controlls>('controlls')
     const snapToGrid = inject('snapToGrid') as (point: Point) => Point
@@ -53,14 +56,26 @@ export default defineComponent({
     const gridPosition = computed(() => (snapToGrid({ ...position.value, ...size.value })))
     const updatePosition = (diffrence: Point) => (position.value = { x: position.value.x + diffrence.x, y: position.value.y + diffrence.y })
 
-    watch(() => position, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }))
+    const tableColumnPositions = inject('tableColumnPositions') as Ref<{ [tableName: string]: { [columnName: string]: Point } }>
+
+    watch(() => [columns.value, gridPosition.value], () => {
+      tableColumnPositions.value[props.tableName] = Object.fromEntries(Object.entries(columns.value).map(([key], index) => [
+        key,
+        {
+          x: gridPosition.value.x + 80,
+          y: gridPosition.value.y + (graphConfig.cell * 2 * (index + 1.5))
+        }
+      ]))
+    })
+
+    watch(() => position.value, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }))
 
     onMounted(() => {
       store.dispatch('queryColumns', props.tableName)
       position.value = store.state.graph.tables?.[props.tableName] ?? { x: Object.keys(store.state.graph.tables).length * 192, y: 0 }
       store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value })
     })
-    return { columns, controlls, updatePosition, gridPosition, position }
+    return { columns, controlls, updatePosition, gridPosition, position, tableColumnPositions }
   }
 })
 </script>
