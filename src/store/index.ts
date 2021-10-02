@@ -10,7 +10,11 @@ export default createStore<State>({
     database: null,
     tables: {},
     modifications: {},
-    graph: {}
+    graph: {
+      pan: { x: 16, y: 16 },
+      zoom: 1,
+      tables: {}
+    }
   },
   mutations,
   actions,

@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep'
 import { MutationTree } from 'vuex'
-import { Column, State, Table, TableModification } from './types'
+import { Column, Point, State, Table, TableModification } from './types'
 
 const mutations: MutationTree<State> = {
   setSqlJs (state, sqlJs: State['sqlJs']) {
@@ -100,8 +100,12 @@ const mutations: MutationTree<State> = {
       state.modifications[tableName].data.delete.push(rowNumber)
     }
   },
-  setGraphTablePosition (state, { tableName, position }: { tableName: string, position: { x: number, y: number } }) {
-    state.graph[tableName] = position
+  setGraphZoomPan (state, { zoom, pan }: { zoom: number, pan: Point }) {
+    state.graph.zoom = zoom
+    state.graph.pan = pan
+  },
+  setGraphTablePosition (state, { tableName, position }: { tableName: string, position: Point }) {
+    state.graph.tables[tableName] = position
   }
 }
 

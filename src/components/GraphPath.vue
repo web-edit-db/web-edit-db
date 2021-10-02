@@ -7,8 +7,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, PropType } from 'vue'
-import { FindPath } from './GraphRoot.vue'
+import { computed, defineComponent, PropType, watch } from 'vue'
 
 export default defineComponent({
   props: {
@@ -22,9 +21,9 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const findPath = inject<FindPath>('findPath')
-    const path = computed(() => findPath?.(props.start, props.end) ?? [props.start, props.end])
-    const svgPath = computed(() => `M${path.value[0].x + 10} ${path.value[0].y + 10} ` + path.value.slice(1).map(point => `L${point.x + 10} ${point.y + 10}`).join(' '))
+    const path = computed(() => [props.start, { x: props.start.x, y: props.start.y }, props.end])
+    watch(() => path.value, () => console.log('updated!'), { immediate: true })
+    const svgPath = computed(() => `M${path.value[0].x} ${path.value[0].y} ` + path.value.slice(1).map(point => `L${point.x} ${point.y}`).join(' '))
     return { svgPath }
   }
 })

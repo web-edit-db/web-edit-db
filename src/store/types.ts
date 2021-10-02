@@ -42,8 +42,17 @@ export interface TableModification extends Table {
   },
 }
 
-export interface Graph{
-  [tableName: string]: { x: number, y: number }
+export interface Point {
+  x: number,
+  y: number
+}
+
+export interface Graph {
+  tables: {
+    [tableName: string]: Point
+  },
+  pan: Point,
+  zoom: number
 }
 
 export interface State {

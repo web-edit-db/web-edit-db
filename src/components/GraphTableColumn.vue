@@ -1,13 +1,21 @@
 <template>
   <div>
-    <slot />
+    {{ columnName }}
   </div>
 </template>
 
-<style lang="postcss" scoped>
-div {
-  @apply bg-white text-black;
-  @apply px-2 py-1;
-  @apply rounded;
-}
-</style>
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  props: {
+    columnName: {
+      type: String,
+      required: true
+    }
+  },
+  setup () {
+    return {}
+  }
+})
+</script>
