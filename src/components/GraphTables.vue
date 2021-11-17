@@ -1,15 +1,11 @@
 <template>
   <g>
-    <template
+    <graph-table
       v-for="table, tableName in tables"
       :key="tableName"
-    >
-      <graph-table
-        v-if="!table.new"
-        :ref="el => tablePositions[tableName] = el?.gridPosition ?? { x: 0, y: 0, w: 0, h: 0 }"
-        :table-name="tableName"
-      />
-    </template>
+      :ref="el => tablePositions[tableName] = { ...el?.gridPosition ?? { x: 0, y: 0, w: 0, h: 0 }, name: el?.tableName }"
+      :table-name="tableName"
+    />
   </g>
 </template>
 

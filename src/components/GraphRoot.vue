@@ -62,14 +62,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, provide, reactive, ref, watch } from 'vue'
+import { defineComponent, onMounted, provide, reactive, Ref, ref, watch } from 'vue'
 import GraphTables from './GraphTables.vue'
-import GraphPath from './GraphPath.vue'
 import { useStore } from 'vuex'
 import { State } from '@/store/types'
 import { graphConfig } from '@/helpers'
 
-export type Point = { x: number, y: number, h?: number, w?: number }
+export type Rect = { x: number, y: number, h: number, w: number }
+export type Point = Partial<Rect> & Omit<Rect, 'h' | 'w'>
 export type Node = {
   parent?: Point,
   closed?: boolean,
@@ -81,7 +81,11 @@ export type Node = {
 export type FindPath = (start: Point, end: Point) => Point[]
 export interface Controlls {
   lastPosition: Point,
-  target: null | ((diffrence: Point) => void),
+  lastGridPosition: Point,
+  target: null | {
+    update (diffrence: Point): void,
+    grid: boolean
+  },
   mouseup(): void,
   mousemove(event: MouseEvent): void
   mousedown(event: MouseEvent): void,
@@ -90,8 +94,7 @@ export interface Controlls {
 
 export default defineComponent({
   components: {
-    GraphTables,
-    GraphPath
+    GraphTables
   },
   setup () {
     const store = useStore<State>()
@@ -144,6 +147,7 @@ export default defineComponent({
     })
     const controlls: Controlls = {
       lastPosition: { x: 0, y: 0 },
+      lastGridPosition: { x: 0, y: 0 },
       target: null,
       mousemove (event) {
         const diffrence = {
@@ -151,9 +155,19 @@ export default defineComponent({
           y: event.clientY - controlls.lastPosition.y
         }
         controlls.lastPosition = { x: event.clientX, y: event.clientY }
+
         if (controlls.target) {
-          // call the target function with the diffrence corrected for zoom
-          controlls.target({ x: diffrence.x / view.zoom, y: diffrence.y / view.zoom })
+          if (controlls.target.grid) {
+            const diffrenceGrid = snapToGrid({
+              x: diffrence.x / view.zoom + controlls.lastGridPosition.x,
+              y: diffrence.y / view.zoom + controlls.lastGridPosition.y
+            })
+            controlls.lastGridPosition.y = (controlls.lastGridPosition.y + (diffrence.y / view.zoom - diffrenceGrid.y)) % graphConfig.cell
+            controlls.lastGridPosition.x = (controlls.lastGridPosition.x + (diffrence.x / view.zoom - diffrenceGrid.x)) % graphConfig.cell
+            if (diffrenceGrid.x !== 0 || diffrenceGrid.y !== 0) controlls.target.update(diffrenceGrid)
+          } else {
+            controlls.target.update(diffrence)
+          }
         } else {
           view.pan = { x: view.pan.x + diffrence.x, y: view.pan.y + diffrence.y }
         }
@@ -164,13 +178,14 @@ export default defineComponent({
       },
       mousedown (event) {
         controlls.lastPosition = { x: event.clientX, y: event.clientY }
+        controlls.lastGridPosition = { x: 0, y: 0 }
         document.addEventListener('mousemove', controlls.mousemove)
         document.addEventListener('mouseup', controlls.mouseup)
       },
       wheel (event) {
         const zoom = view.zoom * Math.exp(Math.sign(event.deltaY) * -0.2)
         const beforeZoom = clientToSVG({ x: event.clientX, y: event.clientY })
-        if (zoom > 0.2 && zoom < 5) {
+        if (zoom > 0.3 && zoom < 5) {
           view.zoom = zoom
           const afterZoom = clientToSVG({ x: event.clientX, y: event.clientY })
           view.pan.x -= (beforeZoom.x - afterZoom.x) * zoom

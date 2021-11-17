@@ -1,16 +1,13 @@
 <template>
   <foreignObject
-    :height="gridPosition.h"
-    :width="gridPosition.w"
-    :x="gridPosition.x"
-    :y="gridPosition.y"
+    :height="position.h"
+    :width="position.w"
+    :x="position.x"
+    :y="position.y"
   >
     <div
       class="graph-table"
-      @mousedown="() => {
-        position = gridPosition
-        controlls.target = updatePosition
-      }"
+      @mousedown="() => { controlls.target = { update: updatePosition, grid: true } }"
       @mouseup="controlls.target = null"
     >
       <header>{{ tableName }}</header>
@@ -31,12 +28,10 @@ import { useStore } from 'vuex'
 import GraphTableColumn from '@/components/GraphTableColumn.vue'
 import { Controlls, Point } from './GraphRoot.vue'
 import { graphConfig } from '@/helpers'
-import GraphPath from './GraphPath.vue'
 
 export default defineComponent({
   components: {
-    GraphTableColumn,
-    GraphPath
+    GraphTableColumn
   },
   props: {
     tableName: {
@@ -49,33 +44,42 @@ export default defineComponent({
     const columns = computed(() => store.state.modifications[props.tableName]?.columns ?? {})
 
     const controlls = inject<Controlls>('controlls')
-    const snapToGrid = inject('snapToGrid') as (point: Point) => Point
 
-    const position = ref({ x: 0, y: 0 })
     const size = computed(() => ({ w: 160, h: (Object.keys(columns.value).length + 1) * graphConfig.cell * 2 }))
-    const gridPosition = computed(() => (snapToGrid({ ...position.value, ...size.value })))
-    const updatePosition = (diffrence: Point) => (position.value = { x: position.value.x + diffrence.x, y: position.value.y + diffrence.y })
+    const position = ref({ x: 0, y: 0, h: 0, w: 0 })
+    const updatePosition: Exclude<Controlls['target'], null>['update'] = (diffrenceGrid) => {
+      position.value = {
+        ...size.value,
+        x: position.value.x + diffrenceGrid.x,
+        y: position.value.y + diffrenceGrid.y
+      }
+    }
 
     const tableColumnPositions = inject('tableColumnPositions') as Ref<{ [tableName: string]: { [columnName: string]: Point } }>
 
-    watch(() => [columns.value, gridPosition.value], () => {
+    watch([columns, position], () => {
       tableColumnPositions.value[props.tableName] = Object.fromEntries(Object.entries(columns.value).map(([key], index) => [
         key,
         {
-          x: gridPosition.value.x + 80,
-          y: gridPosition.value.y + (graphConfig.cell * 2 * (index + 1.5))
+          x: position.value.x + 80,
+          y: position.value.y + (graphConfig.cell * 2 * (index + 1.5))
         }
       ]))
     })
 
-    watch(() => position.value, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }))
+    watch(position, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }), { flush: 'post' })
 
     onMounted(() => {
       store.dispatch('queryColumns', props.tableName)
-      position.value = store.state.graph.tables?.[props.tableName] ?? { x: Object.keys(store.state.graph.tables).length * 192, y: 0 }
+      if (!store.state.modifications[props.tableName].new) store.dispatch('queryColumns', props.tableName)
+      position.value = {
+        ...size.value,
+        x: store.state.graph.tables?.[props.tableName]?.x ?? Object.keys(store.state.graph.tables).length * 192,
+        y: store.state.graph.tables?.[props.tableName]?.y ?? 0
+      }
       store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value })
     })
-    return { columns, controlls, updatePosition, gridPosition, position, tableColumnPositions }
+    return { columns, controlls, size, updatePosition, position, tableColumnPositions }
   }
 })
 </script>
