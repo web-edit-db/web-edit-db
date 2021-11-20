@@ -43,6 +43,7 @@ export default {
       // create the connection
       const connection = new state.sqlJs.Database(fileBufferArray)
 
+      commit('resetState') // first reset current state
       // commit the changes
       commit('setDatabase', {
         connection,

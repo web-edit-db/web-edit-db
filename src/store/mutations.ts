@@ -106,6 +106,13 @@ const mutations: MutationTree<State> = {
   },
   setGraphTablePosition (state, { tableName, position }: { tableName: string, position: Point }) {
     state.graph.tables[tableName] = position
+  },
+  resetState (state) {
+    console.log('state reset')
+    state.tables = {}
+    state.modifications = {}
+    state.graph.zoom = 1
+    state.graph.pan = { x: 0, y: 0 }
   }
 }
 

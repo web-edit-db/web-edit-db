@@ -23,7 +23,12 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const path = computed(() => [props.start, { x: props.start.x, y: props.start.y }, props.end])
+    const path = computed(() => [
+      props.start,
+      { x: props.start.x + (props.start.x > props.end.x ? -96 : 96), y: props.start.y },
+      { x: props.end.x + (props.start.x < props.end.x ? -96 : 96), y: props.end.y },
+      props.end
+    ])
     watch(() => path.value, () => console.log('updated!'), { immediate: true })
     const svgPath = computed(() => `M${path.value[0].x} ${path.value[0].y} ` + path.value.slice(1).map(point => `L${point.x} ${point.y}`).join(' '))
     return { svgPath }

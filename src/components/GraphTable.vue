@@ -7,7 +7,7 @@
   >
     <div
       class="graph-table"
-      @mousedown="() => { controlls.target = { update: updatePosition, grid: true } }"
+      @mousedown="() => { controlls.target = { position: getPosition, grid: true, table: tableName } }"
       @mouseup="controlls.target = null"
     >
       <header>{{ tableName }}</header>
@@ -47,13 +47,7 @@ export default defineComponent({
 
     const size = computed(() => ({ w: 160, h: (Object.keys(columns.value).length + 1) * graphConfig.cell * 2 }))
     const position = ref({ x: 0, y: 0, h: 0, w: 0 })
-    const updatePosition: Exclude<Controlls['target'], null>['update'] = (diffrenceGrid) => {
-      position.value = {
-        ...size.value,
-        x: position.value.x + diffrenceGrid.x,
-        y: position.value.y + diffrenceGrid.y
-      }
-    }
+    const getPosition = () => position
 
     const tableColumnPositions = inject('tableColumnPositions') as Ref<{ [tableName: string]: { [columnName: string]: Point } }>
 
@@ -79,7 +73,7 @@ export default defineComponent({
       }
       store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value })
     })
-    return { columns, controlls, size, updatePosition, position, tableColumnPositions }
+    return { columns, controlls, size, position, getPosition, tableColumnPositions }
   }
 })
 </script>

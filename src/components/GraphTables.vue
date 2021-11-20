@@ -3,7 +3,7 @@
     <graph-table
       v-for="table, tableName in tables"
       :key="tableName"
-      :ref="el => tablePositions[tableName] = { ...el?.gridPosition ?? { x: 0, y: 0, w: 0, h: 0 }, name: el?.tableName }"
+      :ref="el => tablePositions[tableName] = { ...el?.position ?? { x: 0, y: 0, w: 0, h: 0 }, name: el?.tableName }"
       :table-name="tableName"
     />
   </g>

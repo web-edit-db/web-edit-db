@@ -82,9 +82,12 @@ export type FindPath = (start: Point, end: Point) => Point[]
 export interface Controlls {
   lastPosition: Point,
   lastGridPosition: Point,
+  lockedOffset: Point,
   target: null | {
-    update (diffrence: Point): void,
-    grid: boolean
+    // update (diffrence: Point): { x: boolean, y: boolean },
+    position: () => Ref<Point>
+    grid: boolean,
+    table: null|string
   },
   mouseup(): void,
   mousemove(event: MouseEvent): void
@@ -148,6 +151,7 @@ export default defineComponent({
     const controlls: Controlls = {
       lastPosition: { x: 0, y: 0 },
       lastGridPosition: { x: 0, y: 0 },
+      lockedOffset: { x: 0, y: 0 },
       target: null,
       mousemove (event) {
         const diffrence = {
@@ -157,16 +161,25 @@ export default defineComponent({
         controlls.lastPosition = { x: event.clientX, y: event.clientY }
 
         if (controlls.target) {
+          const position = controlls.target.position()
           if (controlls.target.grid) {
             const diffrenceGrid = snapToGrid({
-              x: diffrence.x / view.zoom + controlls.lastGridPosition.x,
-              y: diffrence.y / view.zoom + controlls.lastGridPosition.y
+              x: diffrence.x / view.zoom + Math.min(controlls.lastGridPosition.x, graphConfig.cell),
+              y: diffrence.y / view.zoom + Math.min(controlls.lastGridPosition.y, graphConfig.cell)
             })
-            controlls.lastGridPosition.y = (controlls.lastGridPosition.y + (diffrence.y / view.zoom - diffrenceGrid.y)) % graphConfig.cell
             controlls.lastGridPosition.x = (controlls.lastGridPosition.x + (diffrence.x / view.zoom - diffrenceGrid.x)) % graphConfig.cell
-            if (diffrenceGrid.x !== 0 || diffrenceGrid.y !== 0) controlls.target.update(diffrenceGrid)
+            controlls.lastGridPosition.y = (controlls.lastGridPosition.y + (diffrence.y / view.zoom - diffrenceGrid.y)) % graphConfig.cell
+            position.value = {
+              ...position.value,
+              x: position.value.x + diffrenceGrid.x,
+              y: position.value.y + diffrenceGrid.y
+            }
           } else {
-            controlls.target.update(diffrence)
+            position.value = {
+              ...position.value,
+              x: position.value.x + diffrence.x,
+              y: position.value.y + diffrence.y
+            }
           }
         } else {
           view.pan = { x: view.pan.x + diffrence.x, y: view.pan.y + diffrence.y }
@@ -179,6 +192,7 @@ export default defineComponent({
       mousedown (event) {
         controlls.lastPosition = { x: event.clientX, y: event.clientY }
         controlls.lastGridPosition = { x: 0, y: 0 }
+        controlls.lockedOffset = { x: 0, y: 0 }
         document.addEventListener('mousemove', controlls.mousemove)
         document.addEventListener('mouseup', controlls.mouseup)
       },
