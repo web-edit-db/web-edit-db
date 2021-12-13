@@ -2,7 +2,6 @@
   <teleport to="#graph-path-layer">
     <path
       :d="svgPath"
-      stroke="red"
       fill="none"
     />
   </teleport>
@@ -35,3 +34,11 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="postcss" scoped>
+path {
+  /* @apply bg-primary-300; */
+  stroke: theme('colors.primary.500');
+  stroke-width: 3;
+}
+</style>

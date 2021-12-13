@@ -1,6 +1,13 @@
 <template>
-  <div>
-    {{ columnName }}
+  <div class="column">
+    <span>{{ columnName }}</span>
+    <div class="properties">
+      <span v-if="column.primaryKey">PK</span>
+      <span v-if="column.unique">U</span>
+      <span v-if="column.notNull">NN</span>
+      <span>{{ column.type }}</span>
+    </div>
+    <!-- {{ column.unique }} -->
     <graph-path
       v-if="column.foreign.table && column.foreign.column && tableColumnPositions[tableName]"
       :start="tableColumnPositions[tableName][columnName]"
@@ -36,3 +43,27 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped lang="postcss">
+div.column {
+  @apply flex;
+  @apply justify-between;
+}
+
+div.column span {
+  @apply ellipsis;
+  @apply flex-grow;
+}
+
+div.properties {
+  @apply flex;
+  @apply gap-1;
+}
+
+div.properties span {
+  /* @apply bg-primary;
+  @apply rounded;
+  @apply text-sm; */
+  @apply text-xs;
+}
+</style>
