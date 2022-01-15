@@ -109,7 +109,7 @@ export default defineComponent({
           {
             tableName: tableName.value,
             columnName: props.selected?.column,
-            [props.selected?.new ? 'newIndex' : 'rowNumber']: (props.selected?.rowId),
+            [props.selected?.new ? 'newIndex' : 'rowNumber']: ((props.selected?.row || 1) - 1),
             updateValue:
               props.selected?.value === value && !props.selected?.new
                 ? undefined

@@ -1,17 +1,38 @@
 <template>
-  <div class="column">
-    <span>{{ columnName }}</span>
-    <div class="properties">
-      <span v-if="column.primaryKey">PK</span>
-      <span v-if="column.unique">U</span>
-      <span v-if="column.notNull">NN</span>
-      <span>{{ column.type }}</span>
+  <div
+    :key="column.name"
+    class="graph-table-column"
+  >
+    <div class="name">
+      {{ column.name }}
     </div>
-    <!-- {{ column.unique }} -->
+    <div class="properties">
+      <div
+        v-if="column.notNull"
+        class="property"
+      >
+        NN
+      </div>
+      <div
+        v-if="column.unique"
+        class="property"
+      >
+        UN
+      </div>
+      <div
+        v-if="column.primaryKey"
+        class="property"
+      >
+        PK
+      </div>
+      <div class="property">
+        {{ column.type }}
+      </div>
+    </div>
     <graph-path
       v-if="column.foreign.table && column.foreign.column && tableColumnPositions[tableName]"
       :start="tableColumnPositions[tableName][columnName]"
-      :end="tableColumnPositions[column.foreign.table]?.[column.foreign.column] ?? { ...tableColumnPositions[tableName][columnName], x: tableColumnPositions[tableName][columnName].x + 100 }"
+      :end="tableColumnPositions[column.foreign.table]?.[column.foreign.column]"
     />
   </div>
 </template>
@@ -45,25 +66,36 @@ export default defineComponent({
 </script>
 
 <style scoped lang="postcss">
-div.column {
+.graph-table-column {
+  @apply bg-white;
   @apply flex;
-  @apply justify-between;
-}
-
-div.column span {
-  @apply ellipsis;
-  @apply flex-grow;
-}
-
-div.properties {
-  @apply flex;
+  @apply justify-between items-center;
+  @apply px-3;
+  @apply rounded-lg;
+  @apply select-none;
   @apply gap-1;
+  height: 34px;
+
 }
 
-div.properties span {
-  /* @apply bg-primary;
-  @apply rounded;
-  @apply text-sm; */
-  @apply text-xs;
+.graph-table-column .name {
+  @apply text-sm;
+  @apply leading-none;
+  min-width: 50px;
+  max-width: 100px;
+  @apply ellipsis overflow-hidden;
 }
+
+.graph-table-column .properties {
+  @apply flex gap-0.5;
+}
+
+.graph-table-column .property {
+  @apply text-xs;
+  @apply px-1 p-0.5;
+  @apply bg-primary;
+  @apply text-white;
+  border-radius: 4px;
+}
+
 </style>

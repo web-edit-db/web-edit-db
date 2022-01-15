@@ -24,8 +24,8 @@ export default defineComponent({
   setup (props) {
     const path = computed(() => [
       props.start,
-      { x: props.start.x + (props.start.x > props.end.x ? -96 : 96), y: props.start.y },
-      { x: props.end.x + (props.start.x < props.end.x ? -96 : 96), y: props.end.y },
+      { x: props.start.x + (props.start.x > props.end.x ? -100 : 100), y: props.start.y },
+      { x: props.end.x + (props.start.x < props.end.x ? -100 : 100), y: props.end.y },
       props.end
     ])
     watch(() => path.value, () => console.log('updated!'), { immediate: true })

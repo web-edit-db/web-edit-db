@@ -23,7 +23,7 @@
             <path
               :d="`M ${graphConfig.cell} 0 L 0 0 L 0 ${graphConfig.cell}`"
               fill="none"
-              stroke-width="3"
+              stroke-width="2"
             />
           </pattern>
           <pattern
@@ -31,8 +31,8 @@
             :width="graphConfig.cellLarge"
             :height="graphConfig.cellLarge"
             patternUnits="userSpaceOnUse"
-            x="-1.1"
-            y="-1.1"
+            x="-0.5"
+            y="-0.5"
           >
             <rect
               :width="graphConfig.cellLarge"
@@ -42,7 +42,7 @@
             <path
               :d="`M${graphConfig.cellLarge} 0 L0 0 L0 ${graphConfig.cellLarge}`"
               fill="none"
-              stroke-width="4"
+              stroke-width="2"
             />
           </pattern>
         </defs>
@@ -62,37 +62,45 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, provide, reactive, Ref, ref, watch } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  provide,
+  reactive,
+  Ref,
+  ref,
+  watch
+} from 'vue'
 import GraphTables from './GraphTables.vue'
 import { useStore } from 'vuex'
 import { State } from '@/store/types'
 import { graphConfig } from '@/helpers'
 
-export type Rect = { x: number, y: number, h: number, w: number }
-export type Point = Partial<Rect> & Omit<Rect, 'h' | 'w'>
+export type Rect = { x: number; y: number; h: number; w: number };
+export type Point = Partial<Rect> & Omit<Rect, 'h' | 'w'>;
 export type Node = {
-  parent?: Point,
-  closed?: boolean,
-  opened?: boolean,
-  cost: number,
-  costFromStart: number,
-  costFromEnd: number
-}
-export type FindPath = (start: Point, end: Point) => Point[]
+  parent?: Point;
+  closed?: boolean;
+  opened?: boolean;
+  cost: number;
+  costFromStart: number;
+  costFromEnd: number;
+};
+export type FindPath = (start: Point, end: Point) => Point[];
 export interface Controlls {
-  lastPosition: Point,
-  lastGridPosition: Point,
-  lockedOffset: Point,
+  lastPosition: Point;
+  lastGridPosition: Point;
+  lockedOffset: Point;
   target: null | {
     // update (diffrence: Point): { x: boolean, y: boolean },
-    position: () => Ref<Point>
-    grid: boolean,
-    table: null|string
-  },
-  mouseup(): void,
-  mousemove(event: MouseEvent): void
-  mousedown(event: MouseEvent): void,
-  wheel(event: WheelEvent): void
+    position: () => Ref<Point>;
+    grid: boolean;
+    table: null | string;
+  };
+  mouseup(): void;
+  mousemove(event: MouseEvent): void;
+  mousedown(event: MouseEvent): void;
+  wheel(event: WheelEvent): void;
 }
 
 export default defineComponent({
@@ -103,7 +111,9 @@ export default defineComponent({
     const store = useStore<State>()
 
     const tablePositions = ref({} as { [tableName: string]: Point })
-    const tableColumnPositions = ref({ } as { [tableName: string]: { [columnName: string]: Point } })
+    const tableColumnPositions = ref(
+      {} as { [tableName: string]: { [columnName: string]: Point } }
+    )
     provide('tablePositions', tablePositions)
     provide('tableColumnPositions', tableColumnPositions)
 
@@ -128,15 +138,14 @@ export default defineComponent({
         x: Math.max(
           Math.min(
             graphConfig.cell * Math.round(point.x / graphConfig.cell),
-            (graphConfig.size / 2) - (point.w ?? 0)
+            graphConfig.size / 2 - (point.w ?? 0)
           ),
           graphConfig.size / -2
         ),
-        y:
-        Math.max(
+        y: Math.max(
           Math.min(
             graphConfig.cell * Math.round(point.y / graphConfig.cell),
-            (graphConfig.size / 2) - (point.h ?? 0)
+            graphConfig.size / 2 - (point.h ?? 0)
           ),
           graphConfig.size / -2
         )
@@ -164,11 +173,21 @@ export default defineComponent({
           const position = controlls.target.position()
           if (controlls.target.grid) {
             const diffrenceGrid = snapToGrid({
-              x: diffrence.x / view.zoom + Math.min(controlls.lastGridPosition.x, graphConfig.cell),
-              y: diffrence.y / view.zoom + Math.min(controlls.lastGridPosition.y, graphConfig.cell)
+              x:
+                diffrence.x / view.zoom +
+                Math.min(controlls.lastGridPosition.x, graphConfig.cell),
+              y:
+                diffrence.y / view.zoom +
+                Math.min(controlls.lastGridPosition.y, graphConfig.cell)
             })
-            controlls.lastGridPosition.x = (controlls.lastGridPosition.x + (diffrence.x / view.zoom - diffrenceGrid.x)) % graphConfig.cell
-            controlls.lastGridPosition.y = (controlls.lastGridPosition.y + (diffrence.y / view.zoom - diffrenceGrid.y)) % graphConfig.cell
+            controlls.lastGridPosition.x =
+              (controlls.lastGridPosition.x +
+                (diffrence.x / view.zoom - diffrenceGrid.x)) %
+              graphConfig.cell
+            controlls.lastGridPosition.y =
+              (controlls.lastGridPosition.y +
+                (diffrence.y / view.zoom - diffrenceGrid.y)) %
+              graphConfig.cell
             position.value = {
               ...position.value,
               x: position.value.x + diffrenceGrid.x,
@@ -182,7 +201,10 @@ export default defineComponent({
             }
           }
         } else {
-          view.pan = { x: view.pan.x + diffrence.x, y: view.pan.y + diffrence.y }
+          view.pan = {
+            x: view.pan.x + diffrence.x,
+            y: view.pan.y + diffrence.y
+          }
         }
       },
       mouseup () {
@@ -213,7 +235,10 @@ export default defineComponent({
       view.zoom = store.state.graph.zoom
       view.pan = store.state.graph.pan
     })
-    watch(() => [view.zoom, view.pan], () => store.commit('setGraphZoomPan', { zoom: view.zoom, pan: view.pan }))
+    watch(
+      () => [view.zoom, view.pan],
+      () => store.commit('setGraphZoomPan', { zoom: view.zoom, pan: view.pan })
+    )
 
     return {
       graphConfig,
@@ -232,10 +257,10 @@ svg {
 }
 
 #backgroundPatternSmall path {
-  stroke: theme('colors.gray.200');
+  stroke: theme("colors.gray.200");
 }
 
 #backgroundPattern path {
-  stroke: theme('colors.gray.300');
+  stroke: theme("colors.gray.300");
 }
 </style>

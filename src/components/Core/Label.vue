@@ -24,7 +24,7 @@ export default defineComponent({
       default: 'label'
     },
     variant: {
-      type: String as PropType<'default' | 'primary' | 'success' | 'error' | 'warning'| 'text'>,
+      type: String as PropType<'default' | 'primary' | 'success' | 'error' | 'warning'| 'text' | 'white'>,
       default: 'default'
     },
     size: {
@@ -100,6 +100,12 @@ export default defineComponent({
   &.text {
     &:hover { @apply bg-gray-200; }
     &, &:active { @apply bg-transparent text-black border-none shadow-none; }
+    &:focus { @apply ring-gray-400 ring-opacity-50; }
+  }
+
+  &.white {
+    &:hover { @apply bg-gray-200 border-gray-200; }
+    &, &:active { @apply bg-white border-white text-black; }
     &:focus { @apply ring-gray-400 ring-opacity-50; }
   }
 }

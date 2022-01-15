@@ -35,7 +35,8 @@ export default {
       // prompt the user for database file
       const file = await fileOpen({
         mimeTypes: ['application/vnd.sqlite3'],
-        extensions: SQLITE_EXTENSIONS
+        extensions: SQLITE_EXTENSIONS,
+        description: 'SQLite Database'
       })
       router.push('/graph')
       // turn file into array
@@ -206,7 +207,7 @@ export default {
           ...state.modifications[tableName].columns,
           [columnName]: {
             name: columnName,
-            type: 'STRING',
+            type: 'TEXT',
             min: null,
             max: null,
             unique: false,
@@ -265,7 +266,7 @@ export default {
   },
 
   // table
-  async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: {tableName: string, newTableName?: string, columns: {[name: string]: Column}}) {
+  async alterTable ({ state, dispatch, commit }, { tableName, newTableName, columns }: { tableName: string, newTableName?: string, columns: { [name: string]: Column } }) {
     if (!state.database) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
     const columnsUpdated = Object.entries(columns).filter(([, column]) => !column.drop && !column.new).map(([old, column]) => ({ old, new: column.name }))
@@ -306,7 +307,7 @@ export default {
     await dispatch('queryTables')
     if (!newTableName) await dispatch('queryColumns', tableName)
   },
-  async createTable ({ state, dispatch, commit }, { tableName, columns }: { tableName: string, columns: { [name: string]: Column }}) {
+  async createTable ({ state, dispatch, commit }, { tableName, columns }: { tableName: string, columns: { [name: string]: Column } }) {
     if (!state.database) return undefined
     if (columns === undefined) columns = state.modifications[tableName].columns
 
@@ -367,7 +368,7 @@ export default {
     }
     for (const newId in data.new) {
       sql.push(`
-        INSERT INTO [${tableName}] (${Object.keys(data.new[newId]).join(', ')})
+        INSERT INTO [${tableName}] (${Object.keys(data.new[newId]).map(value => `[${value}]`).join(', ')})
           VALUES (${Object.values(data.new[newId]).map(value => `${typeof value === 'string' ? ('"' + value + '"') : value}`).join(', ')});
       `)
     }

@@ -11,7 +11,7 @@ export default createStore<State>({
     tables: {},
     modifications: {},
     graph: {
-      pan: { x: 16, y: 16 },
+      pan: { x: 10, y: 10 },
       zoom: 1,
       tables: {}
     }

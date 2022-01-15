@@ -2,7 +2,7 @@ export function gridSnap (value: number): number {
   return Math.round(value / 10) * 10
 }
 
-const graphConfigCell = 16
+const graphConfigCell = 20
 export const graphConfig = {
   cell: graphConfigCell,
   cellLarge: graphConfigCell * 5,

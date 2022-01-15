@@ -7,12 +7,28 @@
   >
     <div
       class="graph-table"
-      @mousedown="() => { controlls.target = { position: getPosition, grid: true, table: tableName } }"
+      @mousedown="
+        () => {
+          controlls.target = {
+            position: getPosition,
+            grid: true,
+            table: tableName,
+          };
+        }
+      "
       @mouseup="controlls.target = null"
     >
-      <header>{{ tableName }}</header>
+      <header>
+        <span>{{ tableName }}</span>
+        <v-button
+          variant="text"
+          size="sm"
+        >
+          <palette-icon />
+        </v-button>
+      </header>
       <graph-table-column
-        v-for="column, columnName in columns"
+        v-for="(column, columnName) in columns"
         :key="columnName"
         :column-name="columnName"
         :table-name="tableName"
@@ -23,15 +39,27 @@
 
 <script lang="ts">
 import { State } from '@/store/types'
-import { computed, defineComponent, inject, onMounted, Ref, ref, watch } from 'vue'
+import {
+  computed,
+  defineComponent,
+  inject,
+  onMounted,
+  Ref,
+  ref,
+  watch
+} from 'vue'
 import { useStore } from 'vuex'
 import GraphTableColumn from '@/components/GraphTableColumn.vue'
 import { Controlls, Point } from './GraphRoot.vue'
 import { graphConfig } from '@/helpers'
+import { PaletteIcon } from 'vue-tabler-icons'
+import { VButton } from '@/components/Core'
 
 export default defineComponent({
   components: {
-    GraphTableColumn
+    GraphTableColumn,
+    PaletteIcon,
+    VButton
   },
   props: {
     tableName: {
@@ -55,7 +83,7 @@ export default defineComponent({
       tableColumnPositions.value[props.tableName] = Object.fromEntries(Object.entries(columns.value).map(([key], index) => [
         key,
         {
-          x: position.value.x + 80,
+          x: position.value.x + (size.value.w / 2),
           y: position.value.y + (graphConfig.cell * 2 * (index + 1.5))
         }
       ]))
@@ -64,11 +92,10 @@ export default defineComponent({
     watch(position, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }), { flush: 'post' })
 
     onMounted(() => {
-      store.dispatch('queryColumns', props.tableName)
       if (!store.state.modifications[props.tableName].new) store.dispatch('queryColumns', props.tableName)
       position.value = {
         ...size.value,
-        x: store.state.graph.tables?.[props.tableName]?.x ?? Object.keys(store.state.graph.tables).length * 192,
+        x: store.state.graph.tables?.[props.tableName]?.x ?? Object.keys(store.state.graph.tables).length * 200,
         y: store.state.graph.tables?.[props.tableName]?.y ?? 0
       }
       store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value })
@@ -80,29 +107,27 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .graph-table {
-  @apply shadow-md;
   @apply flex flex-col;
-  @apply leading-none;
+  @apply p-1.5;
   @apply bg-primary;
   @apply rounded-lg;
-  @apply select-none;
-}
-
-.graph-table header, .graph-table div {
-  @apply h-6;
-  @apply m-1;
-  @apply leading-6;
-}
-
-.graph-table div{
-  @apply bg-white text-black;
-  @apply rounded;
-  @apply px-3;
+  @apply gap-1.5;
 }
 
 .graph-table header {
+  @apply flex;
+  @apply justify-between items-center;
   @apply text-white;
   @apply text-lg;
-  @apply px-1;
+  @apply leading-none;
+  @apply px-1.5;
+  @apply select-none;
+  @apply text-white;
+}
+
+.graph-table header button {
+  &:hover { @apply bg-gray-300 border-gray-300; }
+  &, &:active { @apply bg-white border-white text-primary w-7; }
+  &:focus { @apply ring-gray-400 ring-opacity-50; }
 }
 </style>
