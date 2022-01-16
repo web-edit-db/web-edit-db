@@ -38,19 +38,31 @@ export default {
         extensions: SQLITE_EXTENSIONS,
         description: 'SQLite Database'
       })
-      router.push('/graph')
+      await router.push('/')
       // turn file into array
       const fileBufferArray = new Uint8Array(await file.arrayBuffer())
       // create the connection
       const connection = new state.sqlJs.Database(fileBufferArray)
 
-      commit('resetState') // first reset current state
+      // commit('resetState') // first reset current state
+      Object.assign(state, {
+        sqlJs: state.sqlJs,
+        database: null,
+        tables: {},
+        modifications: {},
+        graph: {
+          pan: { x: 10, y: 10 },
+          zoom: 1,
+          tables: {}
+        }
+      })
       // commit the changes
       commit('setDatabase', {
         connection,
         name: file.name,
         handle: file.handle
       })
+      await router.push('/graph')
       dispatch('queryTables')
       window.$message.success(`Opened database '${state.database?.name}'`)
     }
