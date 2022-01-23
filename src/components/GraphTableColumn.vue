@@ -30,7 +30,7 @@
       </div>
     </div>
     <graph-path
-      v-if="column.foreign.table && column.foreign.column && tableColumnPositions[tableName]"
+      v-if="column.foreign.table && column.foreign.column && tableColumnPositions[tableName] && tableColumnPositions[column.foreign.table]"
       :start="tableColumnPositions[tableName][columnName]"
       :end="tableColumnPositions[column.foreign.table]?.[column.foreign.column]"
     />
@@ -60,7 +60,16 @@ export default defineComponent({
     const store = useStore<State>()
     const column = computed(() => store.state.modifications[props.tableName].columns[props.columnName])
     const tableColumnPositions = inject('tableColumnPositions') as Ref<{ [tableName: string]: { [columnName: string]: Point } }>
-    return { column, tableColumnPositions }
+
+    const width = computed(() => {
+      let widthOutput = 100
+      if (column.value.primaryKey) widthOutput += 20
+      if (column.value.notNull) widthOutput += 20
+      if (column.value.unique) widthOutput += 20
+      if (column.value.type) widthOutput += (column.value.type.length * 7.5) + 8
+      return widthOutput
+    })
+    return { column, tableColumnPositions, width }
   }
 })
 </script>
@@ -95,6 +104,7 @@ export default defineComponent({
   @apply px-1 p-0.5;
   @apply bg-primary;
   @apply text-white;
+  @apply font-mono;
   border-radius: 4px;
 }
 

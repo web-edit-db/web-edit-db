@@ -30,6 +30,7 @@
       <graph-table-column
         v-for="(column, columnName) in columns"
         :key="columnName"
+        :ref="el => el && (columnWidths[columnName] = el.width)"
         :column-name="columnName"
         :table-name="tableName"
       />
@@ -72,8 +73,12 @@ export default defineComponent({
     const columns = computed(() => store.state.modifications[props.tableName]?.columns ?? {})
 
     const controlls = inject<Controlls>('controlls')
+    const columnWidths = ref<{ [columnName: string]: number }>({})
 
-    const size = computed(() => ({ w: 160, h: (Object.keys(columns.value).length + 1) * graphConfig.cell * 2 }))
+    const size = computed(() => ({
+      w: Math.ceil((Math.max(...Object.values(columnWidths.value), -12) + 12) / graphConfig.cell) * graphConfig.cell,
+      h: (Object.keys(columns.value).length + 1) * graphConfig.cell * 2
+    }))
     const position = ref({ x: 0, y: 0, h: 0, w: 0 })
     const getPosition = () => position
 
@@ -89,7 +94,15 @@ export default defineComponent({
       ]))
     })
 
-    watch(position, () => store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value }), { flush: 'post' })
+    watch(size, () => (position.value = { ...position.value, ...size.value }), { flush: 'post' })
+    watch(
+      position,
+      () => store.commit(
+        'setGraphTablePosition',
+        { tableName: props.tableName, position: position.value }
+      ),
+      { flush: 'post' }
+    )
 
     onMounted(() => {
       if (!store.state.modifications[props.tableName].new) store.dispatch('queryColumns', props.tableName)
@@ -98,9 +111,8 @@ export default defineComponent({
         x: store.state.graph.tables?.[props.tableName]?.x ?? Object.keys(store.state.graph.tables).length * 200,
         y: store.state.graph.tables?.[props.tableName]?.y ?? 0
       }
-      store.commit('setGraphTablePosition', { tableName: props.tableName, position: position.value })
     })
-    return { columns, controlls, size, position, getPosition, tableColumnPositions }
+    return { columns, controlls, size, position, getPosition, tableColumnPositions, columnWidths }
   }
 })
 </script>
