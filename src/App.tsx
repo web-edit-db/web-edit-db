@@ -1,10 +1,27 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { useRegisterSW } from 'virtual:pwa-register/react'
 
 function App() {
   const [count, setCount] = useState(0)
   const [isDark, setIsDark] = useState(false)
+
+  useRegisterSW({
+    immediate: true,
+    onRegisteredSW(swUrl, registration) {
+      console.log('SW registered: ', registration, swUrl)
+    },
+    onRegisterError(error) {
+      console.log('SW registration error: ', error)
+    },
+    onNeedRefresh() {
+      console.log('Need refresh')
+    },
+    onOfflineReady() {
+      console.log('Offline ready')
+    },
+  })
 
   const toggleTheme = () => {
     const newTheme = !isDark
@@ -59,7 +76,7 @@ function App() {
           onClick={() => setCount((count) => count + 1)}
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          count is {count}
+          count is {count} clicks
         </button>
         <p className="mt-4 text-gray-600 dark:text-gray-300 transition-colors duration-300">
           Edit <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm text-gray-800 dark:text-gray-200 transition-colors duration-300">src/App.tsx</code> and save to test HMR
