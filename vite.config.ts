@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import colors from 'tailwindcss/colors'
+import { reactRouter } from "@react-router/dev/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,8 +10,8 @@ export default defineConfig({
     __DATE__: JSON.stringify(new Date().toISOString())
   },
   plugins: [
-    react(),
     tailwindcss(),
+    reactRouter(),
     VitePWA({
       registerType: 'prompt',
       workbox: {

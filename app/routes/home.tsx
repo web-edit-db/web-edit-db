@@ -1,9 +1,21 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import reactLogo from '../assets/react.svg'
 import viteLogo from '/vite.svg'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
-function App() {
+// export function meta() {
+//     return [
+//         {
+//             title: "Home",
+//         },
+//         {
+//             name: "description",
+//             content: "Home page"
+//         }
+//     ]
+// }
+
+export default function Home() {
   const [count, setCount] = useState(0)
   const [isDark, setIsDark] = useState(false)
 
@@ -36,6 +48,8 @@ function App() {
   }
 
   return (
+    <>
+    <title>Web Edit DB - Home</title>
     <div className="min-h-screen flex flex-col items-center justify-center p-8 transition-colors duration-300 bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
       {/* Theme Toggle Button */}
       <button
@@ -89,7 +103,6 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </div>
+    </>
   )
 }
-
-export default App
