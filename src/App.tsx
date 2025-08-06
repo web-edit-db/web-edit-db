@@ -71,6 +71,9 @@ function App() {
         </a>
       </div>
       <h1 className="text-5xl font-bold mb-8">Vite + React</h1>
+      <p className="text-lg text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">
+        Build date: {__DATE__}
+      </p>
       <div className="p-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-lg transition-colors duration-300">
         <button 
           onClick={() => setCount((count) => count + 1)}

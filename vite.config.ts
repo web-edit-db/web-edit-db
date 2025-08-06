@@ -6,6 +6,9 @@ import colors from 'tailwindcss/colors'
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __DATE__: JSON.stringify(new Date().toISOString())
+  },
   plugins: [
     react(),
     tailwindcss(),
