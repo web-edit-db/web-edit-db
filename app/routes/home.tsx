@@ -3,18 +3,6 @@ import reactLogo from '../assets/react.svg'
 import viteLogo from '/vite.svg'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
-// export function meta() {
-//     return [
-//         {
-//             title: "Home",
-//         },
-//         {
-//             name: "description",
-//             content: "Home page"
-//         }
-//     ]
-// }
-
 export default function Home() {
   const [count, setCount] = useState(0)
   const [isDark, setIsDark] = useState(false)
