@@ -4,6 +4,7 @@ process.env.STORYBOOK = 'true';
 
 const config: StorybookConfig = {
   "stories": [
+    "../app/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],

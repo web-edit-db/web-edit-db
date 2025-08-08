@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import colors from 'tailwindcss/colors'
 import { reactRouter } from "@react-router/dev/vite";
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -107,4 +108,9 @@ export default defineConfig({
     ] : []),
     
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './app'),
+    },
+  },
 })

@@ -1,5 +1,7 @@
 import type { Preview } from '@storybook/react-vite'
 
+import '../app/index.css'
+
 const preview: Preview = {
   parameters: {
     controls: {
@@ -8,7 +10,47 @@ const preview: Preview = {
        date: /Date$/i,
       },
     },
+    backgrounds: {
+      default: 'light',
+      values: [
+        {
+          name: 'light',
+          value: '#ffffff',
+        },
+        {
+          name: 'dark',
+          value: '#1a1a1a',
+        },
+      ],
+    },
   },
+  globalTypes: {
+    theme: {
+      description: 'Global theme for components',
+      defaultValue: 'light',
+      toolbar: {
+        title: 'Theme',
+        icon: 'circlehollow',
+        items: ['light', 'dark'],
+        dynamicTitle: true,
+      },
+    },
+  },
+  decorators: [
+    (Story, context) => {
+      const theme = context.globals.theme
+      
+      // Remove existing theme classes
+      document.documentElement.classList.remove('dark')
+      
+      // Add the selected theme class
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      }
+      
+      return Story()
+    },
+  ],
 };
 
 export default preview;
