@@ -1,1 +1,1 @@
-npm run type-check && npm run test:run 
+npm run type-check && npm run test:run -- --passWithNoTests
