@@ -1,27 +1,10 @@
 import { useState } from 'react'
 import reactLogo from '../assets/react.svg'
 import viteLogo from '/vite.svg'
-import { useRegisterSW } from 'virtual:pwa-register/react'
 
 export default function Home() {
   const [count, setCount] = useState(0)
   const [isDark, setIsDark] = useState(false)
-
-  useRegisterSW({
-    immediate: true,
-    onRegisteredSW(swUrl, registration) {
-      console.log('SW registered: ', registration, swUrl)
-    },
-    onRegisterError(error) {
-      console.log('SW registration error: ', error)
-    },
-    onNeedRefresh() {
-      console.log('Need refresh')
-    },
-    onOfflineReady() {
-      console.log('Offline ready')
-    },
-  })
 
   const toggleTheme = () => {
     const newTheme = !isDark

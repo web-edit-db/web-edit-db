@@ -9,6 +9,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 import type { Route } from "./+types/root";
+import PWAReload from '@/components/PWAReload';
+import { Toaster } from '@/components/ui/sonner';
 
 export function links() {
   return [];
@@ -27,6 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   </head>
   <body>
     {children}
+    <Toaster />
     <ScrollRestoration />
     <Scripts />
   </body>
@@ -35,7 +38,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />
+  return (<>
+    <Outlet />
+    <PWAReload />
+  </>)
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

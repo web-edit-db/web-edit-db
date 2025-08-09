@@ -16,12 +16,11 @@ export default defineConfig({
     ...(process.env.STORYBOOK !== 'true' ? [
       reactRouter(),
       VitePWA({
-        registerType: 'prompt',
+        registerType: 'autoUpdate',
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}']
         },
         includeAssets: ['favicon.ico', 'img/icons/*.png', 'img/icons/*.svg'],
-        // strategies: 'generateSW',
         manifest: {
           name: 'Web Edit DB',
           short_name: 'WebEditDB',
