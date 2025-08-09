@@ -9,4 +9,4 @@ export default defineConfig({
   define: {
     __DATE__: JSON.stringify(new Date().toISOString()),
   },
-}) 
+})

@@ -1,24 +1,24 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookConfig } from '@storybook/react-vite'
 
-process.env.STORYBOOK = 'true';
+process.env.STORYBOOK = 'true'
 
 const config: StorybookConfig = {
-  "stories": [
-    "../app/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+  stories: [
+    '../app/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../stories/**/*.mdx',
+    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
-  "addons": [
-    "@chromatic-com/storybook",
-    "@storybook/addon-docs",
-    "@storybook/addon-onboarding",
-    "@storybook/addon-a11y",
-    "@storybook/addon-vitest",
-    "storybook-addon-remix-react-router"
+  addons: [
+    '@chromatic-com/storybook',
+    '@storybook/addon-docs',
+    '@storybook/addon-onboarding',
+    '@storybook/addon-a11y',
+    '@storybook/addon-vitest',
+    'storybook-addon-remix-react-router',
   ],
-  "framework": {
-    "name": "@storybook/react-vite",
-    "options": {}
-  }
-};
-export default config;
+  framework: {
+    name: '@storybook/react-vite',
+    options: {},
+  },
+}
+export default config

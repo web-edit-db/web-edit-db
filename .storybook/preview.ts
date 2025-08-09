@@ -6,8 +6,8 @@ const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
-       color: /(background|color)$/i,
-       date: /Date$/i,
+        color: /(background|color)$/i,
+        date: /Date$/i,
       },
     },
     backgrounds: {
@@ -39,18 +39,18 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme
-      
+
       // Remove existing theme classes
       document.documentElement.classList.remove('dark')
-      
+
       // Add the selected theme class
       if (theme === 'dark') {
         document.documentElement.classList.add('dark')
       }
-      
+
       return Story()
     },
   ],
-};
+}
 
-export default preview;
+export default preview

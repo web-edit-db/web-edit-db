@@ -1,0 +1,10 @@
+node_modules
+build
+dist
+.react-router
+.react-router/types
+.husky/_
+coverage
+storybook-static
+*.log
+
