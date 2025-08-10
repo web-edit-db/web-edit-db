@@ -74,7 +74,7 @@ export default function Home() {
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-lg transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800">
           <button
             onClick={() => setCount((count) => count + 1)}
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+            className="rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors duration-200 hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:outline-none"
           >
             count is {count} clicks
           </button>

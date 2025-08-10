@@ -90,7 +90,7 @@
 
   --popover-foreground: oklch(0.13 0.028 261.692);
 
-  --primary: oklch(0.21 0.034 264.665);
+  --primary: var(--color-purple-500);
 
   --primary-foreground: oklch(0.985 0.002 247.839);
 
@@ -128,7 +128,7 @@
 
   --sidebar-foreground: oklch(0.13 0.028 261.692);
 
-  --sidebar-primary: oklch(0.21 0.034 264.665);
+  --sidebar-primary: var(--color-purple-600);
 
   --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
 
@@ -154,7 +154,7 @@
 
   --popover-foreground: oklch(0.985 0.002 247.839);
 
-  --primary: oklch(0.928 0.006 264.531);
+  --primary: var(--color-purple-600);
 
   --primary-foreground: oklch(0.21 0.034 264.665);
 
@@ -192,7 +192,7 @@
 
   --sidebar-foreground: oklch(0.985 0.002 247.839);
 
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: var(--color-purple-600);
 
   --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
 
