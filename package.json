@@ -21,6 +21,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@react-router/node": "^7.7.1",
     "@react-router/serve": "^7.7.1",
+    "@sqlite.org/sqlite-wasm": "^3.50.3-build1",
     "@tailwindcss/vite": "^4.1.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -31,7 +32,8 @@
     "react-dom": "^19.1.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "vite-plugin-static-copy": "^3.1.1"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.0",
