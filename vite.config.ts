@@ -111,7 +111,7 @@ export default defineConfig({
       viteStaticCopy({
         targets: [
           {
-            src: './node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3.wasm',
+            src: './node_modules/sql.js/dist/sql-wasm.wasm',
             dest: './',
             rename: 'sqlite3.wasm',
           }

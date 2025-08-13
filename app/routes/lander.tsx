@@ -1,12 +1,14 @@
-import { useDatabaseLoaded } from '@/lib/sqlite/useDatabaseLoaded'
 import { Outlet } from 'react-router'
 import logo from '@/assets/logo.png'
 import { Button } from '@/components/ui/button'
+import { useDatabase } from '@/lib/sqlite/useDatabase'
+import { useVersion } from '@/lib/sqlite/useVersion'
 
 export default function Lander() {
-  const databaseLoaded = useDatabaseLoaded()
+  const { createDatabase, openDatabase, databaseOpened } = useDatabase()
+  const version = useVersion()
 
-  return databaseLoaded ? (
+  return databaseOpened ? (
     <Outlet />
   ) : (
     <div className="flex h-screen flex-col items-center justify-center gap-4">
@@ -16,9 +18,10 @@ export default function Lander() {
         <p className="text-2xl">Welcome to Web Edit DB!</p>
         <p className="text-xl">Get started by opening a database or creating a new one.</p>
         <div className="flex gap-4 mt-4">
-          <Button>Upload Database</Button>
-          <Button>Create Database</Button>
+          <Button onClick={() => openDatabase()}>Upload Database</Button>
+          <Button onClick={() => createDatabase()}>Create Database</Button>
         </div>
+        <p className="text-sm text-muted-foreground mt-4">Sqlite version: {version}</p>
       </div>
     </div>
   )

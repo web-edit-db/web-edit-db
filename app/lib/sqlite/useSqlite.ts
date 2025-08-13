@@ -1,19 +1,31 @@
-import type { Sqlite3Static } from "@sqlite.org/sqlite-wasm";
-import { default as sqlite3InitModule } from '@sqlite.org/sqlite-wasm';
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import initSqlJs from 'sql.js'
+import type { SqlJsStatic } from 'sql.js'
+import { z } from "zod";
+import { createExecSchema, singleResult } from "./utils";
+
+const versionSchema = singleResult(createExecSchema(["sqlite_version()"], [z.string()]))
+  .transform(data => data.value?.[0] ?? null);
+
+const getVersion = (sqlite3: SqlJsStatic) => {
+  const databaseConnection = new sqlite3.Database();
+  const query = databaseConnection.exec("SELECT sqlite_version()");
+  const versionParsed = versionSchema.safeParse(query);
+  if (!versionParsed.success) {
+    console.error(versionParsed.error);
+  }
+  return versionParsed.data ?? null;
+}
 
 export const useSqlite = () => {
-  const [sqlite3, setSqlite3] = useState<Sqlite3Static | null>(null);
+  const [sqlite3, setSqlite3] = useState<SqlJsStatic | null>(null);
+  const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
     const initSqlite = async () => {
-      const sqlite3 = await sqlite3InitModule({
-        locateFile: (path) => {
-          // Ensure WASM files are loaded from the correct location
-          if (path.endsWith('.wasm')) {
-            return `/sqlite3.wasm`;
-          }
-          return path;
+      const sqlite3 = await initSqlJs({
+        locateFile: () => {
+          return `/sqlite3.wasm`;
         },
       });
       setSqlite3(sqlite3);
@@ -21,9 +33,10 @@ export const useSqlite = () => {
     initSqlite();
   }, []);
 
-  const version = useMemo(() => {
-    if (!sqlite3) return null;
-    return sqlite3.version.libVersion;
+  useEffect(() => {
+    if (!sqlite3) return;
+    const version = getVersion(sqlite3);
+    setVersion(version);
   }, [sqlite3]);
 
   return {
