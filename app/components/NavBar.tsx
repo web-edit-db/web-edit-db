@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import logo from "@/assets/logo.png";
+import ThemeSwitchButton from "./ThemeSwitchButton";
 
 export default function NavBar() {
     return (
@@ -8,6 +9,10 @@ export default function NavBar() {
                 <img src={logo} alt="" className="p-1.5 h-14" />
                 <span className="text-primary">Web Edit DB</span>
             </Link> 
+            {/* space  */}
+            <div className="flex gap-1">
+                <ThemeSwitchButton />
+            </div>
         </nav>
     );
 }
