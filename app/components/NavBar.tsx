@@ -1,6 +1,8 @@
 import { Link } from 'react-router'
 import logo from '@/assets/logo.png'
 import ThemeSwitchButton from './ThemeSwitchButton'
+import UploadDatabaseButton from './sqlite/UploadDatabaseButton'
+import CreateDatabaseButton from './sqlite/CreateDatabaseButton'
 
 export default function NavBar() {
   return (
@@ -13,7 +15,9 @@ export default function NavBar() {
         <span className="text-primary">Web Edit DB</span>
       </Link>
       {/* space  */}
-      <div className="flex gap-1">
+      <div className="flex items-center gap-2">
+        <UploadDatabaseButton labelText="Upload" />
+        <CreateDatabaseButton labelText="Create" />
         <ThemeSwitchButton />
       </div>
     </nav>
