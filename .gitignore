@@ -28,3 +28,6 @@ dist-ssr
 /build/
 *storybook.log
 storybook-static
+
+# Crush
+.crush
