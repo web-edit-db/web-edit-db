@@ -19,7 +19,7 @@ const StoryWrapper = (args: UploadDatabaseButtonProps) => {
 }
 
 const meta = {
-  title: 'Components/SQLite/UploadDatabaseButton',
+  title: 'SQLite/UploadDatabaseButton',
   component: UploadDatabaseButton,
   parameters: {
     layout: 'centered',

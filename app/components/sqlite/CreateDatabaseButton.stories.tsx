@@ -19,7 +19,7 @@ const StoryWrapper = (args: CreateDatabaseButtonProps) => {
 }
 
 const meta = {
-  title: 'Components/SQLite/CreateDatabaseButton',
+  title: 'SQLite/CreateDatabaseButton',
   component: CreateDatabaseButton,
   parameters: {
     layout: 'centered',
