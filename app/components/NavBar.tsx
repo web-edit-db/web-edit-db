@@ -3,6 +3,7 @@ import logo from '@/assets/logo.png'
 import ThemeSwitchButton from './ThemeSwitchButton'
 import UploadDatabaseButton from './sqlite/UploadDatabaseButton'
 import CreateDatabaseButton from './sqlite/CreateDatabaseButton'
+import DatabaseVersionButton from './sqlite/DatabaseVersionButton'
 
 export default function NavBar() {
   return (
@@ -18,6 +19,7 @@ export default function NavBar() {
       <div className="flex items-center gap-2">
         <UploadDatabaseButton labelText="Upload" />
         <CreateDatabaseButton labelText="Create" />
+        <DatabaseVersionButton />
         <ThemeSwitchButton />
       </div>
     </nav>
