@@ -18,11 +18,11 @@ export default function Lander() {
       <div className="flex flex-col items-center justify-center">
         <p className="text-2xl">Welcome to Web Edit DB!</p>
         <p className="text-xl">Get started by opening a database or creating a new one.</p>
-        <div className="flex gap-4 mt-4">
+        <div className="mt-4 flex gap-4">
           <UploadDatabaseButton labelText="Upload Database" />
           <CreateDatabaseButton labelText="Create Database" />
         </div>
-        <p className="text-sm text-muted-foreground mt-4">Sqlite version: {version}</p>
+        <p className="text-muted-foreground mt-4 text-sm">Sqlite version: {version}</p>
       </div>
     </div>
   )

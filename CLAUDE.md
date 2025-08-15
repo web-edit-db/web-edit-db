@@ -32,12 +32,14 @@ npm run build-storybook   # Build Storybook for production
 ## Architecture
 
 ### Core Technologies
+
 - **React 19** with TypeScript and React Router v7 (file-based routing)
 - **SQLite in browser** via WebAssembly (@sqlite.org/sqlite-wasm + sql.js)
 - **Tailwind CSS v4** with shadcn/ui components
 - **PWA** with offline capabilities
 
 ### Key Directories
+
 ```
 app/
 ├── components/           # React components
@@ -53,13 +55,16 @@ stories/                 # Storybook stories
 ```
 
 ### SQLite Integration
+
 - Browser-based SQLite using WebAssembly (no server required)
 - Context provider pattern via `SqliteProvider`
 - Custom hooks in `app/lib/sqlite/` for database operations
 - Support for file upload/download, transactions, and error handling
 
 ### Component System
+
 Uses shadcn/ui components with Tailwind CSS. Generate new components with:
+
 ```bash
 npx shadcn@latest add [component-name]
 ```
@@ -74,12 +79,14 @@ npx shadcn@latest add [component-name]
 ## Build Configuration
 
 ### Vite Configuration
+
 - SQLite WASM files excluded from optimization
 - PWA plugin with service worker
 - Static file copying for SQLite binaries
 - Path aliases: `@/*` → `app/*`
 
 ### Important Notes
+
 - SSR is **disabled** (client-side only app)
 - SQLite WASM requires special handling in build process
 - PWA icons and manifest configured for "Web Edit DB"
@@ -87,6 +94,7 @@ npx shadcn@latest add [component-name]
 ## Current Development
 
 Project is on `react-rewrite` branch with recent focus on:
+
 - SQLite database management features
 - AlertDialog components
 - Storybook integration improvements

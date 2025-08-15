@@ -30,9 +30,9 @@ export default function UploadDatabaseButton({ labelText = null }: UploadDatabas
   }, [openDatabase, databaseOpened, showAlertDialog])
   return (
     <>
-      <Button 
-        variant="outline" 
-        size={labelText ? 'default' : 'icon'} 
+      <Button
+        variant="outline"
+        size={labelText ? 'default' : 'icon'}
         onClick={openDatabaseHandler}
         disabled={isLoading}
       >

@@ -63,9 +63,9 @@ export default function CreateDatabaseButton({ labelText = null }: CreateDatabas
 
   return (
     <>
-      <Button 
-        variant="outline" 
-        size={labelText ? 'default' : 'icon'} 
+      <Button
+        variant="outline"
+        size={labelText ? 'default' : 'icon'}
         onClick={handleCreateClick}
         disabled={isLoading}
       >
@@ -105,14 +105,17 @@ export default function CreateDatabaseButton({ labelText = null }: CreateDatabas
               className={`w-full ${!isValidDatabaseName(databaseName) && databaseName ? 'border-destructive dark:border-destructive' : ''}`}
             />
             {databaseName && !isValidDatabaseName(databaseName) && (
-              <p className="mt-2 text-sm text-destructive">
+              <p className="text-destructive mt-2 text-sm">
                 Database name cannot contain spaces and must not be empty
               </p>
             )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCreateDatabase} disabled={!isValidDatabaseName(databaseName)}>
+            <AlertDialogAction
+              onClick={handleCreateDatabase}
+              disabled={!isValidDatabaseName(databaseName)}
+            >
               Create Database
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,7 +1,7 @@
-import { useVersion } from "@/lib/sqlite/useVersion";
+import { useVersion } from '@/lib/sqlite/useVersion'
 
 export default function About() {
-  const version = useVersion();
+  const version = useVersion()
   return (
     <>
       <title>Web Edit DB - About</title>

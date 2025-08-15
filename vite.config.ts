@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import colors from 'tailwindcss/colors'
 import { reactRouter } from '@react-router/dev/vite'
 import path from 'path'
-import { viteStaticCopy} from 'vite-plugin-static-copy'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -108,15 +108,15 @@ export default defineConfig({
           }),
         ]
       : []),
-      viteStaticCopy({
-        targets: [
-          {
-            src: './node_modules/sql.js/dist/sql-wasm.wasm',
-            dest: './',
-            rename: 'sqlite3.wasm',
-          }
-        ]
-      })
+    viteStaticCopy({
+      targets: [
+        {
+          src: './node_modules/sql.js/dist/sql-wasm.wasm',
+          dest: './',
+          rename: 'sqlite3.wasm',
+        },
+      ],
+    }),
   ],
   resolve: {
     alias: {
@@ -125,5 +125,5 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['@sqlite.org/sqlite-wasm'],
-  }
+  },
 })

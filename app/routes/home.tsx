@@ -9,7 +9,6 @@ export default function Home() {
     <>
       <title>Web Edit DB - Home</title>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-8 text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-white">
-
         <div className="mb-8 flex gap-8">
           <a
             href="https://vite.dev"
@@ -41,7 +40,7 @@ export default function Home() {
         <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-lg transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800">
           <button
             onClick={() => setCount((count) => count + 1)}
-            className="rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors duration-200 hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:outline-none"
+            className="bg-primary hover:bg-primary/90 focus:ring-primary/50 rounded-lg px-6 py-3 font-medium text-white transition-colors duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             count is {count} clicks
           </button>
