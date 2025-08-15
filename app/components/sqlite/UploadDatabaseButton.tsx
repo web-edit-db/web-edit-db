@@ -18,7 +18,7 @@ export type UploadDatabaseButtonProps = {
 }
 
 export default function UploadDatabaseButton({ labelText = null }: UploadDatabaseButtonProps) {
-  const { openDatabase, databaseOpened } = useDatabase()
+  const { openDatabase, databaseOpened, isLoading } = useDatabase()
   const [showAlertDialog, setShowAlertDialog] = useState(false)
   const openDatabaseHandler = useCallback(() => {
     if (databaseOpened && !showAlertDialog) {
@@ -30,7 +30,12 @@ export default function UploadDatabaseButton({ labelText = null }: UploadDatabas
   }, [openDatabase, databaseOpened, showAlertDialog])
   return (
     <>
-      <Button variant="outline" size={labelText ? 'default' : 'icon'} onClick={openDatabaseHandler}>
+      <Button 
+        variant="outline" 
+        size={labelText ? 'default' : 'icon'} 
+        onClick={openDatabaseHandler}
+        disabled={isLoading}
+      >
         <UploadIcon className="h-5 w-5" />
         {labelText && <span>{labelText}</span>}
       </Button>

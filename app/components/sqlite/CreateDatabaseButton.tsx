@@ -19,7 +19,7 @@ export type CreateDatabaseButtonProps = {
 }
 
 export default function CreateDatabaseButton({ labelText = null }: CreateDatabaseButtonProps) {
-  const { createDatabase, databaseOpened } = useDatabase()
+  const { createDatabase, databaseOpened, isLoading } = useDatabase()
   const [showWarningDialog, setShowWarningDialog] = useState(false)
   const [showNameDialog, setShowNameDialog] = useState(false)
   const [databaseName, setDatabaseName] = useState('database.db')
@@ -63,7 +63,12 @@ export default function CreateDatabaseButton({ labelText = null }: CreateDatabas
 
   return (
     <>
-      <Button variant="outline" size={labelText ? 'default' : 'icon'} onClick={handleCreateClick}>
+      <Button 
+        variant="outline" 
+        size={labelText ? 'default' : 'icon'} 
+        onClick={handleCreateClick}
+        disabled={isLoading}
+      >
         <PlusIcon className="h-5 w-5" />
         {labelText && <span>{labelText}</span>}
       </Button>

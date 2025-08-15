@@ -9,6 +9,7 @@ import {
 } from 'react'
 import initSqlJs from 'sql.js'
 import type { SqlJsStatic, Database } from 'sql.js'
+import { toast } from 'sonner'
 
 export type NamedDatabase = {
   database: Database
@@ -19,6 +20,7 @@ type SqliteContextType = {
   sqlite3: SqlJsStatic | null
   database: NamedDatabase | null
   isLoading: boolean
+  error: string | null
   setDatabase: (database: NamedDatabase | null) => void
 }
 
@@ -28,6 +30,7 @@ export function SqliteProvider({ children }: { children: ReactNode }) {
   const [sqlite3, setSqlite3] = useState<SqlJsStatic | null>(null)
   const [database, setDatabase] = useState<NamedDatabase | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const initSqlite = async () => {
@@ -40,8 +43,13 @@ export function SqliteProvider({ children }: { children: ReactNode }) {
         setSqlite3(sqlite3)
         setIsLoading(false)
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to initialize SQLite'
+        setError(errorMessage)
         setIsLoading(false)
-        throw error
+        toast.error('SQLite Engine Failed', {
+          description: errorMessage,
+        })
+        console.error('SQLite initialization failed:', error)
       }
     }
 
@@ -70,9 +78,10 @@ export function SqliteProvider({ children }: { children: ReactNode }) {
       sqlite3,
       database,
       isLoading,
+      error,
       setDatabase: setDatabaseAndClosePrevious,
     } satisfies SqliteContextType
-  }, [sqlite3, database, isLoading, setDatabaseAndClosePrevious])
+  }, [sqlite3, database, isLoading, error, setDatabaseAndClosePrevious])
 
   return <SqliteContext.Provider value={value}>{children}</SqliteContext.Provider>
 }

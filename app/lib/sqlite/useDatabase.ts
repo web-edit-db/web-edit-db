@@ -1,9 +1,10 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { fileOpen } from 'browser-fs-access'
 import { useSqliteContext } from './SqliteProvider'
 
 export const useDatabase = () => {
-  const { sqlite3, database, setDatabase } = useSqliteContext()
+  const { sqlite3, database, isLoading: sqliteLoading, setDatabase } = useSqliteContext()
+  const [isOperationLoading, setIsOperationLoading] = useState(false)
 
   const databaseOpened = useMemo(() => {
     if (!sqlite3) {
@@ -19,6 +20,10 @@ export const useDatabase = () => {
     return database.fileName
   }, [database])
 
+  const isLoading = useMemo(() => {
+    return sqliteLoading || isOperationLoading
+  }, [sqliteLoading, isOperationLoading])
+
   const createDatabase = useCallback(
     async (filename: string = 'database.db', overwrite = false) => {
       if (!sqlite3) {
@@ -29,9 +34,14 @@ export const useDatabase = () => {
         throw new Error('Database already opened')
       }
 
-      const database = new sqlite3.Database()
-      setDatabase({ database, fileName: filename })
-      return database
+      setIsOperationLoading(true)
+      try {
+        const database = new sqlite3.Database()
+        setDatabase({ database, fileName: filename })
+        return database
+      } finally {
+        setIsOperationLoading(false)
+      }
     },
     [sqlite3, databaseOpened, setDatabase],
   )
@@ -46,18 +56,23 @@ export const useDatabase = () => {
         throw new Error('Database already opened')
       }
 
-      const databaseBlob = await fileOpen({
-        description: 'Select a database file',
-        mimeTypes: ['application/vnd.sqlite3', 'application/x-sqlite3'],
-      })
-      const databaseBufferArray = new Uint8Array(await databaseBlob.arrayBuffer())
+      setIsOperationLoading(true)
+      try {
+        const databaseBlob = await fileOpen({
+          description: 'Select a database file',
+          mimeTypes: ['application/vnd.sqlite3', 'application/x-sqlite3'],
+        })
+        const databaseBufferArray = new Uint8Array(await databaseBlob.arrayBuffer())
 
-      const database = new sqlite3.Database(databaseBufferArray)
-      setDatabase({ database, fileName: databaseBlob.name })
-      return database
+        const database = new sqlite3.Database(databaseBufferArray)
+        setDatabase({ database, fileName: databaseBlob.name })
+        return database
+      } finally {
+        setIsOperationLoading(false)
+      }
     },
     [sqlite3, databaseOpened, setDatabase],
   )
 
-  return { createDatabase, openDatabase, databaseOpened, databaseName }
+  return { createDatabase, openDatabase, databaseOpened, databaseName, isLoading }
 }
