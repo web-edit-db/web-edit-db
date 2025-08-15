@@ -3,6 +3,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import type { Route } from './+types/root'
 import PWAReload from '@/components/PWAReload'
 import { Toaster } from '@/components/ui/sonner'
+import { SqliteProvider } from './lib/sqlite/SqliteProvider'
 
 export function links() {
   return []
@@ -32,7 +33,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <>
-      <Outlet />
+      <SqliteProvider>
+        <Outlet />
+      </SqliteProvider>
       <PWAReload />
     </>
   )
