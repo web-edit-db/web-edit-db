@@ -1,0 +1,244 @@
+---
+globs: *.test.ts,*.test.tsx,*.spec.ts,*.spec.tsx,*.stories.ts,*.stories.tsx
+description: Testing patterns with Vitest, Testing Library, and Storybook development
+---
+
+# Testing & Storybook Guide
+
+This project uses Vitest + Testing Library for unit/integration tests and Storybook for component development.
+
+## Testing Stack
+
+### Core Testing Tools
+
+- **Test Runner**: Vitest
+- **DOM Testing**: @testing-library/react + @testing-library/jest-dom
+- **User Interactions**: @testing-library/user-event
+- **Browser Testing**: @vitest/browser (configured)
+- **Coverage**: @vitest/coverage-v8
+
+### Test Configuration
+
+- [vitest.config.ts](mdc:vitest.config.ts) - Main test configuration
+- [app/vitest.setup.ts](mdc:app/vitest.setup.ts) - Test setup file
+- Tests run in browser environment via @vitest/browser
+
+## Testing Patterns
+
+### Component Testing
+
+```typescript
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import MyComponent from './MyComponent'
+
+describe('MyComponent', () => {
+  it('renders with correct text', () => {
+    render(<MyComponent title="Test Title" />)
+    expect(screen.getByText('Test Title')).toBeInTheDocument()
+  })
+
+  it('handles user interactions', async () => {
+    const user = userEvent.setup()
+    const mockFn = vi.fn()
+
+    render(<MyComponent onClick={mockFn} />)
+
+    await user.click(screen.getByRole('button'))
+    expect(mockFn).toHaveBeenCalledOnce()
+  })
+})
+```
+
+### Testing SQLite Components
+
+```typescript
+import { render } from '@testing-library/react'
+import { SqliteProvider } from '@/lib/sqlite/SqliteProvider'
+
+function renderWithSqlite(component: React.ReactElement) {
+  return render(
+    <SqliteProvider>
+      {component}
+    </SqliteProvider>
+  )
+}
+
+describe('DatabaseComponent', () => {
+  it('handles database operations', async () => {
+    renderWithSqlite(<DatabaseComponent />)
+    // Test database interactions
+  })
+})
+```
+
+### Testing Custom Hooks
+
+```typescript
+import { renderHook, act } from '@testing-library/react'
+import { useDatabase } from '@/lib/sqlite/useDatabase'
+import { SqliteProvider } from '@/lib/sqlite/SqliteProvider'
+
+describe('useDatabase', () => {
+  it('creates database successfully', async () => {
+    const { result } = renderHook(() => useDatabase(), {
+      wrapper: SqliteProvider,
+    })
+
+    await act(async () => {
+      await result.current.createDatabase('test.db')
+    })
+
+    expect(result.current.databaseOpened).toBe(true)
+  })
+})
+```
+
+## Storybook Configuration
+
+### Setup
+
+- **Main Config**: `.storybook/main.ts`
+- **Preview**: `.storybook/preview.ts`
+- **Addons**: Accessibility, Docs, Vitest integration
+- **Framework**: React + Vite
+
+### Story Patterns
+
+#### Basic Component Stories
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/react'
+import { Button } from './Button'
+
+const meta = {
+  title: 'Components/Button',
+  component: Button,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['default', 'destructive', 'outline'],
+    },
+  },
+} satisfies Meta<typeof Button>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {
+  args: {
+    children: 'Button',
+    variant: 'default',
+  },
+}
+
+export const Destructive: Story = {
+  args: {
+    children: 'Delete',
+    variant: 'destructive',
+  },
+}
+```
+
+#### Stories with Providers
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/react'
+import { SqliteProvider } from '@/lib/sqlite/SqliteProvider'
+import { DatabaseComponent } from './DatabaseComponent'
+
+const meta = {
+  title: 'SQLite/DatabaseComponent',
+  component: DatabaseComponent,
+  decorators: [
+    (Story) => (
+      <SqliteProvider>
+        <Story />
+      </SqliteProvider>
+    ),
+  ],
+} satisfies Meta<typeof DatabaseComponent>
+```
+
+#### Interactive Stories
+
+```typescript
+import { userEvent, within, expect } from '@storybook/test'
+
+export const WithInteraction: Story = {
+  args: {
+    onClick: () => console.log('Clicked!'),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const button = canvas.getByRole('button')
+
+    await userEvent.click(button)
+    await expect(button).toHaveFocus()
+  },
+}
+```
+
+## Available Scripts
+
+### Testing Commands
+
+```bash
+npm run test           # Run tests in watch mode
+npm run test:run       # Run tests once
+npm run type-check     # TypeScript type checking
+```
+
+### Storybook Commands
+
+```bash
+npm run storybook      # Start Storybook dev server
+npm run build-storybook # Build static Storybook
+```
+
+## Testing Best Practices
+
+### Component Testing
+
+- Test behavior, not implementation
+- Use accessible queries (`getByRole`, `getByLabelText`)
+- Mock external dependencies
+- Test error states and loading states
+- Test keyboard navigation
+
+### Story Development
+
+- Create stories for all component variants
+- Include examples of error states
+- Document component props with controls
+- Use decorators for required providers
+- Add interaction tests for complex components
+
+### File Organization
+
+- Co-locate tests: `Component.test.tsx` next to `Component.tsx`
+- Co-locate stories: `Component.stories.tsx` next to `Component.tsx`
+- Use descriptive test names
+- Group related tests with `describe` blocks
+
+### Testing SQLite Features
+
+- Mock heavy database operations in unit tests
+- Use real SQLite for integration tests
+- Test error handling (database not ready, connection failures)
+- Test cleanup and resource management
+
+## Accessibility Testing
+
+Storybook includes @storybook/addon-a11y for accessibility testing:
+
+- Automatically runs accessibility checks
+- Reports violations in the Accessibility panel
+- Test with keyboard navigation
+- Check color contrast ratios
+- Verify ARIA attributes

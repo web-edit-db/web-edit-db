@@ -1,0 +1,73 @@
+---
+globs: *.ts,*.tsx,*.js,*.jsx
+description: TypeScript and React coding standards for Web Edit DB
+---
+
+# Coding Standards & Conventions
+
+## TypeScript Configuration
+
+This project uses strict TypeScript with:
+
+- Path mapping: `@/*` → `app/*`
+- Strict type checking enabled
+- ESLint + Prettier for code formatting
+
+## Code Style
+
+### General Rules
+
+- Use TypeScript for all new files
+- Prefer explicit return types for functions
+- Use `const` assertions and `satisfies` for type safety
+- Always use semicolons (enforced by Prettier)
+
+### React Patterns
+
+- Use function components with hooks
+- Prefer `useCallback` and `useMemo` for performance
+- Use proper TypeScript types for props and state
+- Extract custom hooks for reusable logic
+
+### Import Order (Prettier handles this)
+
+1. React and external libraries
+2. Internal imports with `@/` alias
+3. Relative imports
+4. Type-only imports last
+
+### Naming Conventions
+
+- **Components**: PascalCase (`UserProfile.tsx`)
+- **Hooks**: camelCase starting with `use` (`useDatabase.ts`)
+- **Utils**: camelCase (`utils.ts`)
+- **Types**: PascalCase (`type UserData = {}`)
+- **Constants**: UPPER_SNAKE_CASE (`const API_URL = ''`)
+
+### File Organization
+
+- One component per file
+- Co-locate related files (stories, tests)
+- Use barrel exports sparingly
+- Keep utilities in `/lib` directory
+
+## Error Handling
+
+- Always handle async operations with try/catch
+- Use proper TypeScript error types
+- Provide user-friendly error messages
+- Log errors to console in development
+
+## Performance
+
+- Use React.memo() for expensive components
+- Prefer `useCallback` for event handlers
+- Use `useMemo` for expensive calculations
+- Implement proper cleanup in `useEffect`
+
+## Key Tools
+
+- **Linting**: ESLint with TypeScript and React rules
+- **Formatting**: Prettier with Tailwind plugin
+- **Type Checking**: `npm run type-check`
+- **Testing**: Vitest + Testing Library

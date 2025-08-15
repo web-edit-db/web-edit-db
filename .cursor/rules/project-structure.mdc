@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+description: Web Edit DB project structure and navigation guide
+---
+
+# Web Edit DB - Project Structure Guide
+
+This is a React Router v7 + SQLite web application for database editing in the browser.
+
+## Project Architecture
+
+- **Framework**: React Router v7 (SPA mode, no SSR)
+- **Build Tool**: Vite with TypeScript
+- **Styling**: Tailwind CSS v4 with shadcn/ui components
+- **Database**: SQLite WASM (`sql.js` and `@sqlite.org/sqlite-wasm`)
+- **Testing**: Vitest + Testing Library + Storybook
+- **PWA**: Configured with vite-plugin-pwa
+
+## Key Directory Structure
+
+```
+app/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui base components
+│   └── sqlite/         # SQLite-specific components
+├── lib/                # Utilities and hooks
+│   ├── sqlite/         # SQLite hooks and providers
+│   └── utils.ts        # General utilities (cn function)
+├── routes/             # Route components
+├── layout/             # Layout components
+└── root.tsx           # App root with providers
+```
+
+## Import Aliases
+
+All imports use the `@/` alias pointing to the `app/` directory:
+
+- `@/components` → `app/components`
+- `@/lib` → `app/lib`
+- `@/routes` → `app/routes`
+
+## Key Files to Reference
+
+- [package.json](mdc:package.json) - Dependencies and scripts
+- [app/root.tsx](mdc:app/root.tsx) - App layout and providers
+- [app/routes.ts](mdc:app/routes.ts) - Route configuration
+- [vite.config.ts](mdc:vite.config.ts) - Build configuration
+- [components.json](mdc:components.json) - shadcn/ui configuration
+- [app/lib/sqlite/SqliteProvider.tsx](mdc:app/lib/sqlite/SqliteProvider.tsx) - SQLite context

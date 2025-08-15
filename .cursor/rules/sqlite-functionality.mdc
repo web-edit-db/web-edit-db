@@ -1,0 +1,163 @@
+---
+description: SQLite WASM integration patterns and database operations
+globs: *.ts,*.tsx
+---
+
+# SQLite WASM Integration Guide
+
+This project uses SQLite WASM for in-browser database operations with `sql.js` and `@sqlite.org/sqlite-wasm`.
+
+## Core Architecture
+
+### SQLite Provider
+
+The [app/lib/sqlite/SqliteProvider.tsx](mdc:app/lib/sqlite/SqliteProvider.tsx) provides:
+
+- SQLite WASM initialization
+- Database context management
+- Error handling with toast notifications
+- Automatic cleanup on component unmount
+
+### Key Hooks
+
+#### `useSqliteContext()`
+
+Core context hook providing:
+
+```typescript
+{
+  sqlite3: SqlJsStatic | null,
+  database: NamedDatabase | null,
+  isLoading: boolean,
+  error: string | null,
+  setDatabase: (database: NamedDatabase | null) => void
+}
+```
+
+#### `useDatabase()`
+
+Located in [app/lib/sqlite/useDatabase.ts](mdc:app/lib/sqlite/useDatabase.ts):
+
+- `createDatabase(filename, overwrite)` - Create new in-memory database
+- `openDatabase(overwrite)` - Open file from user's system
+- `databaseOpened` - Boolean state
+- `databaseName` - Current database filename
+- `isLoading` - Operation loading state
+
+#### `useSqlite()` (Custom Hook)
+
+See [app/lib/README.md](mdc:app/lib/README.md) for full documentation:
+
+- `execute(sql)` - Execute SQL statements
+- `queryValue(sql)` - Get single value
+- `queryArray(sql)` - Get array of arrays
+- `queryObject(sql)` - Get array of objects
+- `executeBatch(statements)` - Transaction support
+- `executeWithCallback(sql, callback)` - Row-by-row processing
+
+## Usage Patterns
+
+### Basic Setup
+
+```typescript
+import { useSqliteContext } from '@/lib/sqlite/SqliteProvider'
+
+function MyComponent() {
+  const { sqlite3, database, isLoading, error } = useSqliteContext()
+
+  if (isLoading) return <div>Loading SQLite...</div>
+  if (error) return <div>Error: {error}</div>
+  if (!sqlite3) return <div>SQLite not ready</div>
+
+  // Component logic
+}
+```
+
+### Database Operations
+
+```typescript
+import { useDatabase } from '@/lib/sqlite/useDatabase'
+
+function DatabaseManager() {
+  const { createDatabase, openDatabase, databaseOpened } = useDatabase()
+
+  const handleCreate = async () => {
+    try {
+      await createDatabase('my-app.db')
+      // Database created and set in context
+    } catch (error) {
+      console.error('Failed to create database:', error)
+    }
+  }
+
+  const handleOpen = async () => {
+    try {
+      await openDatabase()
+      // File picker opens, database loaded
+    } catch (error) {
+      console.error('Failed to open database:', error)
+    }
+  }
+}
+```
+
+### SQL Execution
+
+```typescript
+import { useSqlite } from '@/lib/sqlite/useSqlite'
+
+function DataManager() {
+  const { execute, queryObject, executeBatch } = useSqlite()
+
+  const createTable = async () => {
+    await execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE
+      )
+    `)
+  }
+
+  const getUsers = async () => {
+    const users = await queryObject('SELECT * FROM users')
+    return users
+  }
+
+  const insertMultiple = async (userData) => {
+    const statements = userData.map(
+      (user) => `INSERT INTO users (name, email) VALUES ('${user.name}', '${user.email}')`,
+    )
+    await executeBatch(statements)
+  }
+}
+```
+
+## File Browser Integration
+
+Uses `browser-fs-access` for file operations:
+
+- Automatic file type filtering for SQLite files
+- Supports both `.db` and `.sqlite` extensions
+- Handles MIME types: `application/vnd.sqlite3`, `application/x-sqlite3`
+
+## Error Handling
+
+- Provider shows toast notifications for initialization errors
+- Hooks throw descriptive errors
+- Always wrap database operations in try/catch
+- Check loading states before operations
+
+## Performance Considerations
+
+- Database connections are automatically managed
+- Previous databases are closed when opening new ones
+- Use `useMemo` and `useCallback` for derived state
+- Consider pagination for large result sets
+
+## Component Examples
+
+See existing components:
+
+- [app/components/sqlite/CreateDatabaseButton.tsx](mdc:app/components/sqlite/CreateDatabaseButton.tsx)
+- [app/components/sqlite/UploadDatabaseButton.tsx](mdc:app/components/sqlite/UploadDatabaseButton.tsx)

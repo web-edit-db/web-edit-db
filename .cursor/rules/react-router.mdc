@@ -1,0 +1,142 @@
+---
+globs: *.tsx,*.ts
+description: React Router v7 patterns and conventions for Web Edit DB
+---
+
+# React Router v7 Guide
+
+This project uses React Router v7 in SPA mode (no SSR).
+
+## Configuration Files
+
+- [react-router.config.ts](mdc:react-router.config.ts) - Main config with `ssr: false`
+- [app/routes.ts](mdc:app/routes.ts) - Route definitions using file-based routing
+- [app/root.tsx](mdc:app/root.tsx) - Root layout with providers
+
+## Route Structure
+
+Current routes defined in [app/routes.ts](mdc:app/routes.ts):
+
+```typescript
+export default [
+  layout('layout/main.tsx', [
+    route('*', 'routes/lander.tsx', [
+      index('routes/home.tsx'), // /
+      route('about', 'routes/about.tsx'), // /about
+    ]),
+  ]),
+] satisfies RouteConfig
+```
+
+## Route Components
+
+### File Locations
+
+- **Route Components**: `app/routes/` directory
+- **Layout Components**: `app/layout/` directory
+- **Root Component**: `app/root.tsx`
+
+### Component Patterns
+
+#### Route Component Structure
+
+```typescript
+import type { Route } from './+types/route-name'
+
+export default function RouteName() {
+  return (
+    <div>
+      {/* Route content */}
+    </div>
+  )
+}
+
+// Optional: Error boundary
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  return <div>Error: {error.message}</div>
+}
+
+// Optional: Loading component
+export function HydrateFallback() {
+  return <div>Loading...</div>
+}
+```
+
+#### Layout Component Structure
+
+```typescript
+import { Outlet } from 'react-router'
+
+export default function Layout() {
+  return (
+    <div>
+      <header>{/* Navigation */}</header>
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  )
+}
+```
+
+## Navigation & Links
+
+### Using Links
+
+```typescript
+import { Link, NavLink } from 'react-router'
+
+// Basic link
+<Link to="/about">About</Link>
+
+// Navigation link with active state
+<NavLink
+  to="/about"
+  className={({ isActive }) => isActive ? 'active' : ''}
+>
+  About
+</NavLink>
+```
+
+### Programmatic Navigation
+
+```typescript
+import { useNavigate } from 'react-router'
+
+function Component() {
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    navigate('/about')
+  }
+}
+```
+
+## Data Loading
+
+Since SSR is disabled, use client-side data fetching:
+
+```typescript
+import { useEffect, useState } from 'react'
+
+export default function RouteComponent() {
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    // Client-side data loading
+    fetchData().then(setData)
+  }, [])
+
+  if (!data) return <div>Loading...</div>
+
+  return <div>{/* Render data */}</div>
+}
+```
+
+## Type Safety
+
+React Router v7 generates types in `.react-router/types/` directory:
+
+- Import route types: `import type { Route } from './+types/route-name'`
+- TypeScript configuration includes these types
+- Run `npm run type-check` to validate routes

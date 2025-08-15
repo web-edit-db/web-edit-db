@@ -1,0 +1,234 @@
+---
+globs: *.tsx,*.ts
+description: shadcn/ui component development and Tailwind CSS patterns
+---
+
+# UI Components & Styling Guide
+
+This project uses shadcn/ui components with Tailwind CSS v4 and Lucide React icons.
+
+## shadcn/ui Configuration
+
+Configuration in [components.json](mdc:components.json):
+
+- **Style**: New York variant
+- **Base Color**: Gray
+- **CSS Variables**: Enabled for theming
+- **Icon Library**: Lucide React
+- **Aliases**: `@/components`, `@/lib/utils`, `@/components/ui`
+
+## Component Structure
+
+### Base UI Components
+
+Located in `app/components/ui/`:
+
+- [button.tsx](mdc:app/components/ui/button.tsx) - Primary button component
+- [input.tsx](mdc:app/components/ui/input.tsx) - Form input component
+- [alert-dialog.tsx](mdc:app/components/ui/alert-dialog.tsx) - Modal dialogs
+- [sonner.tsx](mdc:app/components/ui/sonner.tsx) - Toast notifications
+
+### Feature Components
+
+Located in `app/components/`:
+
+- Domain-specific components (e.g., `sqlite/` directory)
+- Layout components (`NavBar.tsx`, `ThemeSwitchButton.tsx`)
+- PWA components (`PWAReload.tsx`)
+
+## Styling Patterns
+
+### Utility Classes with `cn()`
+
+The [app/lib/utils.ts](mdc:app/lib/utils.ts) provides `cn()` function for conditional classes:
+
+```typescript
+import { cn } from '@/lib/utils'
+
+function Button({ className, variant = 'default', ...props }) {
+  return (
+    <button
+      className={cn(
+        'base-button-classes',
+        variant === 'destructive' && 'destructive-classes',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+```
+
+### Component Variants with CVA
+
+Use `class-variance-authority` for component variants:
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority'
+
+const buttonVariants = cva('base-classes', {
+  variants: {
+    variant: {
+      default: 'default-classes',
+      destructive: 'destructive-classes',
+    },
+    size: {
+      default: 'default-size',
+      sm: 'small-size',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+})
+
+type ButtonProps = VariantProps<typeof buttonVariants> &
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+```
+
+## Theming
+
+### Dark Mode Support
+
+- Uses `next-themes` for theme management
+- Custom theme switch in [app/components/ThemeSwitchButton.tsx](mdc:app/components/ThemeSwitchButton.tsx)
+- CSS variables defined in [app/index.css](mdc:app/index.css)
+
+### Theme Hook
+
+```typescript
+import { useTheme } from '@/lib/useTheme'
+
+function Component() {
+  const { theme, setTheme, systemTheme } = useTheme()
+
+  return (
+    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+      Toggle Theme
+    </button>
+  )
+}
+```
+
+## Icon Usage
+
+### Lucide React Icons
+
+```typescript
+import { User, Settings, Database } from 'lucide-react'
+
+function IconExample() {
+  return (
+    <div className="flex items-center gap-2">
+      <User className="h-4 w-4" />
+      <Settings className="h-5 w-5 text-muted-foreground" />
+      <Database className="h-6 w-6 text-primary" />
+    </div>
+  )
+}
+```
+
+## Toast Notifications
+
+### Using Sonner
+
+```typescript
+import { toast } from 'sonner'
+
+function Component() {
+  const handleSuccess = () => {
+    toast.success('Operation completed!')
+  }
+
+  const handleError = () => {
+    toast.error('Something went wrong', {
+      description: 'Please try again later',
+    })
+  }
+
+  const handleCustom = () => {
+    toast('Custom message', {
+      action: {
+        label: 'Undo',
+        onClick: () => console.log('Undo'),
+      },
+    })
+  }
+}
+```
+
+## Responsive Design
+
+### Tailwind Breakpoints
+
+- `sm:` - 640px and up
+- `md:` - 768px and up
+- `lg:` - 1024px and up
+- `xl:` - 1280px and up
+- `2xl:` - 1536px and up
+
+### Mobile-First Approach
+
+```typescript
+<div className="
+  p-4
+  md:p-6
+  lg:p-8
+  grid
+  grid-cols-1
+  md:grid-cols-2
+  lg:grid-cols-3
+">
+  {/* Responsive grid */}
+</div>
+```
+
+## Component Development
+
+### TypeScript Props
+
+Always define proper TypeScript interfaces:
+
+```typescript
+interface ComponentProps {
+  title: string
+  optional?: boolean
+  children: React.ReactNode
+  onClick: () => void
+}
+
+export default function Component({ title, optional = false, ...props }: ComponentProps) {
+  return <div>{/* Component JSX */}</div>
+}
+```
+
+### Forwarding Refs
+
+For UI components that need ref forwarding:
+
+```typescript
+import { forwardRef } from 'react'
+
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <input
+        ref={ref}
+        className={cn('input-classes', className)}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = 'Input'
+```
+
+## Accessibility
+
+- Use semantic HTML elements
+- Provide proper ARIA labels
+- Ensure keyboard navigation
+- Test with screen readers
+- Use proper color contrast ratios
+- Include focus indicators
