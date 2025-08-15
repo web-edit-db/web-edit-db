@@ -1,5 +1,6 @@
+import React from 'react'
 import type { Preview } from '@storybook/react-vite'
-
+import { SqliteProvider } from '../app/lib/sqlite/SqliteProvider'
 import '../app/index.css'
 
 const preview: Preview = {
@@ -50,6 +51,7 @@ const preview: Preview = {
 
       return Story()
     },
+    (Story) => <SqliteProvider>{Story()}</SqliteProvider>,
   ],
 }
 

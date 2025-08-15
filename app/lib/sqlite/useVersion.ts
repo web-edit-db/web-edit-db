@@ -1,6 +1,6 @@
-import { useSqlite } from "./useSqlite";
+import { useSqlite } from './useSqlite'
 
 export const useVersion = () => {
-    const { version } = useSqlite();
-    return version;
-};
+  const { version } = useSqlite()
+  return version
+}
