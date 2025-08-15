@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { fileOpen } from 'browser-fs-access'
+import { fileOpen, fileSave } from 'browser-fs-access'
+import { toast } from 'sonner'
 import { useSqliteContext } from './SqliteProvider'
 
 export const useDatabase = () => {
@@ -74,5 +75,35 @@ export const useDatabase = () => {
     [sqlite3, databaseOpened, setDatabase],
   )
 
-  return { createDatabase, openDatabase, databaseOpened, databaseName, isLoading }
+  const saveDatabase = useCallback(async () => {
+    if (!database || !databaseOpened || !databaseName) {
+      toast.error('No database to save')
+      return
+    }
+
+    setIsOperationLoading(true)
+    try {
+      // Export the database as Uint8Array
+      const databaseData = database.database.export()
+
+      // Create a file from the database data
+      const file = new File([databaseData], databaseName, { type: 'application/vnd.sqlite3' })
+
+      // Save the file using browser-fs-access
+      await fileSave(file, {
+        extensions: ['.db', '.sqlite', '.sqlite3'],
+        fileName: databaseName,
+        description: 'SQLite Database',
+      })
+
+      toast.success('Database saved successfully')
+    } catch (error) {
+      console.error('Failed to save database:', error)
+      toast.error('Failed to save database')
+    } finally {
+      setIsOperationLoading(false)
+    }
+  }, [database, databaseOpened, databaseName])
+
+  return { createDatabase, openDatabase, saveDatabase, databaseOpened, databaseName, isLoading }
 }
