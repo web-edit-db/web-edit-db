@@ -1,0 +1,167 @@
+---
+alwaysApply: true
+description: Import conventions and barrel export policies for Web Edit DB
+---
+
+# Import Conventions & File Organization
+
+This project follows specific import patterns and file organization principles.
+
+## Import Path Preferences
+
+### Always Use Absolute Imports with `@/` Alias
+
+**✅ PREFERRED - Use `@/` alias for all imports:**
+
+```typescript
+import { Button } from '@/components/ui/button'
+import { useDatabase } from '@/lib/sqlite/use-database'
+import { CreateDatabaseButton } from '@/components/sqlite/database-actions/create-database-button'
+```
+
+**❌ AVOID - Relative imports with `../` or `./`:**
+
+```typescript
+import { Button } from '../../ui/button'
+import { useDatabase } from '../../../lib/sqlite/use-database'
+import { CreateDatabaseButton } from './create-database-button'
+```
+
+### Exception: Same Directory Imports
+
+The ONLY acceptable relative import is within the same directory:
+
+```typescript
+// File: create-database-button.stories.tsx
+import CreateDatabaseButton from './create-database-button' // ✅ Same directory OK
+```
+
+## Barrel Export Policy
+
+### ❌ DO NOT Create `index.ts` Barrel Export Files
+
+**NEVER create these files:**
+
+- `index.ts` files that only re-export other modules
+- Barrel exports for convenience grouping
+- Directory-level export aggregation files
+
+**Why we avoid barrel exports:**
+
+1. **Build Performance**: Increases bundle size and compilation time
+2. **Tree Shaking**: Can interfere with dead code elimination
+3. **Circular Dependencies**: Risk of import cycles
+4. **Maintenance Overhead**: Extra files to maintain with no functional benefit
+5. **Import Clarity**: Direct imports are more explicit about dependencies
+
+### ✅ Direct Imports Only
+
+Instead of barrel exports, always import directly from source files:
+
+```typescript
+// ✅ CORRECT - Direct imports
+import { CreateDatabaseButton } from '@/components/sqlite/database-actions/create-database-button'
+import { DatabaseVersionButton } from '@/components/sqlite/database-info/database-version-button'
+import { UploadDatabaseButton } from '@/components/sqlite/database-actions/upload-database-button'
+
+// ❌ WRONG - Don't create barrel exports for this
+import {
+  CreateDatabaseButton,
+  DatabaseVersionButton,
+  UploadDatabaseButton,
+} from '@/components/sqlite'
+```
+
+## File Organization
+
+### Group Related Files by Feature, Not by Export Convenience
+
+Organize files in logical groups based on functionality:
+
+```
+app/components/sqlite/
+├── database-actions/           # Database management operations
+│   ├── create-database-button.tsx
+│   ├── upload-database-button.tsx
+│   └── save-database-button.tsx
+├── database-info/             # Database information display
+│   └── database-version-button.tsx
+└── [NO index.ts files]        # Don't create barrel exports
+```
+
+## Implementation Guidelines
+
+### For AI Assistant
+
+When suggesting code changes:
+
+1. **Always use `@/` imports** for any file outside the current directory
+2. **Never suggest creating `index.ts` barrel export files**
+3. **Replace relative imports** with absolute `@/` imports when encountered
+4. **Use direct imports** to specific files, not grouped exports
+
+### For Developers
+
+When adding new components:
+
+1. Place files in appropriate feature directories
+2. Import directly using `@/` paths
+3. Don't create convenience export files
+4. Keep imports explicit and traceable
+
+## Path Alias Configuration
+
+The `@/` alias is configured to point to the `app/` directory:
+
+- `@/components` → `app/components`
+- `@/lib` → `app/lib`
+- `@/routes` → `app/routes`
+
+## Benefits
+
+1. **Consistency**: All imports follow the same pattern
+2. **Refactoring Safety**: Absolute paths are more resilient to file moves
+3. **Build Performance**: No unnecessary barrel export processing
+4. **Developer Experience**: Clear, explicit import paths
+5. **Bundle Optimization**: Better tree shaking and dead code elimination
+
+## ESLint Enforcement
+
+The project automatically enforces these import conventions with ESLint rules:
+
+```javascript
+// Enforce absolute imports with @/ alias over relative imports
+'import/no-relative-parent-imports': 'error',
+'no-relative-import-paths/no-relative-import-paths': [
+  'error',
+  {
+    allowSameFolder: true,  // Allow ./file imports within same directory
+    rootDir: 'app',        // Our app directory  
+    prefix: '@',           // Use @/ alias
+  },
+],
+```
+
+### What ESLint Will Catch
+
+These rules will automatically prevent:
+
+❌ **Relative Parent Imports:**
+```typescript
+import { Button } from '../ui/button'
+import { useDatabase } from '../../lib/sqlite/use-database'
+import { CreateDatabaseButton } from '../sqlite/database-actions/create-database-button'
+```
+
+✅ **Absolute Imports with @/ Alias:**
+```typescript
+import { Button } from '@/components/ui/button'
+import { useDatabase } from '@/lib/sqlite/use-database'
+import { CreateDatabaseButton } from '@/components/sqlite/database-actions/create-database-button'
+```
+
+✅ **Same Directory Imports (Allowed):**
+```typescript
+// In: create-database-button.stories.tsx
+import CreateDatabaseButton from './create-database-button'  // ✅ OK
+```

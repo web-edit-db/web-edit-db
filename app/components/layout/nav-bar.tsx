@@ -1,10 +1,10 @@
 import { Link } from 'react-router'
 import logo from '@/assets/logo.png'
-import ThemeSwitchButton from '../theme-switch-button'
-import UploadDatabaseButton from '../sqlite/upload-database-button'
-import CreateDatabaseButton from '../sqlite/create-database-button'
-import SaveDatabaseButton from '../sqlite/save-database-button'
-import DatabaseVersionButton from '../sqlite/database-version-button'
+import ThemeSwitchButton from '@/components/theme-switch-button'
+import UploadDatabaseButton from '@/components/sqlite/database-actions/upload-database-button'
+import CreateDatabaseButton from '@/components/sqlite/database-actions/create-database-button'
+import SaveDatabaseButton from '@/components/sqlite/database-actions/save-database-button'
+import DatabaseVersionButton from '@/components/sqlite/database-info/database-version-button'
 import { useDatabase } from '@/lib/sqlite/use-database'
 
 export default function NavBar() {

@@ -1,5 +1,5 @@
 import { UploadIcon } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import { useDatabase } from '@/lib/sqlite/use-database'
 import { useCallback, useState } from 'react'
 import {
@@ -11,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog'
+} from '@/components/ui/alert-dialog'
 
 export type UploadDatabaseButtonProps = {
   labelText: string | null

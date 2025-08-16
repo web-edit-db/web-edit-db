@@ -1,5 +1,5 @@
 import { DownloadIcon } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import { useDatabase } from '@/lib/sqlite/use-database'
 
 export type SaveDatabaseButtonProps = {

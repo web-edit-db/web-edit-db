@@ -1,6 +1,6 @@
 import { PlusIcon } from 'lucide-react'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useDatabase } from '@/lib/sqlite/use-database'
 import { useCallback, useState } from 'react'
 import {
@@ -12,7 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog'
+} from '@/components/ui/alert-dialog'
 
 export type CreateDatabaseButtonProps = {
   labelText: string | null

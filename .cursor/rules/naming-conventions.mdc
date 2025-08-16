@@ -88,9 +88,16 @@ app/components/
 ├── layout/                       # Layout components (kebab-case)
 │   ├── nav-bar.tsx
 │   └── side-bar.tsx
-├── sqlite/                       # Feature components (kebab-case)
-│   ├── create-database-button.tsx
-│   └── upload-database-button.tsx
+├── sqlite/                       # SQLite feature components (kebab-case)
+│   ├── database-actions/         # Database management operations
+│   │   ├── create-database-button.tsx
+│   │   ├── upload-database-button.tsx
+│   │   ├── save-database-button.tsx
+│   │   └── index.ts             # Barrel export
+│   ├── database-info/           # Database information display
+│   │   ├── database-version-button.tsx
+│   │   └── index.ts             # Barrel export
+│   └── index.ts                 # Main barrel export
 ├── theme-switch-button.tsx       # Standalone components (kebab-case)
 └── pwa-reload.tsx
 ```
