@@ -16,7 +16,7 @@ const CustomSidebarToggle = () => {
   )
 }
 
-export default function AppSideBar({ children }: { children: React.ReactNode }) {
+export default function SideBar({ children }: { children: React.ReactNode }) {
   return (
     <Sidebar className="border-primary top-(--header-height) h-[calc(100svh-var(--header-height))]! border-r-2">
       <SidebarContent className="bg-white dark:bg-gray-800">{children}</SidebarContent>

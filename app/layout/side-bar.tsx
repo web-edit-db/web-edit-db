@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import AppSideBar from '@/components/AppSideBar'
+import AppSideBar from '@/components/layout/SideBar'
 import { useTables } from '@/lib/sqlite/useTables'
 
 export default function SideBarLayout() {

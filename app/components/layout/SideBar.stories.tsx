@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router'
-import AppSideBar from './AppSideBar'
+import AppSideBar from './SideBar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 // Mock the database hook for Storybook
@@ -58,29 +58,3 @@ export const Default: Story = {
     },
   },
 }
-
-// Story showing sidebar content without provider wrapper
-// export const ContentOnly: Story = {
-//   render: () => (
-//     <SidebarProvider defaultOpen={true}>
-//       <div className="flex h-full">
-//         <SideBar />
-//         <main className="flex-1 bg-gray-50 p-4 dark:bg-gray-900">
-//           <div className="max-w-2xl">
-//             <h1 className="mb-4 text-2xl font-bold">Sidebar Content Demo</h1>
-//             <p className="text-gray-600 dark:text-gray-400">
-//               This story shows just the sidebar content component with the provider wrapper.
-//             </p>
-//           </div>
-//         </main>
-//       </div>
-//     </SidebarProvider>
-//   ),
-//   parameters: {
-//     docs: {
-//       description: {
-//         story: 'Shows the SideBarContent component directly with manual provider setup.',
-//       },
-//     },
-//   },
-// }
