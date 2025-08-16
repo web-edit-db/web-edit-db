@@ -131,12 +131,11 @@ The project automatically enforces these import conventions with ESLint rules:
 
 ```javascript
 // Enforce absolute imports with @/ alias over relative imports
-'import/no-relative-parent-imports': 'error',
 'no-relative-import-paths/no-relative-import-paths': [
   'error',
   {
-    allowSameFolder: true,  // Allow ./file imports within same directory
-    rootDir: 'app',        // Our app directory  
+    allowSameFolder: true, // Allow ./file imports within same directory
+    rootDir: 'app',        // Our app directory
     prefix: '@',           // Use @/ alias
   },
 ],
@@ -147,6 +146,7 @@ The project automatically enforces these import conventions with ESLint rules:
 These rules will automatically prevent:
 
 ❌ **Relative Parent Imports:**
+
 ```typescript
 import { Button } from '../ui/button'
 import { useDatabase } from '../../lib/sqlite/use-database'
@@ -154,6 +154,7 @@ import { CreateDatabaseButton } from '../sqlite/database-actions/create-database
 ```
 
 ✅ **Absolute Imports with @/ Alias:**
+
 ```typescript
 import { Button } from '@/components/ui/button'
 import { useDatabase } from '@/lib/sqlite/use-database'
@@ -161,7 +162,8 @@ import { CreateDatabaseButton } from '@/components/sqlite/database-actions/creat
 ```
 
 ✅ **Same Directory Imports (Allowed):**
+
 ```typescript
 // In: create-database-button.stories.tsx
-import CreateDatabaseButton from './create-database-button'  // ✅ OK
+import CreateDatabaseButton from './create-database-button' // ✅ OK
 ```

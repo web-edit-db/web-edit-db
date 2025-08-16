@@ -2,7 +2,6 @@
 import storybook from 'eslint-plugin-storybook'
 import checkFile from 'eslint-plugin-check-file'
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
-import importPlugin from 'eslint-plugin-import'
 
 import js from '@eslint/js'
 import globals from 'globals'
@@ -29,7 +28,6 @@ export default tseslint.config(
       plugins: {
         'check-file': checkFile,
         'no-relative-import-paths': noRelativeImportPaths,
-        import: importPlugin,
       },
       rules: {
         // Enforce kebab-case for all file names
@@ -52,7 +50,6 @@ export default tseslint.config(
           },
         ],
         // Enforce absolute imports with @/ alias over relative imports
-        'import/no-relative-parent-imports': 'error',
         'no-relative-import-paths/no-relative-import-paths': [
           'error',
           {
