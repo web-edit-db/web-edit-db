@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import SaveDatabaseButton, { type SaveDatabaseButtonProps } from './save-database-button'
+import UploadDatabaseButton, { type UploadDatabaseButtonProps } from './upload-button'
 import { useDatabase } from '@/lib/sqlite/use-database'
 
 // Create a wrapper component that can use hooks
-const StoryWrapper = (args: SaveDatabaseButtonProps) => {
+const StoryWrapper = (args: UploadDatabaseButtonProps) => {
   const { databaseOpened, databaseName } = useDatabase()
 
   return (
@@ -11,22 +11,22 @@ const StoryWrapper = (args: SaveDatabaseButtonProps) => {
       className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
     >
       <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Database ready: ${databaseName}` : 'No database to save'}
+        {databaseOpened ? `Selected file: ${databaseName}` : 'No file selected'}
       </div>
-      <SaveDatabaseButton {...args} />
+      <UploadDatabaseButton {...args} />
     </div>
   )
 }
 
 const meta = {
-  title: 'SQLite/SaveDatabaseButton',
-  component: SaveDatabaseButton,
+  title: 'SQLite/UploadDatabaseButton',
+  component: UploadDatabaseButton,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
         component:
-          'A button component for saving/downloading SQLite database files. Shows a download icon and handles database export using browser-fs-access. Only enabled when a database is open.',
+          'A button component for uploading/opening SQLite database files. Shows an upload icon and handles database state management. This demo shows the behavior of the UploadDatabaseButton component.',
       },
     },
   },
@@ -39,12 +39,12 @@ const meta = {
       control: {
         type: 'text',
       },
-      type: { name: 'string' },
+      type: { name: 'string' }, // Storybook argTypes type for string
       description: 'Label text for the button. Use null for no label.',
     },
   },
   render: (args) => <StoryWrapper {...args} />,
-} satisfies Meta<typeof SaveDatabaseButton>
+} satisfies Meta<typeof UploadDatabaseButton>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -55,6 +55,6 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   args: {
-    labelText: 'Save Database',
+    labelText: 'Upload Database',
   },
 }

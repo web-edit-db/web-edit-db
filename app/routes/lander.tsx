@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router'
 import logo from '@/assets/logo.png'
-import UploadDatabaseButton from '@/components/sqlite/database-actions/upload-database-button'
-import CreateDatabaseButton from '@/components/sqlite/database-actions/create-database-button'
+import UploadDatabaseButton from '@/components/sqlite/database-actions/upload-button'
+import CreateDatabaseButton from '@/components/sqlite/database-actions/create-button'
 import { useDatabase } from '@/lib/sqlite/use-database'
 import { useVersion } from '@/lib/sqlite/use-version'
 

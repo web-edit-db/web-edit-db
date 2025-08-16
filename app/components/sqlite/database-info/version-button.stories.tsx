@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import DatabaseVersionButton from './database-version-button'
+import DatabaseVersionButton from './version-button'
 import { SqliteProvider } from '@/lib/sqlite/sqlite-provider'
 
 const meta: Meta<typeof DatabaseVersionButton> = {
