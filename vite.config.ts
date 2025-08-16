@@ -127,4 +127,20 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@sqlite.org/sqlite-wasm'],
   },
+  server: {
+    watch: {
+      // Exclude test files from hot reload
+      ignored: [
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/test/**',
+        '**/tests/**',
+        '**/__tests__/**',
+        '**/vitest.config.*',
+        '**/vitest.setup.*',
+        '**/*.stories.*',
+        '**/coverage/**',
+      ],
+    },
+  },
 })
