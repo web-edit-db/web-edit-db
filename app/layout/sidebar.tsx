@@ -3,7 +3,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import AppSideBar from '@/components/layout/side-bar'
 import { useTables } from '@/lib/sqlite/use-tables'
 
-export default function SideBarLayout() {
+export default function SidebarLayout() {
   const { tables } = useTables()
   return (
     <>
