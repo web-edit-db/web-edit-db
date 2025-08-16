@@ -1,0 +1,79 @@
+---
+description: Testing command patterns and when to use watch vs run modes
+---
+
+# Testing Command Guidelines
+
+## Test Command Usage
+
+When running tests via terminal commands, choose the appropriate mode:
+
+### Single Test Run (Preferred for AI)
+
+```bash
+npm run test:run
+```
+
+- Runs tests once and exits
+- Perfect for validation and CI/CD
+- **Use this when AI is running tests to check code**
+- Equivalent to `vitest run`
+
+### Watch Mode (Manual Development)
+
+```bash
+npm run test
+```
+
+- Runs tests and watches for file changes
+- Stays running until manually stopped with `q`
+- **Only use when explicitly requested by user**
+- Equivalent to `vitest`
+
+### Specific Test File
+
+```bash
+# Single run of specific file
+npm run test:run -- path/to/test.file.test.ts
+
+# Watch mode for specific file (only if user requests)
+npm run test -- path/to/test.file.test.ts
+```
+
+## AI Guidelines
+
+**ALWAYS use `npm run test:run` when:**
+
+- Validating code changes
+- Running tests after implementation
+- Checking test coverage
+- Verifying functionality
+
+**NEVER use `npm run test` unless:**
+
+- User explicitly requests watch mode
+- User asks to "watch tests" or similar
+
+## Other Test Commands
+
+```bash
+npm run type-check     # TypeScript validation
+npm run lint          # ESLint validation
+npm run storybook     # Component development
+```
+
+## Examples
+
+✅ **Correct:**
+
+```bash
+npm run test:run -- app/lib/sqlite/table-utils.test.ts
+```
+
+❌ **Avoid (causes hanging terminal):**
+
+```bash
+npm run test -- app/lib/sqlite/table-utils.test.ts
+```
+
+This prevents the AI from running tests in watch mode that require manual intervention to exit.
