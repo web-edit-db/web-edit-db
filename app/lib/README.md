@@ -22,7 +22,7 @@ npm install @sqlite.org/sqlite-wasm
 ## Basic Usage
 
 ```tsx
-import { useSqlite } from './lib/useSqlite'
+import { useSqlite } from './lib/use-sqlite'
 
 function MyComponent() {
   const { database, isLoading, error, isReady, execute, queryObject } = useSqlite()

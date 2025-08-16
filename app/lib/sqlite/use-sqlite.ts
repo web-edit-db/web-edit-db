@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { useSqliteContext } from './SqliteProvider'
+import { useSqliteContext } from './sqlite-provider'
 import type { QueryExecResult } from 'sql.js'
 
 export const useSqlite = () => {

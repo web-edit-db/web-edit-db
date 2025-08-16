@@ -1,7 +1,7 @@
 import { PlusIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
-import { useDatabase } from '@/lib/sqlite/useDatabase'
+import { useDatabase } from '@/lib/sqlite/use-database'
 import { useCallback, useState } from 'react'
 import {
   AlertDialog,

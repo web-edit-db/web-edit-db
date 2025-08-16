@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router'
 import logo from '@/assets/logo.png'
-import UploadDatabaseButton from '@/components/sqlite/UploadDatabaseButton'
-import CreateDatabaseButton from '@/components/sqlite/CreateDatabaseButton'
-import { useDatabase } from '@/lib/sqlite/useDatabase'
-import { useVersion } from '@/lib/sqlite/useVersion'
+import UploadDatabaseButton from '@/components/sqlite/upload-database-button'
+import CreateDatabaseButton from '@/components/sqlite/create-database-button'
+import { useDatabase } from '@/lib/sqlite/use-database'
+import { useVersion } from '@/lib/sqlite/use-version'
 
 export default function Lander() {
   const { databaseOpened } = useDatabase()

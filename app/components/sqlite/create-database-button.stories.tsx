@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import SaveDatabaseButton, { type SaveDatabaseButtonProps } from './SaveDatabaseButton'
-import { useDatabase } from '@/lib/sqlite/useDatabase'
+import CreateDatabaseButton, { type CreateDatabaseButtonProps } from './create-database-button'
+import { useDatabase } from '@/lib/sqlite/use-database'
 
 // Create a wrapper component that can use hooks
-const StoryWrapper = (args: SaveDatabaseButtonProps) => {
+const StoryWrapper = (args: CreateDatabaseButtonProps) => {
   const { databaseOpened, databaseName } = useDatabase()
 
   return (
@@ -11,22 +11,22 @@ const StoryWrapper = (args: SaveDatabaseButtonProps) => {
       className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
     >
       <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Database ready: ${databaseName}` : 'No database to save'}
+        {databaseOpened ? `Current database: ${databaseName}` : 'No database open'}
       </div>
-      <SaveDatabaseButton {...args} />
+      <CreateDatabaseButton {...args} />
     </div>
   )
 }
 
 const meta = {
-  title: 'SQLite/SaveDatabaseButton',
-  component: SaveDatabaseButton,
+  title: 'SQLite/CreateDatabaseButton',
+  component: CreateDatabaseButton,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
         component:
-          'A button component for saving/downloading SQLite database files. Shows a download icon and handles database export using browser-fs-access. Only enabled when a database is open.',
+          'A button component for creating new SQLite databases. Shows a plus icon and handles database creation with name input dialog. If a database is already open, it warns the user before proceeding.',
       },
     },
   },
@@ -44,7 +44,7 @@ const meta = {
     },
   },
   render: (args) => <StoryWrapper {...args} />,
-} satisfies Meta<typeof SaveDatabaseButton>
+} satisfies Meta<typeof CreateDatabaseButton>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -55,6 +55,6 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   args: {
-    labelText: 'Save Database',
+    labelText: 'Create Database',
   },
 }

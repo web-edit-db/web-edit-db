@@ -1,0 +1,127 @@
+---
+alwaysApply: true
+description: File and component naming conventions following shadcn/ui standards
+---
+
+# File & Component Naming Conventions
+
+This project follows **shadcn/ui naming standards** for consistency and maintainability.
+
+## File Naming Rules
+
+### Component Files (.tsx/.ts)
+
+1. **UI Components** (`app/components/ui/`): Use **kebab-case**
+   - ✅ `button.tsx`, `alert-dialog.tsx`, `dropdown-menu.tsx`
+   - ❌ `Button.tsx`, `AlertDialog.tsx`, `DropdownMenu.tsx`
+
+2. **Feature Components** (`app/components/`): Use **kebab-case**
+   - ✅ `theme-switch-button.tsx`, `pwa-reload.tsx`
+   - ❌ `ThemeSwitchButton.tsx`, `PWAReload.tsx`
+
+3. **Layout Components** (`app/components/layout/`): Use **kebab-case**
+   - ✅ `nav-bar.tsx`, `side-bar.tsx`
+   - ❌ `NavBar.tsx`, `SideBar.tsx`
+
+4. **SQLite Components** (`app/components/sqlite/`): Use **kebab-case**
+   - ✅ `create-database-button.tsx`, `upload-database-button.tsx`
+   - ❌ `CreateDatabaseButton.tsx`, `UploadDatabaseButton.tsx`
+
+### Story Files (.stories.tsx)
+
+Follow the same convention as component files:
+
+- ✅ `button.stories.tsx`, `create-database-button.stories.tsx`
+- ❌ `Button.stories.tsx`, `CreateDatabaseButton.stories.tsx`
+
+### Hooks and Utilities (.ts)
+
+Use **kebab-case** for multi-word files:
+
+- ✅ `use-mobile.ts`, `use-database.ts`
+- ❌ `useMobile.ts`, `useDatabase.ts`
+
+## Component Names (Inside Files)
+
+React component names should remain **PascalCase**:
+
+```typescript
+// File: create-database-button.tsx
+export default function CreateDatabaseButton() {
+  return <button>Create Database</button>
+}
+
+// File: nav-bar.tsx
+export default function NavBar() {
+  return <nav>Navigation</nav>
+}
+```
+
+## Import/Export Patterns
+
+### Barrel Exports (index.ts)
+
+```typescript
+// File: app/components/ui/index.ts
+export { Button } from './button'
+export { AlertDialog } from './alert-dialog'
+export { Input } from './input'
+```
+
+### Import Statements
+
+```typescript
+// Importing from kebab-case files
+import { Button } from '@/components/ui/button'
+import { CreateDatabaseButton } from '@/components/sqlite/create-database-button'
+import { NavBar } from '@/components/layout/nav-bar'
+```
+
+## Directory Structure
+
+```
+app/components/
+├── ui/                           # shadcn/ui components (kebab-case)
+│   ├── button.tsx
+│   ├── alert-dialog.tsx
+│   └── dropdown-menu.tsx
+├── layout/                       # Layout components (kebab-case)
+│   ├── nav-bar.tsx
+│   └── side-bar.tsx
+├── sqlite/                       # Feature components (kebab-case)
+│   ├── create-database-button.tsx
+│   └── upload-database-button.tsx
+├── theme-switch-button.tsx       # Standalone components (kebab-case)
+└── pwa-reload.tsx
+```
+
+## ESLint Enforcement
+
+The project ESLint configuration enforces these naming conventions using `eslint-plugin-check-file`:
+
+- **File names** must use kebab-case for all TypeScript/JavaScript files
+- **Folder names** must use kebab-case for all directories in `app/` and `src/`
+- **React component names** (inside files) must use PascalCase
+- **Hook functions** must start with "use" and follow camelCase
+- **Variables** should use camelCase, PascalCase, or UPPER_CASE
+
+### ESLint Rules
+
+```javascript
+'check-file/filename-naming-convention': [
+  'error',
+  { '**/*.{ts,tsx,js,jsx}': 'KEBAB_CASE' }
+],
+'check-file/folder-naming-convention': [
+  'error',
+  { 'app/**/': 'KEBAB_CASE', 'src/**/': 'KEBAB_CASE' }
+]
+```
+
+## Benefits
+
+1. **Consistency** with shadcn/ui ecosystem
+2. **URL-friendly** names for potential routing
+3. **Clear separation** between file names (kebab-case) and component names (PascalCase)
+4. **Better tooling support** and autocomplete
+5. **Easier maintenance** and refactoring

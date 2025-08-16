@@ -1,6 +1,6 @@
 import { parsedQuerySingle } from './helpers'
 import { z } from 'zod'
-import { useSqliteContext } from './SqliteProvider'
+import { useSqliteContext } from './sqlite-provider'
 import { useEffect, useState } from 'react'
 
 export const useVersion = () => {

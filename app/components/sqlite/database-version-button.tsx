@@ -1,6 +1,6 @@
 import { InfoIcon } from 'lucide-react'
 import { Button } from '../ui/button'
-import { useVersion } from '@/lib/sqlite/useVersion'
+import { useVersion } from '@/lib/sqlite/use-version'
 import { useState } from 'react'
 import {
   AlertDialog,

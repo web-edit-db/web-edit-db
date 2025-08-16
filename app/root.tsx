@@ -1,9 +1,9 @@
 import './index.css'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import type { Route } from './+types/root'
-import PWAReload from '@/components/PWAReload'
+import PWAReload from '@/components/pwa-reload'
 import { Toaster } from '@/components/ui/sonner'
-import { SqliteProvider } from './lib/sqlite/SqliteProvider'
+import { SqliteProvider } from './lib/sqlite/sqlite-provider'
 
 export function links() {
   return []

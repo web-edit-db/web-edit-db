@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useSqliteContext } from './SqliteProvider'
+import { useSqliteContext } from './sqlite-provider'
 import { z } from 'zod'
 import { parsedQuery } from './helpers'
 

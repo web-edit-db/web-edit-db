@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router'
-import AppSideBar from './SideBar'
+import AppSideBar from './side-bar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 // Mock the database hook for Storybook

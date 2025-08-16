@@ -1,5 +1,6 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook'
+import checkFile from 'eslint-plugin-check-file'
 
 import js from '@eslint/js'
 import globals from 'globals'
@@ -22,6 +23,61 @@ export default tseslint.config(
       languageOptions: {
         ecmaVersion: 2020,
         globals: globals.browser,
+      },
+      plugins: {
+        'check-file': checkFile,
+      },
+      rules: {
+        // Enforce kebab-case for all file names
+        'check-file/filename-naming-convention': [
+          'error',
+          {
+            '**/*.{ts,tsx,js,jsx}': 'KEBAB_CASE',
+          },
+          {
+            // Allow exceptions for config files
+            ignoreMiddleExtensions: true,
+          },
+        ],
+        // Enforce kebab-case for all folder names
+        'check-file/folder-naming-convention': [
+          'error',
+          {
+            'app/**/': 'KEBAB_CASE',
+            'src/**/': 'KEBAB_CASE',
+          },
+        ],
+        // Enforce naming conventions for React components and hooks
+        '@typescript-eslint/naming-convention': [
+          'error',
+          // React components must be PascalCase
+          {
+            selector: 'function',
+            filter: {
+              regex: '^[A-Z]',
+              match: true,
+            },
+            format: ['PascalCase'],
+          },
+          // Hook functions must start with 'use' and be camelCase
+          {
+            selector: 'function',
+            filter: {
+              regex: '^use[A-Z]',
+              match: true,
+            },
+            format: ['camelCase'],
+          },
+          // Variables should generally be camelCase
+          {
+            selector: 'variable',
+            format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+            filter: {
+              regex: '^(__.*__|_.*)',
+              match: false,
+            },
+          },
+        ],
       },
     },
     eslintConfigPrettier,

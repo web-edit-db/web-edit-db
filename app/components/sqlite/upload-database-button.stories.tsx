@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import CreateDatabaseButton, { type CreateDatabaseButtonProps } from './CreateDatabaseButton'
-import { useDatabase } from '@/lib/sqlite/useDatabase'
+import UploadDatabaseButton, { type UploadDatabaseButtonProps } from './upload-database-button'
+import { useDatabase } from '@/lib/sqlite/use-database'
 
 // Create a wrapper component that can use hooks
-const StoryWrapper = (args: CreateDatabaseButtonProps) => {
+const StoryWrapper = (args: UploadDatabaseButtonProps) => {
   const { databaseOpened, databaseName } = useDatabase()
 
   return (
@@ -11,22 +11,22 @@ const StoryWrapper = (args: CreateDatabaseButtonProps) => {
       className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
     >
       <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Current database: ${databaseName}` : 'No database open'}
+        {databaseOpened ? `Selected file: ${databaseName}` : 'No file selected'}
       </div>
-      <CreateDatabaseButton {...args} />
+      <UploadDatabaseButton {...args} />
     </div>
   )
 }
 
 const meta = {
-  title: 'SQLite/CreateDatabaseButton',
-  component: CreateDatabaseButton,
+  title: 'SQLite/UploadDatabaseButton',
+  component: UploadDatabaseButton,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
         component:
-          'A button component for creating new SQLite databases. Shows a plus icon and handles database creation with name input dialog. If a database is already open, it warns the user before proceeding.',
+          'A button component for uploading/opening SQLite database files. Shows an upload icon and handles database state management. This demo shows the behavior of the UploadDatabaseButton component.',
       },
     },
   },
@@ -39,12 +39,12 @@ const meta = {
       control: {
         type: 'text',
       },
-      type: { name: 'string' },
+      type: { name: 'string' }, // Storybook argTypes type for string
       description: 'Label text for the button. Use null for no label.',
     },
   },
   render: (args) => <StoryWrapper {...args} />,
-} satisfies Meta<typeof CreateDatabaseButton>
+} satisfies Meta<typeof UploadDatabaseButton>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -55,6 +55,6 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   args: {
-    labelText: 'Create Database',
+    labelText: 'Upload Database',
   },
 }

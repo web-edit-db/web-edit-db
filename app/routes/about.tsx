@@ -1,4 +1,4 @@
-import { useVersion } from '@/lib/sqlite/useVersion'
+import { useVersion } from '@/lib/sqlite/use-version'
 
 export default function About() {
   const { appVersion, sqliteVersion, appBuildDate } = useVersion()
