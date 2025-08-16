@@ -10,6 +10,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy'
 export default defineConfig({
   define: {
     __DATE__: JSON.stringify(new Date().toISOString()),
+    __VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
   },
   plugins: [
     tailwindcss(),

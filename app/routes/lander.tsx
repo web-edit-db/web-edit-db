@@ -7,7 +7,7 @@ import { useVersion } from '@/lib/sqlite/useVersion'
 
 export default function Lander() {
   const { databaseOpened } = useDatabase()
-  const version = useVersion()
+  const { sqliteVersion } = useVersion()
 
   return databaseOpened ? (
     <Outlet />
@@ -22,7 +22,7 @@ export default function Lander() {
           <UploadDatabaseButton labelText="Upload Database" />
           <CreateDatabaseButton labelText="Create Database" />
         </div>
-        <p className="text-muted-foreground mt-4 text-sm">Sqlite version: {version}</p>
+        <p className="text-muted-foreground mt-4 text-sm">Sqlite version: {sqliteVersion}</p>
       </div>
     </div>
   )

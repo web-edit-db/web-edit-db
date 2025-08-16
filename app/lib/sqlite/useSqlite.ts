@@ -30,11 +30,8 @@ export const useSqlite = () => {
 
   return {
     sqlite3,
-    version,
+    sqliteVersion: version,
+    appVersion: __VERSION__,
+    appBuildDate: __DATE__,
   }
-}
-
-export const useVersion = () => {
-  const { version } = useSqlite()
-  return version
 }
