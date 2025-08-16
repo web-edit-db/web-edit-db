@@ -8,7 +8,7 @@ import DatabaseVersionButton from './sqlite/DatabaseVersionButton'
 
 export default function NavBar() {
   return (
-    <nav className="border-primary flex h-14 items-center justify-between border-b-[1.8px] bg-white px-3 shadow-lg dark:bg-gray-800">
+    <nav className="border-primary sticky top-0 z-10 flex h-[var(--header-height)] items-center justify-between border-b-[1.8px] bg-white px-3 shadow-lg dark:bg-gray-800">
       <Link
         to="/"
         className="text-primary flex cursor-pointer items-center text-2xl font-light select-none"

@@ -4,6 +4,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
+  --header-height: calc(--spacing(14));
+
   --radius-sm: calc(var(--radius) - 4px);
 
   --radius-md: calc(var(--radius) - 2px);
