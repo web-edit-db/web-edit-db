@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { fileOpen, fileSave } from 'browser-fs-access'
 import { toast } from 'sonner'
 import { useSqliteContext } from './sqlite-provider'
+import { Database } from './database'
 
 export const useDatabase = () => {
   const { sqlite3, database, isLoading: sqliteLoading, setDatabase } = useSqliteContext()
@@ -18,7 +19,7 @@ export const useDatabase = () => {
     if (!database) {
       return null
     }
-    return database.fileName
+    return database.getFilename()
   }, [database])
 
   const isLoading = useMemo(() => {
@@ -37,9 +38,7 @@ export const useDatabase = () => {
 
       setIsOperationLoading(true)
       try {
-        const database = new sqlite3.Database()
-        setDatabase({ database, fileName: filename })
-        return database
+        setDatabase(Database.create(sqlite3, filename))
       } finally {
         setIsOperationLoading(false)
       }
@@ -63,11 +62,7 @@ export const useDatabase = () => {
           description: 'Select a database file',
           mimeTypes: ['application/vnd.sqlite3', 'application/x-sqlite3'],
         })
-        const databaseBufferArray = new Uint8Array(await databaseBlob.arrayBuffer())
-
-        const database = new sqlite3.Database(databaseBufferArray)
-        setDatabase({ database, fileName: databaseBlob.name })
-        return database
+        setDatabase(Database.open(sqlite3, databaseBlob.name, await databaseBlob.arrayBuffer()))
       } finally {
         setIsOperationLoading(false)
       }
@@ -83,14 +78,8 @@ export const useDatabase = () => {
 
     setIsOperationLoading(true)
     try {
-      // Export the database as Uint8Array
-      const databaseData = database.database.export()
-
-      // Create a file from the database data
-      const file = new File([databaseData], databaseName, { type: 'application/vnd.sqlite3' })
-
-      // Save the file using browser-fs-access
-      await fileSave(file, {
+      const databaseFile = database.exportFile()
+      await fileSave(databaseFile, {
         extensions: ['.db', '.sqlite', '.sqlite3'],
         fileName: databaseName,
         description: 'SQLite Database',

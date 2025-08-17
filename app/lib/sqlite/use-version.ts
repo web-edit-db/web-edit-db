@@ -1,7 +1,6 @@
-import { parsedQuerySingle } from './helpers'
-import { z } from 'zod'
 import { useSqliteContext } from './sqlite-provider'
 import { useEffect, useState } from 'react'
+import { Database } from './database'
 
 export const useVersion = () => {
   const { sqlite3 } = useSqliteContext()
@@ -9,14 +8,7 @@ export const useVersion = () => {
 
   useEffect(() => {
     if (!sqlite3) return
-    const { version } = parsedQuerySingle(
-      new sqlite3.Database(),
-      'SELECT sqlite_version() as version',
-      z.object({
-        version: z.string(),
-      }),
-    ) ?? { version: null }
-    setVersion(version)
+    setVersion(Database.getVersion(sqlite3))
   }, [sqlite3])
   return {
     sqliteVersion: version,
