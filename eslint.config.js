@@ -46,7 +46,9 @@ export default tseslint.config(
           'error',
           {
             'app/**/': 'KEBAB_CASE',
-            'src/**/': 'KEBAB_CASE',
+          },
+          {
+            ignoreWords: ['__mocks__'],
           },
         ],
         // Enforce absolute imports with @/ alias over relative imports
