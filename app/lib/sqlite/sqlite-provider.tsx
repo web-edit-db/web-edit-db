@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import initSqlJs from 'sql.js'
 import type { SqlJsStatic } from 'sql.js'
 import { toast } from 'sonner'
-import { Database } from './database'
+import { Database } from '@/lib/sqlite/database'
 
 type SqliteContextType = {
   sqlite3: SqlJsStatic | null

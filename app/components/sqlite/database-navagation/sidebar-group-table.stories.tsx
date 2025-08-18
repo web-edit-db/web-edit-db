@@ -3,8 +3,10 @@ import { MemoryRouter } from 'react-router'
 import SidebarGroupTable from './sidebar-group-table'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { SqliteProvider, useSqliteContext } from '@/lib/sqlite/sqlite-provider'
-import { useEffect } from 'react'
 import { encodeTableName } from '@/lib/sqlite/table-utils'
+import { useEffect } from 'react'
+import { Database } from '@/lib/sqlite/database'
+import { mocked } from 'storybook/test'
 
 // Mock tables data for different scenarios
 const mockTablesData: Record<string, string[]> = {
@@ -57,24 +59,24 @@ const meta = {
   },
   decorators: [
     (Story, { args }) => {
+      const { mockTables } = args as {
+        mockTables: keyof typeof mockTablesData
+      }
       const { setDatabase, sqlite3 } = useSqliteContext()
       useEffect(() => {
         if (!sqlite3) return
-        const newDatabase = new sqlite3.Database()
-        // Ensure args has the correct type to access mockTables
-        const mockTablesKey = (args as { mockTables: keyof typeof mockTablesData }).mockTables
-        const tables = mockTablesData[mockTablesKey] || []
+        const database = new Database(sqlite3, 'storybook-test.db')
+        const tables = (mockTablesData[mockTables] || []).map((table) => {
+          return {
+            name: table,
+            tbl_name: table,
+          }
+        })
 
-        // for each table in mockTablesData, create a new table
-        for (const table of tables) {
-          newDatabase.exec(
-            `CREATE TABLE IF NOT EXISTS ${table} (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)`,
-          )
-        }
-
-        setDatabase({ database: newDatabase, fileName: 'storybook-test.db' })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [sqlite3])
+        // now update the tables mock to return the tables from the database
+        mocked(database.getTableNames).mockReturnValue(tables)
+        setDatabase(database)
+      }, [sqlite3, setDatabase, mockTables])
       return Story()
     },
     (Story, { args }) => {

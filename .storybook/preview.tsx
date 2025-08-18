@@ -2,6 +2,9 @@ import React from 'react'
 import type { Preview } from '@storybook/react-vite'
 import { SqliteProvider } from '../app/lib/sqlite/sqlite-provider'
 import '../app/index.css'
+import { sb } from 'storybook/test'
+
+sb.mock(import('../app/lib/sqlite/database'))
 
 const preview: Preview = {
   parameters: {

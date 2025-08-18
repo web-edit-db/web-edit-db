@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { fileOpen, fileSave } from 'browser-fs-access'
 import { toast } from 'sonner'
 import { useSqliteContext } from './sqlite-provider'
-import { Database } from './database'
+import { Database } from '@/lib/sqlite/database'
 
 export const useDatabase = () => {
   const { sqlite3, database, isLoading: sqliteLoading, setDatabase } = useSqliteContext()
