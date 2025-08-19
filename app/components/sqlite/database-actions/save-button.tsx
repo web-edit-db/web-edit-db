@@ -1,14 +1,19 @@
 import { DownloadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useDatabase } from '@/lib/sqlite/use-database'
 
 export type SaveDatabaseButtonProps = {
   labelText?: string | null
+  saveDatabase: () => Promise<void>
+  databaseOpened: boolean
+  isLoading: boolean
 }
 
-export default function SaveDatabaseButton({ labelText = null }: SaveDatabaseButtonProps) {
-  const { saveDatabase, databaseOpened, isLoading } = useDatabase()
-
+export default function SaveDatabaseButton({
+  labelText = null,
+  saveDatabase,
+  databaseOpened,
+  isLoading,
+}: SaveDatabaseButtonProps) {
   return (
     <Button
       variant="default"

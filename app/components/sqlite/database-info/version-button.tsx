@@ -1,6 +1,5 @@
 import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useVersion } from '@/lib/sqlite/use-version'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -14,10 +13,17 @@ import {
 
 export type DatabaseVersionButtonProps = {
   labelText?: string | null
+  sqliteVersion: string | null
+  appVersion: string | null
+  appBuildDate: string | null
 }
 
-export default function DatabaseVersionButton({ labelText = null }: DatabaseVersionButtonProps) {
-  const { sqliteVersion, appVersion, appBuildDate } = useVersion()
+export default function DatabaseVersionButton({
+  labelText = null,
+  sqliteVersion,
+  appVersion,
+  appBuildDate,
+}: DatabaseVersionButtonProps) {
   const [showVersionDialog, setShowVersionDialog] = useState(false)
 
   const handleVersionClick = () => {

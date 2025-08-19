@@ -1,6 +1,5 @@
 import { UploadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useDatabase } from '@/lib/sqlite/use-database'
 import { useCallback, useState } from 'react'
 import {
   AlertDialog,
@@ -15,10 +14,17 @@ import {
 
 export type UploadDatabaseButtonProps = {
   labelText: string | null
+  openDatabase: (overwrite?: boolean) => Promise<void>
+  databaseOpened: boolean
+  isLoading: boolean
 }
 
-export default function UploadDatabaseButton({ labelText = null }: UploadDatabaseButtonProps) {
-  const { openDatabase, databaseOpened, isLoading } = useDatabase()
+export default function UploadDatabaseButton({
+  labelText = null,
+  openDatabase,
+  databaseOpened,
+  isLoading,
+}: UploadDatabaseButtonProps) {
   const [showAlertDialog, setShowAlertDialog] = useState(false)
   const openDatabaseHandler = useCallback(() => {
     if (databaseOpened && !showAlertDialog) {

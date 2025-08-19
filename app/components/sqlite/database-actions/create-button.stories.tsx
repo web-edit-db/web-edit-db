@@ -1,22 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import CreateDatabaseButton, { type CreateDatabaseButtonProps } from './create-button'
-import { useDatabase } from '@/lib/sqlite/use-database'
-
-// Create a wrapper component that can use hooks
-const StoryWrapper = (args: CreateDatabaseButtonProps) => {
-  const { databaseOpened, databaseName } = useDatabase()
-
-  return (
-    <div
-      className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
-    >
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Current database: ${databaseName}` : 'No database open'}
-      </div>
-      <CreateDatabaseButton {...args} />
-    </div>
-  )
-}
+import { fn } from 'storybook/test'
+import CreateDatabaseButton from './create-button'
 
 const meta = {
   title: 'SQLite/CreateDatabaseButton',
@@ -33,6 +17,9 @@ const meta = {
   tags: ['autodocs'],
   args: {
     labelText: null,
+    createDatabase: fn(),
+    databaseOpened: false,
+    isLoading: false,
   },
   argTypes: {
     labelText: {
@@ -42,8 +29,22 @@ const meta = {
       type: { name: 'string' },
       description: 'Label text for the button. Use null for no label.',
     },
+    databaseOpened: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether a database is currently open.',
+    },
+    isLoading: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether database operations are in progress.',
+    },
+    createDatabase: {
+      description: 'Function to create a new database.',
+    },
   },
-  render: (args) => <StoryWrapper {...args} />,
 } satisfies Meta<typeof CreateDatabaseButton>
 
 export default meta
@@ -56,5 +57,27 @@ export const Default: Story = {
 export const WithLabel: Story = {
   args: {
     labelText: 'Create Database',
+  },
+}
+
+export const DatabaseAlreadyOpen: Story = {
+  args: {
+    labelText: 'Create Database',
+    databaseOpened: true,
+  },
+}
+
+export const Loading: Story = {
+  args: {
+    labelText: 'Create Database',
+    isLoading: true,
+  },
+}
+
+export const LoadingWithDatabaseOpen: Story = {
+  args: {
+    labelText: 'Create Database',
+    databaseOpened: true,
+    isLoading: true,
   },
 }

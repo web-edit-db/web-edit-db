@@ -1,22 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import UploadDatabaseButton, { type UploadDatabaseButtonProps } from './upload-button'
-import { useDatabase } from '@/lib/sqlite/use-database'
-
-// Create a wrapper component that can use hooks
-const StoryWrapper = (args: UploadDatabaseButtonProps) => {
-  const { databaseOpened, databaseName } = useDatabase()
-
-  return (
-    <div
-      className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
-    >
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Selected file: ${databaseName}` : 'No file selected'}
-      </div>
-      <UploadDatabaseButton {...args} />
-    </div>
-  )
-}
+import { fn } from 'storybook/test'
+import UploadDatabaseButton from './upload-button'
 
 const meta = {
   title: 'SQLite/UploadDatabaseButton',
@@ -33,17 +17,34 @@ const meta = {
   tags: ['autodocs'],
   args: {
     labelText: null,
+    openDatabase: fn(),
+    databaseOpened: false,
+    isLoading: false,
   },
   argTypes: {
     labelText: {
       control: {
         type: 'text',
       },
-      type: { name: 'string' }, // Storybook argTypes type for string
+      type: { name: 'string' },
       description: 'Label text for the button. Use null for no label.',
     },
+    databaseOpened: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether a database is currently open.',
+    },
+    isLoading: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether database operations are in progress.',
+    },
+    openDatabase: {
+      description: 'Function to open a database from file system.',
+    },
   },
-  render: (args) => <StoryWrapper {...args} />,
 } satisfies Meta<typeof UploadDatabaseButton>
 
 export default meta
@@ -56,5 +57,27 @@ export const Default: Story = {
 export const WithLabel: Story = {
   args: {
     labelText: 'Upload Database',
+  },
+}
+
+export const DatabaseAlreadyOpen: Story = {
+  args: {
+    labelText: 'Upload Database',
+    databaseOpened: true,
+  },
+}
+
+export const Loading: Story = {
+  args: {
+    labelText: 'Upload Database',
+    isLoading: true,
+  },
+}
+
+export const LoadingWithDatabaseOpen: Story = {
+  args: {
+    labelText: 'Upload Database',
+    databaseOpened: true,
+    isLoading: true,
   },
 }

@@ -1,7 +1,6 @@
 import { PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useDatabase } from '@/lib/sqlite/use-database'
 import { useCallback, useState } from 'react'
 import {
   AlertDialog,
@@ -16,10 +15,17 @@ import {
 
 export type CreateDatabaseButtonProps = {
   labelText: string | null
+  createDatabase: (filename: string, overwrite?: boolean) => Promise<void>
+  databaseOpened: boolean
+  isLoading: boolean
 }
 
-export default function CreateDatabaseButton({ labelText = null }: CreateDatabaseButtonProps) {
-  const { createDatabase, databaseOpened, isLoading } = useDatabase()
+export default function CreateDatabaseButton({
+  labelText = null,
+  createDatabase,
+  databaseOpened,
+  isLoading,
+}: CreateDatabaseButtonProps) {
   const [showWarningDialog, setShowWarningDialog] = useState(false)
   const [showNameDialog, setShowNameDialog] = useState(false)
   const [databaseName, setDatabaseName] = useState('database.db')

@@ -1,22 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import SaveDatabaseButton, { type SaveDatabaseButtonProps } from './save-button'
-import { useDatabase } from '@/lib/sqlite/use-database'
-
-// Create a wrapper component that can use hooks
-const StoryWrapper = (args: SaveDatabaseButtonProps) => {
-  const { databaseOpened, databaseName } = useDatabase()
-
-  return (
-    <div
-      className={`flex flex-col items-center p-4 ${databaseOpened ? 'bg-green-50 dark:bg-green-950' : 'bg-gray-50 dark:bg-gray-950'}`}
-    >
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {databaseOpened ? `Database ready: ${databaseName}` : 'No database to save'}
-      </div>
-      <SaveDatabaseButton {...args} />
-    </div>
-  )
-}
+import { fn } from 'storybook/test'
+import SaveDatabaseButton from './save-button'
 
 const meta = {
   title: 'SQLite/SaveDatabaseButton',
@@ -33,6 +17,9 @@ const meta = {
   tags: ['autodocs'],
   args: {
     labelText: null,
+    saveDatabase: fn(),
+    databaseOpened: false,
+    isLoading: false,
   },
   argTypes: {
     labelText: {
@@ -42,8 +29,22 @@ const meta = {
       type: { name: 'string' },
       description: 'Label text for the button. Use null for no label.',
     },
+    databaseOpened: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether a database is currently open.',
+    },
+    isLoading: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Whether database operations are in progress.',
+    },
+    saveDatabase: {
+      description: 'Function to save the database to file system.',
+    },
   },
-  render: (args) => <StoryWrapper {...args} />,
 } satisfies Meta<typeof SaveDatabaseButton>
 
 export default meta
@@ -56,5 +57,28 @@ export const Default: Story = {
 export const WithLabel: Story = {
   args: {
     labelText: 'Save Database',
+  },
+}
+
+export const DatabaseOpen: Story = {
+  args: {
+    labelText: 'Save Database',
+    databaseOpened: true,
+  },
+}
+
+export const Loading: Story = {
+  args: {
+    labelText: 'Save Database',
+    databaseOpened: true,
+    isLoading: true,
+  },
+}
+
+export const DisabledNoDB: Story = {
+  args: {
+    labelText: 'Save Database',
+    databaseOpened: false,
+    isLoading: false,
   },
 }

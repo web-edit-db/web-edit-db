@@ -7,7 +7,6 @@ import {
   SidebarGroupContent,
   SidebarMenu,
 } from '@/components/ui/sidebar'
-import { useTables } from '@/lib/sqlite/use-tables'
 import { encodeTableName } from '@/lib/sqlite/table-utils'
 import { PlusIcon } from 'lucide-react'
 import { Link, useParams } from 'react-router'
@@ -36,8 +35,11 @@ function SidebarGroupTableMenuItem({ table }: { table: { name: string } }) {
   )
 }
 
-export default function SidebarGroupTable() {
-  const { tables } = useTables()
+export type SidebarGroupTableProps = {
+  tables: Array<{ name: string }>
+}
+
+export default function SidebarGroupTable({ tables }: SidebarGroupTableProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex items-center justify-between">
