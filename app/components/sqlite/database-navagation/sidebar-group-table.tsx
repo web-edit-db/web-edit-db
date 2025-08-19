@@ -28,15 +28,16 @@ function SidebarGroupTableMenuItem({ table }: { table: { name: string } }) {
 
 export type SidebarGroupTableProps = {
   tables: Array<{ name: string }>
+  onAddTable?: () => void
 }
 
-export default function SidebarGroupTable({ tables }: SidebarGroupTableProps) {
+export default function SidebarGroupTable({ tables, onAddTable }: SidebarGroupTableProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="mb-1 flex items-center justify-between">
         <span className="text-lg font-bold select-none">Tables</span>
         {/* show a plus for creating a new table */}
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={onAddTable}>
           <PlusIcon className="h-4 w-4" />
         </Button>
       </SidebarGroupLabel>

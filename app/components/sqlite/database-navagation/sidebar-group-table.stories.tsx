@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router'
 import SidebarGroupTable from './sidebar-group-table'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { encodeTableName } from '@/lib/sqlite/table-utils'
+import { fn } from 'storybook/test'
 
 // Mock tables data for different scenarios
 const mockTablesData: Record<string, Array<{ name: string }>> = {
@@ -44,10 +45,15 @@ const meta = {
   tags: ['autodocs'],
   args: {
     tables: mockTablesData.fewTables,
+    onAddTable: fn(),
   },
   argTypes: {
     tables: {
       description: 'Array of table objects with name property',
+    },
+    onAddTable: {
+      description: 'Callback function triggered when the add table button is clicked',
+      action: 'onAddTable',
     },
   },
   decorators: [
