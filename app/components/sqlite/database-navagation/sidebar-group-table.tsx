@@ -9,28 +9,19 @@ import {
 } from '@/components/ui/sidebar'
 import { encodeTableName } from '@/lib/sqlite/table-utils'
 import { PlusIcon } from 'lucide-react'
-import { Link, useParams } from 'react-router'
+import { NavLink } from 'react-router'
 import { useMemo } from 'react'
-import { decodeTableName } from '@/lib/sqlite/table-utils'
 
 function SidebarGroupTableMenuItem({ table }: { table: { name: string } }) {
-  const params = useParams()
   const link = useMemo(() => {
     return `/table/${encodeTableName(table.name)}/edit`
   }, [table.name])
 
-  // Check if this table is currently active by comparing with the URL parameter
-  const isActive = useMemo(() => {
-    if (!params.name) return false
-    const currentTableName = decodeTableName(params.name)
-    return currentTableName === table.name
-  }, [params.name, table.name])
-
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={isActive}>
-        <Link to={link}>{table.name}</Link>
-      </SidebarMenuButton>
+      <NavLink to={link} end>
+        {({ isActive }) => <SidebarMenuButton isActive={isActive}>{table.name}</SidebarMenuButton>}
+      </NavLink>
     </SidebarMenuItem>
   )
 }
