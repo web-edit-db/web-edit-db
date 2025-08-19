@@ -33,7 +33,7 @@ export type SidebarGroupTableProps = {
 export default function SidebarGroupTable({ tables }: SidebarGroupTableProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="flex items-center justify-between">
+      <SidebarGroupLabel className="mb-1 flex items-center justify-between">
         <span className="text-lg font-bold select-none">Tables</span>
         {/* show a plus for creating a new table */}
         <Button variant="ghost" size="icon">
