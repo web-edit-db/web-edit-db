@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { IconCheck, IconRotate, IconTrash } from '@tabler/icons-react'
+import { IconRotate, IconTrash, IconTrashOff } from '@tabler/icons-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -23,14 +23,52 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Checkbox } from '@/components/ui/checkbox'
 
 type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
 type ColumnData = {
   new: boolean
   name: string
   type: string
+  notNull: boolean
+  unique: boolean
+  primaryKey: boolean
 }
 const columnTypes = ['TEXT', 'INTEGER', 'NUMERIC', 'REAL', 'BLOB']
+
+const ToggleButton = ({
+  checked,
+  onChange,
+  disabled,
+  label,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+  label: string
+}) => {
+  const buttonClicked = useCallback(() => {
+    onChange(!checked)
+  }, [checked, onChange])
+  return (
+    <Button
+      variant="outline"
+      onClick={buttonClicked}
+      disabled={disabled}
+      className="justify-start px-2"
+    >
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={checked}
+          onCheckedChange={onChange}
+          disabled={disabled}
+          className="cursor-pointer"
+        />
+        <span>{label}</span>
+      </div>
+    </Button>
+  )
+}
 
 export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
   const zodSchema = z.object({
@@ -38,6 +76,9 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
     type: z.string().refine((value) => columnTypes.includes(value), {
       message: 'Type is required and must be one of INTEGER, TEXT, or REAL',
     }),
+    notNull: z.boolean(),
+    unique: z.boolean(),
+    primaryKey: z.boolean(),
   })
   const [isDeleted, setIsDeleted] = useState(false)
   const form = useForm<Omit<ColumnData, 'new'>>({
@@ -49,10 +90,10 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
   const modifiedState: ModifiedState = useMemo(() => {
     if (isDeleted) {
       return 'deleted'
-    } else if (form.formState.isDirty) {
-      return 'modified'
     } else if (columnData.new) {
       return 'new'
+    } else if (form.formState.isDirty) {
+      return 'modified'
     }
     return 'original'
   }, [form.formState.isDirty, isDeleted, columnData.new])
@@ -88,18 +129,20 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
             <span>{columnData.name}</span>
             <span className={cn('select-none', modifiedStateColor)}>{modifiedState}</span>
             <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button variant="ghost" size="icon" onClick={reset} disabled={isResetDisabled}>
-                    <IconRotate />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Reset</TooltipContent>
-              </Tooltip>
+              {!columnData.new && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button variant="ghost" size="icon" onClick={reset} disabled={isResetDisabled}>
+                      <IconRotate />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Reset</TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger>
                   <Button variant="ghost" size="icon" onClick={toggleDeleted}>
-                    {isDeleted ? <IconCheck /> : <IconTrash />}
+                    {isDeleted ? <IconTrashOff /> : <IconTrash />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isDeleted ? 'Restore' : 'Delete'}</TooltipContent>
@@ -145,6 +188,60 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="notNull"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Not Null</FormLabel>
+                <FormControl>
+                  <ToggleButton
+                    checked={field.value}
+                    onChange={field.onChange}
+                    disabled={field.disabled}
+                    label="Not Null"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="unique"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Unique</FormLabel>
+                <FormControl>
+                  <ToggleButton
+                    checked={field.value}
+                    onChange={field.onChange}
+                    disabled={field.disabled}
+                    label="Unique"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="primaryKey"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Primary Key</FormLabel>
+                <FormControl>
+                  <ToggleButton
+                    checked={field.value}
+                    onChange={field.onChange}
+                    disabled={field.disabled}
+                    label="Primary Key"
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

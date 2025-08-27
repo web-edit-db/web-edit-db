@@ -14,6 +14,9 @@ const meta: Meta<typeof ColumnCard> = {
       name: 'id',
       type: 'INTEGER',
       new: false,
+      notNull: false,
+      unique: false,
+      primaryKey: false,
     },
   },
 }
@@ -31,6 +34,9 @@ export const New: Story = {
       name: 'id',
       type: 'INTEGER',
       new: true,
+      notNull: false,
+      unique: false,
+      primaryKey: false,
     },
   },
 }
