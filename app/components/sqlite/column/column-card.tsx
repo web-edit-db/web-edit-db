@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { CheckIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
+import { IconCheck, IconRotate, IconTrash } from '@tabler/icons-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -91,7 +91,7 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
               <Tooltip>
                 <TooltipTrigger>
                   <Button variant="ghost" size="icon" onClick={reset} disabled={isResetDisabled}>
-                    <RotateCcwIcon />
+                    <IconRotate />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Reset</TooltipContent>
@@ -99,7 +99,7 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
               <Tooltip>
                 <TooltipTrigger>
                   <Button variant="ghost" size="icon" onClick={toggleDeleted}>
-                    {isDeleted ? <CheckIcon /> : <Trash2Icon />}
+                    {isDeleted ? <IconCheck /> : <IconTrash />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isDeleted ? 'Restore' : 'Delete'}</TooltipContent>

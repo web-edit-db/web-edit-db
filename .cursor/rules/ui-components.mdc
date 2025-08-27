@@ -5,7 +5,7 @@ description: shadcn/ui component development and Tailwind CSS patterns
 
 # UI Components & Styling Guide
 
-This project uses shadcn/ui components with Tailwind CSS v4 and Lucide React icons.
+This project uses shadcn/ui components with Tailwind CSS v4 and Tabler Icons.
 
 ## shadcn/ui Configuration
 
@@ -14,7 +14,7 @@ Configuration in [components.json](mdc:components.json):
 - **Style**: New York variant
 - **Base Color**: Gray
 - **CSS Variables**: Enabled for theming
-- **Icon Library**: Lucide React
+- **Icon Library**: Tabler Icons
 - **Aliases**: `@/components`, `@/lib/utils`, `@/components/ui`
 
 ## Component Structure
@@ -113,17 +113,17 @@ function Component() {
 
 ## Icon Usage
 
-### Lucide React Icons
+### Tabler Icons
 
 ```typescript
-import { User, Settings, Database } from 'lucide-react'
+import { IconUser, IconSettings, IconDatabase } from '@tabler/icons-react'
 
 function IconExample() {
   return (
     <div className="flex items-center gap-2">
-      <User className="h-4 w-4" />
-      <Settings className="h-5 w-5 text-muted-foreground" />
-      <Database className="h-6 w-6 text-primary" />
+      <IconUser className="h-4 w-4" />
+      <IconSettings className="h-5 w-5 text-muted-foreground" />
+      <IconDatabase className="h-6 w-6 text-primary" />
     </div>
   )
 }

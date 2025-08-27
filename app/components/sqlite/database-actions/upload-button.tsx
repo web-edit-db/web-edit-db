@@ -1,4 +1,4 @@
-import { UploadIcon } from 'lucide-react'
+import { IconUpload } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { useCallback, useState } from 'react'
 import {
@@ -42,7 +42,7 @@ export default function UploadDatabaseButton({
         onClick={openDatabaseHandler}
         disabled={isLoading}
       >
-        <UploadIcon className="h-5 w-5" />
+        <IconUpload className="h-5 w-5" />
         {labelText && <span>{labelText}</span>}
       </Button>
       <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>

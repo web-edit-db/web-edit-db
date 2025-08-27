@@ -1,4 +1,4 @@
-import { PlusIcon } from 'lucide-react'
+import { IconPlus } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useCallback, useState } from 'react'
@@ -75,7 +75,7 @@ export default function CreateDatabaseButton({
         onClick={handleCreateClick}
         disabled={isLoading}
       >
-        <PlusIcon className="h-5 w-5" />
+        <IconPlus className="h-5 w-5" />
         {labelText && <span>{labelText}</span>}
       </Button>
 

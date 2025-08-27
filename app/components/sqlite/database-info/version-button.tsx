@@ -1,4 +1,4 @@
-import { InfoIcon } from 'lucide-react'
+import { IconInfoCircle } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import {
@@ -54,7 +54,7 @@ export default function DatabaseVersionButton({
         disabled={!sqliteVersion}
         title="View Version Information"
       >
-        <InfoIcon className="h-5 w-5" />
+        <IconInfoCircle className="h-5 w-5" />
         {labelText && <span>{labelText}</span>}
       </Button>
 

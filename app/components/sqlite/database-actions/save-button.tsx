@@ -1,4 +1,4 @@
-import { DownloadIcon } from 'lucide-react'
+import { IconDownload } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 
 export type SaveDatabaseButtonProps = {
@@ -22,7 +22,7 @@ export default function SaveDatabaseButton({
       disabled={!databaseOpened || isLoading}
       title="Save Database"
     >
-      <DownloadIcon className="h-5 w-5" />
+      <IconDownload className="h-5 w-5" />
       {labelText && <span>{labelText}</span>}
     </Button>
   )

@@ -13,7 +13,7 @@ This document provides instructions for the Gemini code assistant to effectively
 - **Build Tool:** Vite
 - **Routing:** React Router
 - **Styling:** Tailwind CSS
-- **UI Components:** Radix UI, Lucide React, Sonner
+- **UI Components:** Radix UI, Tabler Icons, Sonner
 - **Database:** SQLite (in-browser via `sqlite-wasm` and `sql.js`)
 - **Testing:** Vitest, Storybook
 - **Linting/Formatting:** ESLint, Prettier

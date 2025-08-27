@@ -8,7 +8,7 @@ import {
   SidebarMenu,
 } from '@/components/ui/sidebar'
 import { encodeTableName } from '@/lib/sqlite/table-utils'
-import { PlusIcon } from 'lucide-react'
+import { IconPlus } from '@tabler/icons-react'
 import { NavLink } from 'react-router'
 import { useMemo } from 'react'
 
@@ -38,7 +38,7 @@ export default function SidebarGroupTable({ tables, onAddTable }: SidebarGroupTa
         <span className="text-lg font-bold select-none">Tables</span>
         {/* show a plus for creating a new table */}
         <Button variant="ghost" size="icon" onClick={onAddTable}>
-          <PlusIcon className="h-4 w-4" />
+          <IconPlus className="h-4 w-4" />
         </Button>
       </SidebarGroupLabel>
       <SidebarGroupContent>
