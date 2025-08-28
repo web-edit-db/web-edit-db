@@ -10,7 +10,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { IconMinus, IconPlus, IconRotate, IconTrash, IconTrashOff } from '@tabler/icons-react'
+import {
+  IconMinus,
+  IconPlus,
+  IconRotate,
+  IconTrash,
+  IconTrashOff,
+  IconX,
+} from '@tabler/icons-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -23,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Checkbox, CheckboxIndicator } from '@/components/ui/checkbox'
 
 const columnTypes = ['Text', 'Integer', 'Numeric', 'Real', 'Blob'] as const
 type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
@@ -39,6 +46,10 @@ type ColumnData = {
   defaultValue: {
     mode: 'value' | 'sql' | 'none'
     value?: string
+  }
+  foreignKey: {
+    table?: string
+    column?: string
   }
 }
 
@@ -70,10 +81,15 @@ const ToggleButton = ({
           checked={checked}
           onCheckedChange={onChange}
           disabled={disabled}
+          asChild
           // don't allow tabbing to the checkbox because we have it in the button
           tabIndex={-1}
           className="cursor-pointer"
-        />
+        >
+          <div>
+            <CheckboxIndicator />
+          </div>
+        </Checkbox>
         <span>{label}</span>
       </div>
     </Button>
@@ -116,6 +132,10 @@ const NumberInputWithPlusMinus = ({
       setInputValue((newValue + 1).toString())
     }
   }, [inputValue])
+  const onClear = useCallback(() => {
+    setInputValue('')
+    onChange(undefined)
+  }, [onChange])
   useEffect(() => {
     const inputValueTrimmed = inputValue.trim()
     // if this is a an empty string, just a minus
@@ -152,15 +172,127 @@ const NumberInputWithPlusMinus = ({
         size="icon"
         variant="outline"
         disabled={disabled}
-        className="-ml-[1px] rounded-l-none focus:z-20"
+        className="-ml-[1px] rounded-l-none rounded-r-none focus:z-20"
       >
         <IconPlus></IconPlus>
       </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="-ml-[1px] rounded-l-none focus:z-20"
+            onClick={onClear}
+          >
+            <IconX />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Clear</TooltipContent>
+      </Tooltip>
     </div>
   )
 }
 
-export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
+const ForeignKeySelector = ({
+  tables,
+  value,
+  onChange,
+  disabled,
+}: {
+  tables: Record<string, string[]>
+  value: {
+    table?: string
+    column?: string
+  }
+  onChange: (value: { table?: string; column?: string }) => void
+  disabled?: boolean
+}) => {
+  const [table, setTable] = useState<string>(value.table ?? '')
+  const [column, setColumn] = useState<string>(value.column ?? '')
+  const onChangeTable = useCallback((table: string) => {
+    setTable(table)
+    setColumn('')
+  }, [])
+  const onChangeColumn = useCallback((column: string) => {
+    setColumn(column)
+  }, [])
+  const onClear = useCallback(() => {
+    setTable('')
+    setColumn('')
+  }, [])
+  useEffect(() => {
+    onChange({
+      table: table === '' ? undefined : table,
+      column: column === '' ? undefined : column,
+    })
+  }, [table, column, onChange])
+  return (
+    <div className="flex">
+      <Select onValueChange={onChangeTable} value={table} disabled={disabled}>
+        <SelectTrigger className="w-full rounded-r-none focus:z-20">
+          <SelectValue placeholder="Select a table" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.keys(tables).length === 0 ? (
+            <div className="text-muted-foreground pointer-events-none px-2 py-1.5 text-sm">
+              No tables yet
+            </div>
+          ) : (
+            Object.keys(tables).map((table) => (
+              <SelectItem key={table} value={table}>
+                {table}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+      <Select onValueChange={onChangeColumn} value={column} disabled={disabled}>
+        <SelectTrigger
+          className="-ml-[1px] w-full rounded-l-none rounded-r-none focus:z-20"
+          disabled={disabled || table === ''}
+        >
+          <SelectValue placeholder="Select a column" />
+        </SelectTrigger>
+        <SelectContent>
+          {table === '' ? (
+            <div className="text-muted-foreground px-2 py-1.5 text-sm">Select a table first</div>
+          ) : tables[table]?.length === 0 ? (
+            <div className="text-muted-foreground px-2 py-1.5 text-sm">
+              No columns in this table
+            </div>
+          ) : (
+            tables[table]?.map((column) => (
+              <SelectItem key={column} value={column}>
+                {column}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="-ml-[1px] rounded-l-none focus:z-20"
+            onClick={onClear}
+          >
+            <IconX />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Clear</TooltipContent>
+      </Tooltip>
+    </div>
+  )
+}
+
+export default function ColumnCard({
+  columnData,
+  tables,
+}: {
+  columnData: ColumnData
+  tables: Record<string, string[]> // table name -> column names
+}) {
   const zodSchema = z
     .object({
       name: z.string().min(1, { message: 'Name is required' }),
@@ -174,8 +306,13 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
         mode: z.enum(['value', 'sql', 'none']),
         value: z.string().optional(),
       }),
+      foreignKey: z.object({
+        table: z.string().optional(),
+        column: z.string().optional(),
+      }),
     })
     .superRefine((data, ctx) => {
+      // super refine for the min/max fields
       if (data.min !== undefined && data.max !== undefined) {
         const minNum = Number(data.min)
         const maxNum = Number(data.max)
@@ -191,6 +328,43 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
             path: ['max'],
           })
         }
+      }
+    })
+    .superRefine((data, ctx) => {
+      const trimmedTable = data.foreignKey.table?.trim() || undefined
+
+      if (trimmedTable === undefined) {
+        return
+      }
+
+      // the table must be a valid table name
+      if (!Object.keys(tables).includes(trimmedTable)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'No such table',
+          path: ['foreignKey'],
+        })
+        return
+      }
+
+      // if the table is set, the column must be set
+      if (data.foreignKey.column === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Select a column from the table`,
+          path: ['foreignKey'],
+        })
+        return
+      }
+
+      // the column must be a valid column name
+      if (!tables[trimmedTable]?.includes(data.foreignKey.column)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `No such column in the table`,
+          path: ['foreignKey'],
+        })
+        return
       }
     })
   const [isDeleted, setIsDeleted] = useState(false)
@@ -245,7 +419,7 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
             <div className="flex items-center gap-2">
               {!columnData.new && (
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" onClick={reset} disabled={isResetDisabled}>
                       <IconRotate />
                     </Button>
@@ -254,7 +428,7 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
                 </Tooltip>
               )}
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" onClick={toggleDeleted}>
                     {isDeleted ? <IconTrashOff /> : <IconTrash />}
                   </Button>
@@ -445,6 +619,25 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
                     <SelectItem value="none">None</SelectItem>
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Foreign Key Selector */}
+          <FormField
+            control={form.control}
+            name="foreignKey"
+            render={({ field }) => (
+              <FormItem className="col-span-12 md:col-span-6">
+                <FormLabel>Foreign Key</FormLabel>
+                <FormControl>
+                  <ForeignKeySelector
+                    tables={tables}
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={field.disabled}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

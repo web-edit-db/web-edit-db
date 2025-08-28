@@ -23,7 +23,12 @@ const meta: Meta<typeof ColumnCard> = {
         mode: 'value',
         value: '1',
       },
+      foreignKey: {
+        table: undefined,
+        column: undefined,
+      },
     },
+    tables: {},
   },
 }
 
@@ -49,6 +54,10 @@ export const NoMinMax: Story = {
         mode: 'value',
         value: '1',
       },
+      foreignKey: {
+        table: undefined,
+        column: undefined,
+      },
     },
   },
 }
@@ -66,6 +75,36 @@ export const New: Story = {
         mode: 'value',
         value: '1',
       },
+      foreignKey: {
+        table: undefined,
+        column: undefined,
+      },
+    },
+  },
+}
+
+export const ForeignKey: Story = {
+  args: {
+    columnData: {
+      name: 'id',
+      type: 'Integer',
+      new: false,
+      notNull: false,
+      unique: false,
+      primaryKey: false,
+      foreignKey: {
+        table: 'users',
+        column: 'id',
+      },
+      defaultValue: {
+        mode: 'value',
+        value: '1',
+      },
+    },
+    tables: {
+      users: ['id', 'name', 'email'],
+      posts: ['id', 'title', 'content'],
+      comments: ['id', 'content', 'post_id'],
     },
   },
 }

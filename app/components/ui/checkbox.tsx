@@ -4,6 +4,21 @@ import { IconCheck } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
 
+function CheckboxIndicator({
+  className,
+  ...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Indicator>) {
+  return (
+    <CheckboxPrimitive.Indicator
+      data-slot="checkbox-indicator"
+      className={cn('flex items-center justify-center text-current transition-none', className)}
+      {...props}
+    >
+      <IconCheck className="size-3.5" />
+    </CheckboxPrimitive.Indicator>
+  )
+}
+
 function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   return (
     <CheckboxPrimitive.Root
@@ -14,14 +29,9 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
       )}
       {...props}
     >
-      <CheckboxPrimitive.Indicator
-        data-slot="checkbox-indicator"
-        className="flex items-center justify-center text-current transition-none"
-      >
-        <IconCheck className="size-3.5" />
-      </CheckboxPrimitive.Indicator>
+      {props.children || <CheckboxIndicator />}
     </CheckboxPrimitive.Root>
   )
 }
 
-export { Checkbox }
+export { Checkbox, CheckboxIndicator }
