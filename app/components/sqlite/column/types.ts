@@ -14,7 +14,7 @@ export type ColumnData = {
   min?: number
   max?: number
   defaultValue: {
-    mode: 'value' | 'sql' | 'none'
+    mode: 'value' | 'sql' | 'none' | 'null'
     value?: string
   }
   foreignKey: {
@@ -34,7 +34,7 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       min: z.number({ message: 'Must be a number' }).optional(),
       max: z.number({ message: 'Must be a number' }).optional(),
       defaultValue: z.object({
-        mode: z.enum(['value', 'sql', 'none']),
+        mode: z.enum(['value', 'sql', 'none', 'null']),
         value: z.string().optional(),
       }),
       foreignKey: z.object({

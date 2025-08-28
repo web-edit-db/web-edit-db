@@ -108,7 +108,7 @@ export const SqlNull: Story = {
   name: 'SQL NULL',
   args: {
     value: {
-      mode: 'sql',
+      mode: 'null',
       value: 'NULL',
     },
     formType: 'Blob',

@@ -10,10 +10,10 @@ import { useCallback } from 'react'
 
 interface DefaultValueSelectorProps {
   value: {
-    mode: 'value' | 'sql' | 'none'
+    mode: 'value' | 'sql' | 'none' | 'null'
     value?: string
   }
-  onChange: (value: { mode: 'value' | 'sql' | 'none'; value?: string }) => void
+  onChange: (value: { mode: 'value' | 'sql' | 'none' | 'null'; value?: string }) => void
   formType: string
   disabled?: boolean
 }
@@ -25,7 +25,7 @@ export default function DefaultValueSelector({
   formType,
 }: DefaultValueSelectorProps) {
   const onModeChange = useCallback(
-    (mode: 'value' | 'sql' | 'none') => {
+    (mode: 'value' | 'sql' | 'none' | 'null') => {
       onChange({ mode, value: value.value })
     },
     [onChange, value.value],
@@ -47,14 +47,21 @@ export default function DefaultValueSelector({
           <SelectItem value="value">{formType}</SelectItem>
           <SelectItem value="sql">SQL</SelectItem>
           <SelectItem value="none">None</SelectItem>
+          <SelectItem value="null">null</SelectItem>
         </SelectContent>
       </Select>
       <Input
         className="rounded-l-none focus:z-20"
-        disabled={disabled || value.mode === 'none'}
-        value={value.value || ''}
+        disabled={disabled || value.mode === 'none' || value.mode === 'null'}
+        value={value.mode === 'null' ? 'null' : value.value || ''}
         onChange={(e) => onValueChange(e.target.value)}
-        placeholder={value.mode === 'none' ? 'No default value' : `Enter ${value.mode} here`}
+        placeholder={
+          value.mode === 'none'
+            ? 'No default value'
+            : value.mode === 'null'
+              ? 'null'
+              : `Enter ${value.mode} here`
+        }
       />
     </div>
   )
