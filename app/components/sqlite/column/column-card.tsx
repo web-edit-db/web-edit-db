@@ -25,29 +25,35 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Checkbox } from '@/components/ui/checkbox'
 
+const columnTypes = ['Text', 'Integer', 'Numeric', 'Real', 'Blob'] as const
 type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
 type ColumnData = {
   new: boolean
   name: string
-  type: string
+  type: (typeof columnTypes)[number]
   notNull: boolean
   unique: boolean
   primaryKey: boolean
   min?: number
   max?: number
+  defaultValue: {
+    mode: 'value' | 'sql' | 'none'
+    value?: string
+  }
 }
-const columnTypes = ['TEXT', 'INTEGER', 'NUMERIC', 'REAL', 'BLOB']
 
 const ToggleButton = ({
   checked,
   onChange,
   disabled,
   label,
+  className,
 }: {
   checked: boolean
   onChange: (checked: boolean) => void
   disabled?: boolean
   label: string
+  className?: string
 }) => {
   const buttonClicked = useCallback(() => {
     onChange(!checked)
@@ -57,7 +63,7 @@ const ToggleButton = ({
       variant="outline"
       onClick={buttonClicked}
       disabled={disabled}
-      className="justify-start px-2"
+      className={cn('justify-start px-2', className)}
     >
       <div className="flex items-center gap-2">
         <Checkbox
@@ -158,14 +164,16 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
   const zodSchema = z
     .object({
       name: z.string().min(1, { message: 'Name is required' }),
-      type: z.string().refine((value) => columnTypes.includes(value), {
-        message: 'Type is required and must be one of INTEGER, TEXT, or REAL',
-      }),
+      type: z.enum(columnTypes, { message: 'Type is required' }),
       notNull: z.boolean(),
       unique: z.boolean(),
       primaryKey: z.boolean(),
       min: z.number({ message: 'Must be a number' }).optional(),
       max: z.number({ message: 'Must be a number' }).optional(),
+      defaultValue: z.object({
+        mode: z.enum(['value', 'sql', 'none']),
+        value: z.string().optional(),
+      }),
     })
     .superRefine((data, ctx) => {
       if (data.min !== undefined && data.max !== undefined) {
@@ -226,6 +234,7 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
   const isResetDisabled = useMemo(() => {
     return modifiedState === 'original' || modifiedState === 'new'
   }, [modifiedState])
+  const formType = form.watch('type')
   return (
     <Form {...form}>
       <Card className="py-4">
@@ -398,6 +407,44 @@ export default function ColumnCard({ columnData }: { columnData: ColumnData }) {
                     disabled={field.disabled}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Default Value */}
+          <FormField
+            control={form.control}
+            name="defaultValue"
+            render={({ field }) => (
+              <FormItem className="col-span-12 md:col-span-6">
+                <FormLabel>Default Value</FormLabel>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange({
+                      mode: value as 'value' | 'sql' | 'none',
+                      value: field.value.value,
+                    })
+                  }}
+                  defaultValue={field.value.mode}
+                  disabled={field.disabled}
+                >
+                  <FormControl>
+                    <div className="grid w-full grid-cols-[auto_1fr]">
+                      <SelectTrigger className="-mr-[1px] w-28 rounded-r-none focus:z-20">
+                        <SelectValue placeholder="Select a mode" />
+                      </SelectTrigger>
+                      <Input
+                        className="rounded-l-none focus:z-20"
+                        disabled={field.disabled || field.value.mode === 'none'}
+                      />
+                    </div>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="value">{formType}</SelectItem>
+                    <SelectItem value="sql">SQL</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
