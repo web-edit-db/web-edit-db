@@ -1,0 +1,100 @@
+import { z } from 'zod'
+
+export const columnTypes = ['Text', 'Integer', 'Numeric', 'Real', 'Blob'] as const
+
+export type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
+
+export type ColumnData = {
+  new: boolean
+  name: string
+  type: (typeof columnTypes)[number]
+  notNull: boolean
+  unique: boolean
+  primaryKey: boolean
+  min?: number
+  max?: number
+  defaultValue: {
+    mode: 'value' | 'sql' | 'none'
+    value?: string
+  }
+  foreignKey: {
+    table?: string
+    column?: string
+  }
+}
+
+export const createColumnSchema = (tables: Record<string, string[]>) =>
+  z
+    .object({
+      name: z.string().min(1, { message: 'Name is required' }),
+      type: z.enum(columnTypes, { message: 'Type is required' }),
+      notNull: z.boolean(),
+      unique: z.boolean(),
+      primaryKey: z.boolean(),
+      min: z.number({ message: 'Must be a number' }).optional(),
+      max: z.number({ message: 'Must be a number' }).optional(),
+      defaultValue: z.object({
+        mode: z.enum(['value', 'sql', 'none']),
+        value: z.string().optional(),
+      }),
+      foreignKey: z.object({
+        table: z.string().optional(),
+        column: z.string().optional(),
+      }),
+    })
+    .superRefine((data, ctx) => {
+      // super refine for the min/max fields
+      if (data.min !== undefined && data.max !== undefined) {
+        const minNum = Number(data.min)
+        const maxNum = Number(data.max)
+        if (!Number.isNaN(minNum) && !Number.isNaN(maxNum) && minNum > maxNum) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Min must be less or equal to max',
+            path: ['min'],
+          })
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Max must be greater or equal to min',
+            path: ['max'],
+          })
+        }
+      }
+    })
+    .superRefine((data, ctx) => {
+      const trimmedTable = data.foreignKey.table?.trim() || undefined
+
+      if (trimmedTable === undefined) {
+        return
+      }
+
+      // the table must be a valid table name
+      if (!Object.keys(tables).includes(trimmedTable)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'No such table',
+          path: ['foreignKey'],
+        })
+        return
+      }
+
+      // if the table is set, the column must be set
+      if (data.foreignKey.column === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Select a column from the table`,
+          path: ['foreignKey'],
+        })
+        return
+      }
+
+      // the column must be a valid column name
+      if (!tables[trimmedTable]?.includes(data.foreignKey.column)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `No such column in the table`,
+          path: ['foreignKey'],
+        })
+        return
+      }
+    })

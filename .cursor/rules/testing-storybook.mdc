@@ -12,7 +12,7 @@ This project uses Vitest + Testing Library for unit/integration tests and Storyb
 ### Core Testing Tools
 
 - **Test Runner**: Vitest
-- **DOM Testing**: @testing-library/react + @testing-library/jest-dom
+- **DOM Testing**: @testing-library/react-vite + @testing-library/jest-dom
 - **User Interactions**: @testing-library/user-event
 - **Browser Testing**: @vitest/browser (configured)
 - **Coverage**: @vitest/coverage-v8
@@ -28,7 +28,7 @@ This project uses Vitest + Testing Library for unit/integration tests and Storyb
 ### Component Testing
 
 ```typescript
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react-vite'
 import { describe, it, expect } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import MyComponent from './MyComponent'
@@ -54,7 +54,7 @@ describe('MyComponent', () => {
 ### Testing SQLite Components
 
 ```typescript
-import { render } from '@testing-library/react'
+import { render } from '@testing-library/react-vite'
 import { SqliteProvider } from '@/lib/sqlite/SqliteProvider'
 
 function renderWithSqlite(component: React.ReactElement) {
@@ -76,7 +76,7 @@ describe('DatabaseComponent', () => {
 ### Testing Custom Hooks
 
 ```typescript
-import { renderHook, act } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react-vite'
 import { useDatabase } from '@/lib/sqlite/useDatabase'
 import { SqliteProvider } from '@/lib/sqlite/SqliteProvider'
 
@@ -168,7 +168,7 @@ const meta = {
 #### Interactive Stories
 
 ```typescript
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect } from 'storybook/test'
 
 export const WithInteraction: Story = {
   args: {
