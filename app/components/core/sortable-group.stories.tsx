@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ExampleLinked } from './sortable-linked'
+import { ExampleLinked } from './sortable-group'
 
 const meta = {
-  title: 'Core/SortableLinked',
+  title: 'Core/SortableGroup',
   component: ExampleLinked,
   parameters: {
     layout: 'padded',
