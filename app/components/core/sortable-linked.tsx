@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import {
@@ -7,47 +7,68 @@ import {
   type DragMoveEvent,
   DragOverlay,
   type DragStartEvent,
+  type UniqueIdentifier,
 } from '@dnd-kit/core'
 import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
   arrayMove,
+  type SortingStrategy,
 } from '@dnd-kit/sortable'
 
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 interface SortableLinkedProps {
   className?: string
 }
 
-const SortableItem = ({
-  item,
-  big,
-  inMotion,
+const ringStyle = 'ring-primary/40 z-20 shadow-xl ring-2 ring-offset-2'
+
+export const SortableGroupItem = ({
+  id,
+  children,
+  className,
 }: {
-  item: { id: string; content: string }
-  big: boolean
-  inMotion: boolean
+  id: string
+  children: React.ReactNode
+  className?: string
 }) => {
-  const { listeners, setNodeRef, transform, isDragging, data, isSorting } = useSortable({
-    id: item.id,
+  const { activeItem } = useSortableGroup()
+  const isSortingGroup = useMemo(() => activeItem !== null, [activeItem])
+  const relatedBeingDragged = useMemo(() => activeItem?.id === id, [activeItem, id])
+  const { listeners, setNodeRef, transform, isDragging, isSorting } = useSortable({
+    id,
     data: {
-      id: item.id,
+      id,
     },
   })
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
+  const showRing = useMemo(
+    () => isDragging || (relatedBeingDragged && !isSorting),
+    [isDragging, isSorting, relatedBeingDragged],
+  )
+
+  // const dimOthers = useMemo(
+  //   () => isSortingGroup && !relatedBeingDragged,
+  //   [isSortingGroup, relatedBeingDragged],
+  // )
+
+  const opacity = useMemo(() => {
+    if (isDragging) return 0.8
+    if (relatedBeingDragged) return 0.8
+    if (isSortingGroup && !relatedBeingDragged) return 0.5
+    return 1
+  }, [isDragging, isSortingGroup, relatedBeingDragged])
 
   return (
     <motion.div
+      key={id}
       ref={setNodeRef}
       layout
-      //   initial={{ opacity: 0, scale: 0.8 }}
       animate={{
-        opacity: isDragging ? 0.5 : 1,
+        opacity: opacity,
         scale: isDragging ? 0.95 : 1,
         y: transform?.y ?? 0,
         x: transform?.x ?? 0,
@@ -58,20 +79,158 @@ const SortableItem = ({
         damping: 30,
         mass: 0.8,
       }}
-      className={cn(
-        'bg-card border-card-foreground cursor-grab rounded-md border-1 p-3 active:cursor-grabbing',
-        big && 'p-10',
-        isDragging ||
-          (inMotion && !isSorting && 'ring-primary z-20 shadow-xl ring-1 ring-offset-2'),
-      )}
+      initial={{ opacity: 0, scale: 0.5 }}
+      exit={{ opacity: 0, scale: 0.5 }}
+      className={cn(className, showRing && ringStyle)}
       {...listeners}
     >
-      {item.content}
+      {children}
     </motion.div>
   )
 }
 
-export const SortableLinked = ({ className }: SortableLinkedProps) => {
+export const SortableGroupItemOverlay = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) => {
+  return (
+    <DragOverlay>
+      <div className={cn(className, ringStyle)}>{children}</div>
+    </DragOverlay>
+  )
+}
+
+type UniqueItem = { id: UniqueIdentifier }
+const dndGroupContext = createContext<{
+  activeItem: UniqueItem | null
+  dragStart: (event: DragStartEvent) => void
+  dragMove: (event: DragMoveEvent) => void
+  dragEnd: (event: DragEndEvent) => void
+  items: UniqueItem[]
+}>({
+  activeItem: null,
+  dragStart: () => {},
+  dragMove: () => {},
+  dragEnd: () => {},
+  items: [],
+})
+
+const SortableGroupContext = <T extends UniqueItem>({
+  children,
+  items,
+  setItems,
+}: {
+  children: React.ReactNode
+  items: T[]
+  setItems: (items: T[]) => void
+}) => {
+  const [activeItem, setActiveItem] = useState<T | null>(null)
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const { active } = event
+      const item = items.find((item) => item.id === active.id)
+      setActiveItem(item || null)
+    },
+    [items],
+  )
+
+  const handleDragMoveOrEnd = useCallback(
+    (event: DragMoveEvent | DragEndEvent) => {
+      const { active, over } = event
+
+      if (!over) return
+
+      const oldIndex = items.findIndex((item) => item.id === active.id)
+      const newIndex = items.findIndex((item) => item.id === over.id)
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setItems(arrayMove(items, oldIndex, newIndex))
+      }
+    },
+    [items, setItems],
+  )
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setActiveItem(null)
+      handleDragMoveOrEnd(event)
+    },
+    [setActiveItem, handleDragMoveOrEnd],
+  )
+
+  return (
+    <dndGroupContext.Provider
+      value={{
+        activeItem,
+        dragStart: handleDragStart,
+        dragMove: handleDragMoveOrEnd,
+        dragEnd: handleDragEnd,
+        items,
+      }}
+    >
+      {children}
+    </dndGroupContext.Provider>
+  )
+}
+
+const useSortableGroup = () => {
+  return useContext(dndGroupContext)
+}
+
+const SortableGroupItemContext = ({
+  children,
+  overlay,
+  strategy = verticalListSortingStrategy,
+}: {
+  children: React.ReactNode
+  overlay: (activeItem: UniqueItem) => React.ReactNode
+  strategy?: SortingStrategy
+}) => {
+  const { activeItem, dragStart, dragMove, dragEnd, items } = useSortableGroup()
+  return (
+    <DndContext onDragStart={dragStart} onDragMove={dragMove} onDragEnd={dragEnd}>
+      <SortableContext items={items} strategy={strategy}>
+        {children}
+      </SortableContext>
+      {createPortal(activeItem && overlay(activeItem), document.body)}
+    </DndContext>
+  )
+}
+
+const ExampleLinkedItem = ({
+  item,
+  big,
+}: {
+  item: { id: string; content: string }
+  big: boolean
+}) => {
+  return (
+    <div
+      className={cn(
+        'bg-card border-card-foreground cursor-grab rounded-md border-1 p-3 active:cursor-grabbing',
+        big && 'p-10',
+      )}
+    >
+      {item.content}
+    </div>
+  )
+}
+
+const ExampleLinkedCard = ({ children, title }: { children: React.ReactNode; title: string }) => {
+  return (
+    <div className="bg-card flex min-h-[400px] w-full max-w-sm flex-col rounded-lg border p-4 shadow-sm">
+      <h3 className="text-card-foreground mb-4 text-lg font-semibold">{title}</h3>
+      <div className="border-muted-foreground/25 flex min-h-[300px] flex-1 flex-col gap-2 rounded-md border-2 border-dashed p-2">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export const ExampleLinked = ({ className }: SortableLinkedProps) => {
   const [items, setItems] = useState([
     { id: '1', content: 'Item 1' },
     { id: '2', content: 'Item 2' },
@@ -82,145 +241,58 @@ export const SortableLinked = ({ className }: SortableLinkedProps) => {
     { id: '7', content: 'Item 7' },
   ])
 
-  // list of indexes one for each item
-  const [previewOrder, setPreviewOrder] = useState<[string, number][]>([])
+  const getOverlay = (activeItem: UniqueItem, big: boolean) => {
+    const overlayItem = items.find((item) => item.id === activeItem.id)
 
-  useMemo(() => {
-    // this will reset the preview order when the items change
-    setPreviewOrder(items.map((item, index) => [item.id, index] as const))
+    if (overlayItem) {
+      return (
+        <SortableGroupItemOverlay className={'rounded-md'}>
+          <ExampleLinkedItem item={overlayItem} big={big} />
+        </SortableGroupItemOverlay>
+      )
+    }
+    return null
+  }
+
+  const appendItem = useCallback(() => {
+    setItems([...items, { id: `${items.length + 1}`, content: `Item ${items.length + 1}` }])
   }, [items])
 
-  const [activeItem, setActiveItem] = useState<{ id: string; content: string } | null>(null)
-
-  const handleDragMove = useCallback(
-    (event: DragMoveEvent) => {
-      // as the order changes, we need to update the preview order
-      console.log('handleDragMove')
-      console.log(event)
-      const { active, over } = event
-      const oldIndex = previewOrder.findIndex(([id]) => id === active.id)
-      const newIndex = items.findIndex((item) => item.id === over?.id)
-
-      if (oldIndex !== -1 && newIndex !== -1) {
-        setItems(arrayMove(items, oldIndex, newIndex))
-      }
-    },
-    [previewOrder, items],
-  )
-
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const { active } = event
-      const item = items.find((item) => item.id === active.id)
-      setActiveItem(item || null)
-    },
-    [items],
-  )
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      console.log('handleDragEnd')
-      const { active, over } = event
-
-      setActiveItem(null)
-
-      if (!over || active.id === over.id) return
-
-      if (items.find((item) => item.id === active.id)) {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          setItems(arrayMove(items, oldIndex, newIndex))
-        }
-      }
-    },
-    [items],
-  )
-
-  const itemsLeft = useMemo(() => {
-    return items
-  }, [items])
-
-  const itemsRight = useMemo(() => {
-    return items
+  const removeItem = useCallback(() => {
+    setItems(items.slice(0, -1))
   }, [items])
 
   return (
     <div className={cn('flex gap-6', className)}>
-      <DndContext
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragMove={handleDragMove}
-      >
-        {/* Left Side */}
-        <SortableContext
-          items={itemsLeft.map((item) => item.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="bg-card flex min-h-[400px] w-full max-w-sm flex-col rounded-lg border p-4 shadow-sm">
-            <h3 className="text-card-foreground mb-4 text-lg font-semibold">Left</h3>
-            <div className="border-muted-foreground/25 flex min-h-[300px] flex-1 flex-col gap-2 rounded-md border-2 border-dashed p-2">
-              <AnimatePresence>
-                {itemsLeft.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    // initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <SortableItem item={item} big={true} inMotion={activeItem?.id === item.id} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </div>
-        </SortableContext>
-        {createPortal(
-          <DragOverlay>
-            {activeItem && <SortableItem item={activeItem} big={true} inMotion={true} />}
-          </DragOverlay>,
-          document.body,
-        )}
-      </DndContext>
-      <DndContext
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragMove={handleDragMove}
-      >
-        {/* Right Side */}
-        <SortableContext
-          items={itemsRight.map((item) => item.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="bg-card flex min-h-[400px] w-full max-w-sm flex-col rounded-lg border p-4 shadow-sm">
-            <h3 className="text-card-foreground mb-4 text-lg font-semibold">Right</h3>
-            <div className="border-muted-foreground/25 flex min-h-[300px] flex-1 flex-col gap-2 rounded-md border-2 border-dashed p-2">
-              <AnimatePresence>
-                {itemsRight.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    // initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <SortableItem item={item} big={false} inMotion={activeItem?.id === item.id} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </div>
-        </SortableContext>
-        {createPortal(
-          <DragOverlay>
-            {activeItem && <SortableItem item={activeItem} big={false} inMotion={false} />}
-          </DragOverlay>,
-          document.body,
-        )}
-      </DndContext>
-      {JSON.stringify(items)}
+      <SortableGroupContext items={items} setItems={setItems}>
+        <SortableGroupItemContext overlay={(activeItem) => getOverlay(activeItem, true)}>
+          <ExampleLinkedCard title="Left">
+            <AnimatePresence>
+              {items.map((item) => (
+                <SortableGroupItem key={item.id} id={item.id} className={'rounded-md'}>
+                  <ExampleLinkedItem item={item} big={true} />
+                </SortableGroupItem>
+              ))}
+            </AnimatePresence>
+          </ExampleLinkedCard>
+        </SortableGroupItemContext>
+        <SortableGroupItemContext overlay={(activeItem) => getOverlay(activeItem, false)}>
+          <ExampleLinkedCard title="Right">
+            <AnimatePresence>
+              {items.map((item) => (
+                <SortableGroupItem key={item.id} id={item.id} className={'rounded-md'}>
+                  <ExampleLinkedItem item={item} big={false} />
+                </SortableGroupItem>
+              ))}
+            </AnimatePresence>
+          </ExampleLinkedCard>
+        </SortableGroupItemContext>
+      </SortableGroupContext>
+      <div className="flex flex-col gap-2">
+        <Button onClick={appendItem}>Add Item</Button>
+        <Button onClick={removeItem}>Remove Item</Button>
+      </div>
+      {/* {JSON.stringify(items)} */}
     </div>
   )
 }

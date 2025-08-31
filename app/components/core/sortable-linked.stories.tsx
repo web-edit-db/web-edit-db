@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SortableLinked } from './sortable-linked'
+import { ExampleLinked } from './sortable-linked'
 
 const meta = {
   title: 'Core/SortableLinked',
-  component: SortableLinked,
+  component: ExampleLinked,
   parameters: {
     layout: 'padded',
     docs: {
@@ -13,8 +13,7 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
-} satisfies Meta<typeof SortableLinked>
+} satisfies Meta<typeof ExampleLinked>
 
 export default meta
 type Story = StoryObj<typeof meta>
