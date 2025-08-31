@@ -17,20 +17,27 @@ import ToggleButton from './toggle-button'
 import TypeSelector from './type-selector'
 
 interface ColumnCardProps {
-  columnData: ColumnData
+  columnData: Omit<ColumnData, 'deleted'>
   tables: Record<string, string[]> // table name -> column names
 }
 
 export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
   const zodSchema = createColumnSchema(tables)
-  const [isDeleted, setIsDeleted] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   const form = useForm<Omit<ColumnData, 'new'>>({
     defaultValues: columnData,
     resolver: zodResolver(zodSchema),
-    disabled: isDeleted,
+    disabled,
     mode: 'all',
   })
+
+  const isDeleted = form.watch('deleted')
+
+  useEffect(() => {
+    console.log('isDeleted', isDeleted)
+    setDisabled(isDeleted === true)
+  }, [isDeleted])
 
   useEffect(() => {
     console.log('Form state:', {
@@ -55,14 +62,13 @@ export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
   }, [isDirty, isDeleted, columnData.new])
 
   const toggleDeleted = useCallback(() => {
-    setIsDeleted(!isDeleted)
-  }, [isDeleted])
+    form.setValue('deleted', !form.getValues('deleted'))
+  }, [form])
 
   const reset = useCallback(() => {
-    if (isDeleted) setIsDeleted(false)
     // form.reset(columnData)
     setTimeout(() => form.reset(columnData), 0)
-  }, [form, isDeleted, columnData])
+  }, [form, columnData])
 
   const isResetDisabled = useMemo(() => {
     return modifiedState === 'original' || modifiedState === 'new'

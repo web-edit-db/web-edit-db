@@ -6,6 +6,7 @@ export type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
 
 export type ColumnData = {
   new: boolean
+  deleted: boolean
   name: string
   type: (typeof columnTypes)[number]
   notNull: boolean
@@ -33,6 +34,7 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       primaryKey: z.boolean(),
       min: z.number({ message: 'Must be a number' }).or(z.undefined()),
       max: z.number({ message: 'Must be a number' }).or(z.undefined()),
+      deleted: z.boolean(),
       defaultValue: z.object({
         mode: z.enum(['value', 'sql', 'none', 'null']),
         value: z.string().or(z.undefined()),

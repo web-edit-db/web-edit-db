@@ -3,7 +3,7 @@ import type { ColumnData } from './types'
 import ColumnCard from './column-card'
 
 interface ComponentListProps {
-  columns: ColumnData[]
+  columns: Omit<ColumnData, 'deleted'>[]
   tables: Record<string, string[]>
 }
 

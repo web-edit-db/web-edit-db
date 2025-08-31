@@ -7,7 +7,7 @@ const mockTables = {
   posts: ['id', 'title', 'content', 'user_id'],
 }
 
-const mockColumns: ColumnData[] = [
+const mockColumns: Omit<ColumnData, 'deleted'>[] = [
   {
     name: 'id',
     type: 'Integer',

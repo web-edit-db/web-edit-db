@@ -37,10 +37,17 @@ export const NewColumn: Story = {
       notNull: false,
       unique: false,
       primaryKey: false,
+      min: undefined,
+      max: undefined,
+
       defaultValue: {
         mode: 'none',
+        value: undefined,
       },
-      foreignKey: {},
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: {},
   },
@@ -61,7 +68,10 @@ export const BasicTextColumn: Story = {
         mode: 'value',
         value: 'Untitled',
       },
-      foreignKey: {},
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: mockTables,
   },
@@ -80,7 +90,12 @@ export const PrimaryKeyColumn: Story = {
         mode: 'sql',
         value: 'AUTOINCREMENT',
       },
-      foreignKey: {},
+      min: undefined,
+      max: undefined,
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: mockTables,
   },
@@ -97,7 +112,10 @@ export const ForeignKeyColumn: Story = {
       primaryKey: false,
       defaultValue: {
         mode: 'none',
+        value: undefined,
       },
+      min: undefined,
+      max: undefined,
       foreignKey: {
         table: 'users',
         column: 'id',
@@ -119,11 +137,15 @@ export const NumericWithRange: Story = {
       primaryKey: false,
       min: 1,
       max: 5,
+
       defaultValue: {
         mode: 'value',
         value: '3',
       },
-      foreignKey: {},
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: mockTables,
   },
@@ -140,10 +162,15 @@ export const UniqueEmailColumn: Story = {
       primaryKey: false,
       min: 5,
       max: 320,
+
       defaultValue: {
         mode: 'none',
+        value: undefined,
       },
-      foreignKey: {},
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: mockTables,
   },
@@ -158,11 +185,17 @@ export const BlobColumn: Story = {
       notNull: false,
       unique: false,
       primaryKey: false,
+
       defaultValue: {
         mode: 'sql',
         value: 'NULL',
       },
-      foreignKey: {},
+      min: undefined,
+      max: undefined,
+      foreignKey: {
+        table: null,
+        column: null,
+      },
     },
     tables: mockTables,
   },
@@ -178,11 +211,17 @@ export const TimestampColumn: Story = {
       notNull: true,
       unique: false,
       primaryKey: false,
+
       defaultValue: {
         mode: 'sql',
         value: 'CURRENT_TIMESTAMP',
       },
-      foreignKey: {},
+      foreignKey: {
+        table: null,
+        column: null,
+      },
+      min: undefined,
+      max: undefined,
     },
     tables: mockTables,
   },
@@ -200,6 +239,7 @@ export const AllConstraintsColumn: Story = {
       primaryKey: false,
       min: 1000,
       max: 9999,
+
       defaultValue: {
         mode: 'value',
         value: '1000',
