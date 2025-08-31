@@ -13,10 +13,10 @@ import { useCallback, useEffect, useState } from 'react'
 interface ForeignKeySelectorProps {
   tables: Record<string, string[]>
   value: {
-    table?: string
-    column?: string
+    table: string | null
+    column: string | null
   }
-  onChange: (value: { table?: string; column?: string }) => void
+  onChange: (value: { table: string | null; column: string | null }) => void
   disabled?: boolean
 }
 
@@ -26,29 +26,43 @@ export default function ForeignKeySelector({
   onChange,
   disabled,
 }: ForeignKeySelectorProps) {
-  const [table, setTable] = useState<string>(value.table ?? '')
-  const [column, setColumn] = useState<string>(value.column ?? '')
-
-  const onChangeTable = useCallback((table: string) => {
-    setTable(table)
-    setColumn('')
-  }, [])
-
-  const onChangeColumn = useCallback((column: string) => {
-    setColumn(column)
-  }, [])
-
-  const onClear = useCallback(() => {
-    setTable('')
-    setColumn('')
-  }, [])
+  const [table, setTable] = useState<string>('')
+  const [column, setColumn] = useState<string>('')
 
   useEffect(() => {
-    onChange({
-      table: table === '' ? undefined : table,
-      column: column === '' ? undefined : column,
-    })
-  }, [table, column, onChange])
+    setTable(value.table ?? '')
+    setColumn(value.column ?? '')
+  }, [value.table, value.column])
+
+  const setTableAndColumnAndOnChange = useCallback(
+    (table: string, column: string) => {
+      setTable(table)
+      setColumn(column)
+      onChange({
+        table: table === '' ? null : table,
+        column: column === '' ? null : column,
+      })
+    },
+    [onChange],
+  )
+
+  const onChangeTable = useCallback(
+    (table: string) => {
+      setTableAndColumnAndOnChange(table, '')
+    },
+    [setTableAndColumnAndOnChange],
+  )
+
+  const onChangeColumn = useCallback(
+    (column: string) => {
+      setTableAndColumnAndOnChange(table, column)
+    },
+    [setTableAndColumnAndOnChange, table],
+  )
+
+  const onClear = useCallback(() => {
+    setTableAndColumnAndOnChange('', '')
+  }, [setTableAndColumnAndOnChange])
 
   return (
     <div className="flex">

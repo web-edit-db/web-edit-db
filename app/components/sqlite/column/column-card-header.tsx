@@ -46,7 +46,13 @@ export default function ColumnCardHeader({
           {!isNew && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={onReset} disabled={isResetDisabled}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onReset}
+                  disabled={isResetDisabled}
+                  type="button"
+                >
                   <IconRotate />
                 </Button>
               </TooltipTrigger>
@@ -55,7 +61,7 @@ export default function ColumnCardHeader({
           )}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={onToggleDeleted}>
+              <Button variant="ghost" size="icon" onClick={onToggleDeleted} type="button">
                 {isDeleted ? <IconTrashOff /> : <IconTrash />}
               </Button>
             </TooltipTrigger>

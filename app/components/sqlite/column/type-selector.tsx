@@ -15,7 +15,7 @@ interface TypeSelectorProps {
 
 export default function TypeSelector({ value, onChange, disabled }: TypeSelectorProps) {
   return (
-    <Select onValueChange={onChange} defaultValue={value} disabled={disabled}>
+    <Select onValueChange={onChange} value={value} disabled={disabled}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a type" />
       </SelectTrigger>

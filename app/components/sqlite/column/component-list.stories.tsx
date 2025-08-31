@@ -15,8 +15,10 @@ const mockColumns: ColumnData[] = [
     notNull: true,
     unique: true,
     primaryKey: true,
+    min: undefined,
+    max: undefined,
     defaultValue: { mode: 'sql', value: 'AUTOINCREMENT' },
-    foreignKey: {},
+    foreignKey: { table: null, column: null },
   },
   {
     name: 'title',
@@ -28,7 +30,7 @@ const mockColumns: ColumnData[] = [
     min: 1,
     max: 255,
     defaultValue: { mode: 'value', value: 'Untitled' },
-    foreignKey: {},
+    foreignKey: { table: null, column: null },
   },
   {
     name: 'user_id',
@@ -37,8 +39,10 @@ const mockColumns: ColumnData[] = [
     notNull: false,
     unique: false,
     primaryKey: false,
-    defaultValue: { mode: 'none' },
-    foreignKey: { table: 'users', column: 'id' },
+    min: undefined,
+    max: undefined,
+    defaultValue: { mode: 'none', value: undefined },
+    foreignKey: { table: null, column: null },
   },
 ]
 
@@ -63,5 +67,25 @@ export const Default: Story = {}
 export const LongList: Story = {
   args: {
     columns: mockColumns.concat(mockColumns).concat(mockColumns),
+  },
+}
+
+export const WithValidation: Story = {
+  args: {
+    columns: [
+      {
+        name: '', // Invalid: empty name
+        type: 'Text',
+        new: true,
+        notNull: true,
+        unique: false,
+        primaryKey: false,
+        min: 10, // Invalid: min > max
+        max: 5,
+        defaultValue: { mode: 'value', value: 'Test' },
+        foreignKey: { table: null, column: null },
+      },
+      ...mockColumns.slice(1),
+    ],
   },
 }

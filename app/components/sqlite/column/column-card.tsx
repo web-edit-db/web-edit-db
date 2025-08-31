@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -32,12 +32,27 @@ export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
     mode: 'all',
   })
 
+  useEffect(() => {
+    console.log('Form state:', {
+      isDirty: form.formState.isDirty,
+      dirtyFields: form.formState.dirtyFields,
+      defaultValues: form.formState.defaultValues,
+      values: form.getValues(),
+    })
+  }, [form.formState.isDirty])
+
+  const isDirty = useMemo(() => {
+    // console.log('isDirty', form.formState.isDirty, form.formState.dirtyFields)
+    return form.formState.isDirty
+    // return Object.keys(form.formState.dirtyFields).length > 0
+  }, [form.formState.isDirty])
+
   const modifiedState: ModifiedState = useMemo(() => {
     if (isDeleted) return 'deleted'
     if (columnData.new) return 'new'
-    if (form.formState.isDirty) return 'modified'
+    if (isDirty) return 'modified'
     return 'original'
-  }, [form.formState.isDirty, isDeleted, columnData.new])
+  }, [isDirty, isDeleted, columnData.new])
 
   const toggleDeleted = useCallback(() => {
     setIsDeleted(!isDeleted)
@@ -45,8 +60,9 @@ export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
 
   const reset = useCallback(() => {
     if (isDeleted) setIsDeleted(false)
-    form.reset()
-  }, [form, isDeleted])
+    // form.reset(columnData)
+    setTimeout(() => form.reset(columnData), 0)
+  }, [form, isDeleted, columnData])
 
   const isResetDisabled = useMemo(() => {
     return modifiedState === 'original' || modifiedState === 'new'

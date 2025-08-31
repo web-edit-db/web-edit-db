@@ -11,15 +11,15 @@ export type ColumnData = {
   notNull: boolean
   unique: boolean
   primaryKey: boolean
-  min?: number
-  max?: number
+  min: number | undefined
+  max: number | undefined
   defaultValue: {
     mode: 'value' | 'sql' | 'none' | 'null'
-    value?: string
+    value: string | undefined
   }
   foreignKey: {
-    table?: string
-    column?: string
+    table: string | null
+    column: string | null
   }
 }
 
@@ -31,15 +31,15 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       notNull: z.boolean(),
       unique: z.boolean(),
       primaryKey: z.boolean(),
-      min: z.number({ message: 'Must be a number' }).optional(),
-      max: z.number({ message: 'Must be a number' }).optional(),
+      min: z.number({ message: 'Must be a number' }).or(z.undefined()),
+      max: z.number({ message: 'Must be a number' }).or(z.undefined()),
       defaultValue: z.object({
         mode: z.enum(['value', 'sql', 'none', 'null']),
-        value: z.string().optional(),
+        value: z.string().or(z.undefined()),
       }),
       foreignKey: z.object({
-        table: z.string().optional(),
-        column: z.string().optional(),
+        table: z.string().nullable(),
+        column: z.string().nullable(),
       }),
     })
     .superRefine((data, ctx) => {
@@ -79,7 +79,7 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       }
 
       // if the table is set, the column must be set
-      if (data.foreignKey.column === undefined) {
+      if (data.foreignKey.column === null) {
         ctx.addIssue({
           code: 'custom',
           message: `Select a column from the table`,
@@ -89,7 +89,10 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       }
 
       // the column must be a valid column name
-      if (!tables[trimmedTable]?.includes(data.foreignKey.column)) {
+      if (
+        data.foreignKey.column !== null &&
+        !tables[trimmedTable]?.includes(data.foreignKey.column)
+      ) {
         ctx.addIssue({
           code: 'custom',
           message: `No such column in the table`,
