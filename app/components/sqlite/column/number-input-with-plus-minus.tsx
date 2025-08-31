@@ -17,13 +17,38 @@ export default function NumberInputWithPlusMinus({
 }: NumberInputWithPlusMinusProps) {
   const [inputValue, setInputValue] = useState(value?.toString() ?? '')
 
+  useEffect(() => {
+    setInputValue(value?.toString() ?? '')
+  }, [value])
+
+  // this is to avoid a race condition between the value and the onChange callback
+  const setInputValueAndOnChange = useCallback(
+    (newValue: string) => {
+      setInputValue(newValue)
+
+      const inputValueTrimmed = newValue.trim()
+
+      if (inputValueTrimmed === '' || inputValueTrimmed === '-') {
+        onChange(undefined)
+      } else {
+        const numValue = Number(inputValueTrimmed)
+        if (Number.isNaN(numValue)) {
+          onChange(undefined)
+        } else {
+          onChange(numValue)
+        }
+      }
+    },
+    [onChange],
+  )
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // prevent the user entering anything that is not a number, -, or ., remove any non-numeric characters
     const newValue = e.target.value.replace(/[^0-9.-]/g, '')
     if (newValue === '') {
-      setInputValue('')
+      setInputValueAndOnChange('')
     } else {
-      setInputValue(newValue)
+      setInputValueAndOnChange(newValue)
     }
   }
 
@@ -31,40 +56,24 @@ export default function NumberInputWithPlusMinus({
     // first try and turn this into a number
     const newValue = inputValue === '' ? Number.NaN : Number(inputValue)
     if (Number.isNaN(newValue)) {
-      setInputValue('0')
+      setInputValueAndOnChange('0')
     } else {
-      setInputValue((newValue - 1).toString())
+      setInputValueAndOnChange((newValue - 1).toString())
     }
-  }, [inputValue])
+  }, [inputValue, setInputValueAndOnChange])
 
   const onPlus = useCallback(() => {
     const newValue = inputValue === '' ? Number.NaN : Number(inputValue)
     if (Number.isNaN(newValue)) {
-      setInputValue('0')
+      setInputValueAndOnChange('0')
     } else {
-      setInputValue((newValue + 1).toString())
+      setInputValueAndOnChange((newValue + 1).toString())
     }
-  }, [inputValue])
+  }, [inputValue, setInputValueAndOnChange])
 
   const onClear = useCallback(() => {
-    setInputValue('')
-    onChange(undefined)
-  }, [onChange])
-
-  useEffect(() => {
-    const inputValueTrimmed = inputValue.trim()
-    // if this is a an empty string, just a minus
-    if (inputValueTrimmed === '' || inputValueTrimmed === '-') {
-      onChange(undefined)
-    } else {
-      const newValue = Number(inputValueTrimmed)
-      if (Number.isNaN(newValue)) {
-        onChange(undefined)
-      } else {
-        onChange(newValue)
-      }
-    }
-  }, [inputValue, onChange])
+    setInputValueAndOnChange('')
+  }, [setInputValueAndOnChange])
 
   return (
     <div className="flex">
@@ -77,6 +86,7 @@ export default function NumberInputWithPlusMinus({
       <Button
         onClick={onMinus}
         size="icon"
+        type="button"
         variant="outline"
         disabled={disabled}
         className="-ml-[1px] rounded-l-none rounded-r-none focus:z-20"
@@ -86,6 +96,7 @@ export default function NumberInputWithPlusMinus({
       <Button
         onClick={onPlus}
         size="icon"
+        type="button"
         variant="outline"
         disabled={disabled}
         className="-ml-[1px] rounded-l-none rounded-r-none focus:z-20"
@@ -95,6 +106,7 @@ export default function NumberInputWithPlusMinus({
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            type="button"
             variant="outline"
             size="icon"
             className="-ml-[1px] rounded-l-none focus:z-20"
