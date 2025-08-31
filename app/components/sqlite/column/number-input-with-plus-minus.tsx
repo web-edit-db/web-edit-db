@@ -110,6 +110,7 @@ export default function NumberInputWithPlusMinus({
             variant="outline"
             size="icon"
             className="-ml-[1px] rounded-l-none focus:z-20"
+            disabled={disabled}
             onClick={onClear}
           >
             <IconX />

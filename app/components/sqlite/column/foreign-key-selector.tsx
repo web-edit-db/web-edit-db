@@ -114,6 +114,7 @@ export default function ForeignKeySelector({
             size="icon"
             className="-ml-[1px] rounded-l-none focus:z-20"
             onClick={onClear}
+            disabled={disabled}
           >
             <IconX />
           </Button>
