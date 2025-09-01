@@ -35,6 +35,7 @@ export const createColumnSchema = (tables: Record<string, string[]>) =>
       min: z.number({ message: 'Must be a number' }).or(z.undefined()),
       max: z.number({ message: 'Must be a number' }).or(z.undefined()),
       deleted: z.boolean(),
+      new: z.boolean(),
       defaultValue: z.object({
         mode: z.enum(['value', 'sql', 'none', 'null']),
         value: z.string().or(z.undefined()),

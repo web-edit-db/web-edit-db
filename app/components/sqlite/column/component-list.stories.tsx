@@ -53,6 +53,7 @@ const meta = {
     layout: 'padded',
   },
   args: {
+    name: 'posts',
     columns: mockColumns,
     tables: mockTables,
   },
@@ -66,12 +67,14 @@ export const Default: Story = {}
 
 export const LongList: Story = {
   args: {
+    name: 'posts',
     columns: mockColumns.concat(mockColumns).concat(mockColumns),
   },
 }
 
 export const WithValidation: Story = {
   args: {
+    name: 'posts',
     columns: [
       {
         name: '', // Invalid: empty name

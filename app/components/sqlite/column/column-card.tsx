@@ -18,14 +18,15 @@ import TypeSelector from './type-selector'
 
 interface ColumnCardProps {
   columnData: Omit<ColumnData, 'deleted'>
+  onDeleteNewColumn: () => void
   tables: Record<string, string[]> // table name -> column names
 }
 
-export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
+export default function ColumnCard({ columnData, tables, onDeleteNewColumn }: ColumnCardProps) {
   const zodSchema = createColumnSchema(tables)
   const [disabled, setDisabled] = useState(false)
 
-  const form = useForm<Omit<ColumnData, 'new'>>({
+  const form = useForm<ColumnData>({
     defaultValues: columnData,
     resolver: zodResolver(zodSchema),
     disabled,
@@ -63,7 +64,10 @@ export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
 
   const toggleDeleted = useCallback(() => {
     form.setValue('deleted', !form.getValues('deleted'))
-  }, [form])
+    if (form.getValues('new')) {
+      onDeleteNewColumn()
+    }
+  }, [form, onDeleteNewColumn])
 
   const reset = useCallback(() => {
     // form.reset(columnData)
@@ -90,6 +94,7 @@ export default function ColumnCard({ columnData, tables }: ColumnCardProps) {
           isResetDisabled={isResetDisabled}
           onReset={reset}
           onToggleDeleted={toggleDeleted}
+          // onDeleteNewColumn={onDeleteNewColumn}
         />
         <CardContent className="grid grid-cols-12 items-start gap-4 px-4">
           {/* Name */}
