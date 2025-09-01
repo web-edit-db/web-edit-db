@@ -6,9 +6,12 @@ import CreateDatabaseButton from '@/components/sqlite/database-actions/create-bu
 import SaveDatabaseButton from '@/components/sqlite/database-actions/save-button'
 import DatabaseVersionButton from '@/components/sqlite/database-info/version-button'
 import { useDatabase } from '@/lib/sqlite/use-database'
+import { useVersion } from '@/lib/sqlite/use-version'
 
 export default function NavBar() {
-  const { databaseName } = useDatabase()
+  const { databaseName, openDatabase, databaseOpened, isLoading, createDatabase, saveDatabase } =
+    useDatabase()
+  const { sqliteVersion, appVersion, appBuildDate } = useVersion()
   return (
     <nav className="border-primary sticky top-0 z-10 grid h-[var(--header-height)] grid-cols-[1fr_auto_1fr] items-center border-b-[1.8px] bg-white px-3 shadow-lg dark:bg-gray-800">
       <div className="flex items-start">
@@ -29,10 +32,29 @@ export default function NavBar() {
       </div>
       {/* space for the right side */}
       <div className="flex items-center justify-end gap-2">
-        <UploadDatabaseButton labelText="Upload" />
-        <CreateDatabaseButton labelText="Create" />
-        <SaveDatabaseButton labelText="Save" />
-        <DatabaseVersionButton />
+        <UploadDatabaseButton
+          labelText="Upload"
+          openDatabase={openDatabase}
+          databaseOpened={databaseOpened}
+          isLoading={isLoading}
+        />
+        <CreateDatabaseButton
+          labelText="Create"
+          createDatabase={createDatabase}
+          databaseOpened={databaseOpened}
+          isLoading={isLoading}
+        />
+        <SaveDatabaseButton
+          labelText="Save"
+          saveDatabase={saveDatabase}
+          databaseOpened={databaseOpened}
+          isLoading={isLoading}
+        />
+        <DatabaseVersionButton
+          sqliteVersion={sqliteVersion}
+          appVersion={appVersion}
+          appBuildDate={appBuildDate}
+        />
         <ThemeSwitchButton />
       </div>
     </nav>

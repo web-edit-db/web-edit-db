@@ -8,8 +8,8 @@ import { useDatabase } from '@/lib/sqlite/use-database'
 import { useVersion } from '@/lib/sqlite/use-version'
 
 export default function Lander() {
-  const { databaseOpened } = useDatabase()
   const { sqliteVersion } = useVersion()
+  const { openDatabase, databaseOpened, isLoading, createDatabase } = useDatabase()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -62,8 +62,18 @@ export default function Lander() {
         <p className="text-2xl">Welcome to Web Edit DB!</p>
         <p className="text-xl">Get started by opening a database or creating a new one.</p>
         <div className="mt-4 flex gap-4">
-          <UploadDatabaseButton labelText="Upload Database" />
-          <CreateDatabaseButton labelText="Create Database" />
+          <UploadDatabaseButton
+            labelText="Upload Database"
+            openDatabase={openDatabase}
+            databaseOpened={databaseOpened}
+            isLoading={isLoading}
+          />
+          <CreateDatabaseButton
+            labelText="Create Database"
+            createDatabase={createDatabase}
+            databaseOpened={databaseOpened}
+            isLoading={isLoading}
+          />
         </div>
         <p className="text-muted-foreground mt-4 text-sm">Sqlite version: {sqliteVersion}</p>
       </div>
