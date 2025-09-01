@@ -23,7 +23,8 @@ export const getTableSchema = (db: Database, tableName: string) => {
       type: z.string(),
       notNull: sqliteBoolean,
       default: z.string().nullable(),
-      primaryKey: sqliteBoolean,
+      // we can have compose primary keys, so anything > 0 is true
+      primaryKey: z.number().transform((val) => val > 0),
       foreignTable: z.string().nullable(),
       foreignColumn: z.string().nullable(),
     }),
