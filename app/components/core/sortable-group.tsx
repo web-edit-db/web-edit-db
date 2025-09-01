@@ -19,6 +19,10 @@ import {
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useSensor, useSensors } from '@dnd-kit/core'
+import { MouseSensor } from '@dnd-kit/core'
+import { TouchSensor } from '@dnd-kit/core'
+import { KeyboardSensor } from '@dnd-kit/core'
 
 interface SortableLinkedProps {
   className?: string
@@ -118,7 +122,7 @@ const dndGroupContext = createContext<{
   items: [],
 })
 
-const SortableGroupContext = <T extends UniqueItem>({
+export const SortableGroupContext = <T extends UniqueItem>({
   children,
   items,
   setItems,
@@ -180,7 +184,7 @@ const useSortableGroup = () => {
   return useContext(dndGroupContext)
 }
 
-const SortableGroupItemContext = ({
+export const SortableGroupItemContext = ({
   children,
   overlay,
   strategy = verticalListSortingStrategy,
@@ -190,8 +194,28 @@ const SortableGroupItemContext = ({
   strategy?: SortingStrategy
 }) => {
   const { activeItem, dragStart, dragMove, dragEnd, items } = useSortableGroup()
+
+  // Configure sensors with distance constraint for mouse/touch while preserving keyboard accessibility
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8, // 8px threshold before drag starts
+    },
+  })
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250, // 250ms delay for touch devices
+      tolerance: 8, // 8px tolerance for touch
+    },
+  })
+
+  // Preserve keyboard sensor for accessibility (no constraints needed)
+  const keyboardSensor = useSensor(KeyboardSensor)
+
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
+
   return (
-    <DndContext onDragStart={dragStart} onDragMove={dragMove} onDragEnd={dragEnd}>
+    <DndContext sensors={sensors} onDragStart={dragStart} onDragMove={dragMove} onDragEnd={dragEnd}>
       <SortableContext items={items} strategy={strategy}>
         {children}
       </SortableContext>
