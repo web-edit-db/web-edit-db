@@ -1,9 +1,12 @@
 import type { Route } from './+types/table.$name.edit'
 import { decodeTableName, normalizeTableName } from '@/lib/sqlite/table-utils'
+import { useTable } from '@/lib/sqlite/use-table'
 
 export default function TableEdit({ params }: Route.ComponentProps) {
   // Decode the table name from the URL parameter
   const tableName = normalizeTableName(decodeTableName(params.name))
+
+  const schema = useTable(tableName)
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
@@ -14,6 +17,12 @@ export default function TableEdit({ params }: Route.ComponentProps) {
         </p>
         <div className="text-muted-foreground mt-1 text-xs">
           URL param: <span className="font-mono">{params.name}</span>
+        </div>
+        <div className="text-muted-foreground mt-1 text-xs">
+          {/* show the json presentated in a readable way */}
+          <pre className="font-mono">
+            <code>{JSON.stringify(schema, null, 2)}</code>
+          </pre>
         </div>
       </div>
     </div>

@@ -37,10 +37,6 @@ export const Database = class {
     return new Database(sqlite3, filename, data as Uint8Array)
   }
 
-  static getVersion() {
-    return this.version
-  }
-
   static regestry = new FinalizationRegistry<() => void>((close) => {
     close()
   })

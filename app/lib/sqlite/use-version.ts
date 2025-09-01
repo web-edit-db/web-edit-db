@@ -1,6 +1,6 @@
 import { useSqliteContext } from './sqlite-provider'
 import { useEffect, useState } from 'react'
-import { Database } from './database'
+import { getVersion } from './queries'
 
 export const useVersion = () => {
   const { sqlite3 } = useSqliteContext()
@@ -8,7 +8,7 @@ export const useVersion = () => {
 
   useEffect(() => {
     if (!sqlite3) return
-    setVersion(Database.getVersion(sqlite3))
+    setVersion(getVersion(sqlite3))
   }, [sqlite3])
   return {
     sqliteVersion: version,

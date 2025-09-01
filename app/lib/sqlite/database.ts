@@ -1,6 +1,6 @@
 import type { Database as SqlJsDatabase, SqlJsStatic } from 'sql.js'
 import z from 'zod'
-import { parsedQuery, parsedQuerySingle } from './helpers'
+import { parsedQuerySingle } from './helpers'
 
 export class Database {
   private db: SqlJsDatabase
@@ -10,6 +10,10 @@ export class Database {
     this.db = new sqlite3.Database(data)
     this.filename = filename
     Database.regestry.register(this, this.close)
+  }
+
+  getDb() {
+    return this.db
   }
 
   close() {
@@ -24,17 +28,6 @@ export class Database {
 
   getFilename() {
     return this.filename
-  }
-
-  getTableNames() {
-    return parsedQuery(
-      this.db,
-      'SELECT name, tbl_name FROM sqlite_master WHERE type = "table"',
-      z.object({
-        name: z.string(),
-        tbl_name: z.string(),
-      }),
-    )
   }
 
   static open(sqlite3: SqlJsStatic, filename: string, data?: Uint8Array | ArrayBuffer) {

@@ -5,6 +5,7 @@ import '../app/index.css'
 import { sb } from 'storybook/test'
 
 sb.mock(import('../app/lib/sqlite/database'))
+sb.mock(import('../app/lib/sqlite/queries'))
 
 const preview: Preview = {
   parameters: {

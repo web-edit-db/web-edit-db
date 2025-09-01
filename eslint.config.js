@@ -6,10 +6,10 @@ import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import { globalIgnores } from 'eslint/config'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import optimizeRegex from 'eslint-plugin-optimize-regex'
 
 export default tseslint.config(
   [
@@ -28,6 +28,7 @@ export default tseslint.config(
       plugins: {
         'check-file': checkFile,
         'no-relative-import-paths': noRelativeImportPaths,
+        'optimize-regex': optimizeRegex,
       },
       rules: {
         // Enforce kebab-case for all file names
@@ -91,6 +92,8 @@ export default tseslint.config(
             },
           },
         ],
+        // Optimize regex
+        'optimize-regex/optimize-regex': 'warn',
       },
     },
     eslintConfigPrettier,
