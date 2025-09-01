@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { columnTypes } from './types'
+import { useCallback } from 'react'
 
 interface TypeSelectorProps {
   value: string
@@ -14,6 +15,9 @@ interface TypeSelectorProps {
 }
 
 export default function TypeSelector({ value, onChange, disabled }: TypeSelectorProps) {
+  const formatTitle = useCallback((type: string) => {
+    return type.charAt(0).toUpperCase() + type.slice(1)
+  }, [])
   return (
     <Select onValueChange={onChange} value={value} disabled={disabled}>
       <SelectTrigger className="w-full">
@@ -22,7 +26,7 @@ export default function TypeSelector({ value, onChange, disabled }: TypeSelector
       <SelectContent>
         {columnTypes.map((type) => (
           <SelectItem key={type} value={type}>
-            {type}
+            {formatTitle(type)}
           </SelectItem>
         ))}
       </SelectContent>

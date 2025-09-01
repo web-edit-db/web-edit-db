@@ -44,12 +44,38 @@ export const parsedQuerySingle = <T extends z.ZodObject>(
   return results.length > 0 ? results[0] : null
 }
 
+const typeMapping: Record<string, string> = {
+  INTEGER: 'INTEGER',
+  INT: 'INTEGER',
+  BIGINT: 'INTEGER',
+  SMALLINT: 'INTEGER',
+  TINYINT: 'INTEGER',
+  FLOAT: 'REAL',
+  REAL: 'REAL',
+  DOUBLE: 'REAL',
+  NUMERIC: 'NUMERIC',
+  DECIMAL: 'REAL',
+  TEXT: 'TEXT',
+  CHAR: 'TEXT',
+  VARCHAR: 'TEXT',
+  NVARCHAR: 'TEXT',
+  BOOLEAN: 'INTEGER',
+  DATETIME: 'TEXT',
+  DATE: 'TEXT',
+  TIME: 'TEXT',
+  BLOB: 'BLOB',
+}
+
+export const columnTypeFix = (column: string) => {
+  return typeMapping[column.toUpperCase()] ?? 'TEXT'
+}
+
 export const deconsturctColumn = (column: string) => {
   const match = column.match(COLUMN_REGEX)
   if (!match) return undefined
   const { type, min, max } = match.groups || {}
   return {
-    type: type.toLowerCase(),
+    type: columnTypeFix(type).toLowerCase(),
     min: min ? Number(min) : undefined,
     max: max ? Number(max) : undefined,
   }

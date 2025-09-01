@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const columnTypes = ['Text', 'Integer', 'Numeric', 'Real', 'Blob'] as const
+export const columnTypes = ['text', 'integer', 'numeric', 'real', 'blob'] as const
 
 export type ModifiedState = 'original' | 'modified' | 'deleted' | 'new'
 

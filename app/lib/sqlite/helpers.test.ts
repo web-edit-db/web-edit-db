@@ -3,7 +3,7 @@ import { constructColumn, deconsturctColumn } from './helpers'
 
 describe('helpers', () => {
   describe('deconsturctColumn', () => {
-    it.each(['INTEGER', 'TEXT', 'NUMBER', 'BLOB', 'REAL'])(
+    it.each(['INTEGER', 'TEXT', 'NUMERIC', 'BLOB', 'REAL'])(
       'should pull out the type, for %s, there is no min or max',
       (type) => {
         expect(deconsturctColumn(type)).toEqual({
@@ -14,7 +14,7 @@ describe('helpers', () => {
       },
     )
 
-    it.each(['INTEGER(10)', 'TEXT(10)', 'NUMBER(10)', 'BLOB(10)', 'REAL(10)'])(
+    it.each(['INTEGER(10)', 'TEXT(10)', 'NUMERIC(10)', 'BLOB(10)', 'REAL(10)'])(
       'should pull out the type, for %s, there is only a max',
       (type) => {
         expect(deconsturctColumn(type)).toEqual({
@@ -25,7 +25,7 @@ describe('helpers', () => {
       },
     )
 
-    it.each(['INTEGER(10, 20)', 'TEXT(10, 20)', 'NUMBER(10, 20)', 'BLOB(10, 20)', 'REAL(10, 20)'])(
+    it.each(['INTEGER(10, 20)', 'TEXT(10, 20)', 'NUMERIC(10, 20)', 'BLOB(10, 20)', 'REAL(10, 20)'])(
       'should pull out the type, for %s, there is a min and max',
       (type) => {
         expect(deconsturctColumn(type)).toEqual({
@@ -58,7 +58,7 @@ describe('helpers', () => {
       { type: 'integer', min: undefined, max: undefined },
       { type: 'bool', min: undefined, max: undefined },
       { type: 'text', min: undefined, max: undefined },
-      { type: 'number', min: undefined, max: undefined },
+      { type: 'numeric', min: undefined, max: undefined },
       { type: 'blob', min: undefined, max: undefined },
       { type: 'real', min: undefined, max: undefined },
     ])('should construct the column for %s, where there is no min or max', ({ type, min, max }) => {
@@ -69,7 +69,7 @@ describe('helpers', () => {
       { type: 'integer', min: 10, max: undefined },
       { type: 'bool', min: 10, max: undefined },
       { type: 'text', min: 10, max: undefined },
-      { type: 'number', min: 10, max: undefined },
+      { type: 'numeric', min: 10, max: undefined },
       { type: 'blob', min: 10, max: undefined },
       { type: 'real', min: 10, max: undefined },
     ])('should construct the column for %s, where there is only a max', ({ type, min, max }) => {
@@ -80,7 +80,7 @@ describe('helpers', () => {
       { type: 'integer', min: undefined, max: 10 },
       { type: 'bool', min: undefined, max: 10 },
       { type: 'text', min: undefined, max: 10 },
-      { type: 'number', min: undefined, max: 10 },
+      { type: 'numeric', min: undefined, max: 10 },
       { type: 'blob', min: undefined, max: 10 },
       { type: 'real', min: undefined, max: 10 },
     ])('should construct the column for %s, where there is only a min', ({ type, min, max }) => {
@@ -91,7 +91,7 @@ describe('helpers', () => {
       { type: 'integer', min: 10, max: 20 },
       { type: 'bool', min: 10, max: 20 },
       { type: 'text', min: 10, max: 20 },
-      { type: 'number', min: 10, max: 20 },
+      { type: 'numeric', min: 10, max: 20 },
       { type: 'blob', min: 10, max: 20 },
       { type: 'real', min: 10, max: 20 },
     ])('should construct the column for %s, where there is a min and max', ({ type, min, max }) => {
