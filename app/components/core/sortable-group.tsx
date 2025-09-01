@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import {
@@ -66,11 +66,6 @@ export const SortableGroupItem = ({
     [isDragging, isSorting, relatedBeingDragged],
   )
 
-  // const dimOthers = useMemo(
-  //   () => isSortingGroup && !relatedBeingDragged,
-  //   [isSortingGroup, relatedBeingDragged],
-  // )
-
   const opacity = useMemo(() => {
     if (isDragging) return 0.8
     if (relatedBeingDragged) return 0.8
@@ -82,7 +77,6 @@ export const SortableGroupItem = ({
     <motion.div
       key={id}
       ref={setNodeRefWithRef}
-      layout
       animate={{
         opacity: opacity,
         scale: isDragging ? 0.95 : 1,
@@ -95,8 +89,8 @@ export const SortableGroupItem = ({
         damping: 30,
         mass: 0.8,
       }}
-      initial={{ opacity: 0, scale: 0.5 }}
-      exit={{ opacity: 0, scale: 0.5 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      exit={{ opacity: 0, scale: 0.9 }}
       className={cn(className, showRing && ringStyle)}
       {...listeners}
     >
@@ -177,19 +171,19 @@ export const SortableGroupContext = <T extends UniqueItem>({
     [setActiveItem, handleDragMoveOrEnd],
   )
 
-  return (
-    <dndGroupContext.Provider
-      value={{
-        activeItem,
-        dragStart: handleDragStart,
-        dragMove: handleDragMoveOrEnd,
-        dragEnd: handleDragEnd,
-        items,
-      }}
-    >
-      {children}
-    </dndGroupContext.Provider>
+  // Memoize context value to prevent unnecessary rerenders
+  const contextValue = useMemo(
+    () => ({
+      activeItem,
+      dragStart: handleDragStart,
+      dragMove: handleDragMoveOrEnd,
+      dragEnd: handleDragEnd,
+      items,
+    }),
+    [activeItem, handleDragStart, handleDragMoveOrEnd, handleDragEnd, items],
   )
+
+  return <dndGroupContext.Provider value={contextValue}>{children}</dndGroupContext.Provider>
 }
 
 const useSortableGroup = () => {
@@ -226,12 +220,18 @@ export const SortableGroupItemContext = ({
 
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
 
+  // Memoize overlay to prevent unnecessary recreation
+  const memoizedOverlay = useMemo(() => {
+    if (!activeItem) return null
+    return createPortal(overlay(activeItem), document.body)
+  }, [activeItem, overlay])
+
   return (
     <DndContext sensors={sensors} onDragStart={dragStart} onDragMove={dragMove} onDragEnd={dragEnd}>
       <SortableContext items={items} strategy={strategy}>
         {children}
       </SortableContext>
-      {createPortal(activeItem && overlay(activeItem), document.body)}
+      {memoizedOverlay}
     </DndContext>
   )
 }
@@ -277,31 +277,47 @@ export const ExampleLinked = ({ className }: SortableLinkedProps) => {
     { id: '7', content: 'Item 7' },
   ])
 
-  const getOverlay = (activeItem: UniqueItem, big: boolean) => {
-    const overlayItem = items.find((item) => item.id === activeItem.id)
+  const getOverlay = useCallback(
+    (activeItem: UniqueItem, big: boolean) => {
+      const overlayItem = items.find((item) => item.id === activeItem.id)
 
-    if (overlayItem) {
-      return (
-        <SortableGroupItemOverlay className={'rounded-md'}>
-          <ExampleLinkedItem item={overlayItem} big={big} />
-        </SortableGroupItemOverlay>
-      )
-    }
-    return null
-  }
+      if (overlayItem) {
+        return (
+          <SortableGroupItemOverlay className={'rounded-md'}>
+            <ExampleLinkedItem item={overlayItem} big={big} />
+          </SortableGroupItemOverlay>
+        )
+      }
+      return null
+    },
+    [items],
+  )
 
   const appendItem = useCallback(() => {
-    setItems([...items, { id: `${items.length + 1}`, content: `Item ${items.length + 1}` }])
-  }, [items])
+    setItems((prevItems) => [
+      ...prevItems,
+      { id: `${prevItems.length + 1}`, content: `Item ${prevItems.length + 1}` },
+    ])
+  }, [])
 
   const removeItem = useCallback(() => {
-    setItems(items.slice(0, -1))
-  }, [items])
+    setItems((prevItems) => prevItems.slice(0, -1))
+  }, [])
+
+  // Memoize overlay functions to prevent recreation
+  const leftOverlay = useCallback(
+    (activeItem: UniqueItem) => getOverlay(activeItem, true),
+    [getOverlay],
+  )
+  const rightOverlay = useCallback(
+    (activeItem: UniqueItem) => getOverlay(activeItem, false),
+    [getOverlay],
+  )
 
   return (
     <div className={cn('flex gap-6', className)}>
       <SortableGroupContext items={items} setItems={setItems}>
-        <SortableGroupItemContext overlay={(activeItem) => getOverlay(activeItem, true)}>
+        <SortableGroupItemContext overlay={leftOverlay}>
           <ExampleLinkedCard title="Left">
             <AnimatePresence>
               {items.map((item) => (
@@ -312,7 +328,7 @@ export const ExampleLinked = ({ className }: SortableLinkedProps) => {
             </AnimatePresence>
           </ExampleLinkedCard>
         </SortableGroupItemContext>
-        <SortableGroupItemContext overlay={(activeItem) => getOverlay(activeItem, false)}>
+        <SortableGroupItemContext overlay={rightOverlay}>
           <ExampleLinkedCard title="Right">
             <AnimatePresence>
               {items.map((item) => (

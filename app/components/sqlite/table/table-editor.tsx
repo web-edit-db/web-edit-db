@@ -19,6 +19,8 @@ interface ComponentListProps {
   name: string
   columns: Omit<ColumnData, 'deleted' | 'new'>[]
   tables: Record<string, string[]>
+  className?: string
+  scrollContainer?: HTMLElement | null
 }
 
 type FormState = {
@@ -43,7 +45,13 @@ const ColumnButton = ({ columnData, onClick }: { columnData: ColumnData; onClick
   )
 }
 
-export default function ComponentList({ columns, tables, name }: ComponentListProps) {
+export default function ComponentList({
+  columns,
+  tables,
+  name,
+  className,
+  scrollContainer,
+}: ComponentListProps) {
   const columnRefs = useRef<(HTMLDivElement | null)[]>([])
   const [highlightedColumn, setHighlightedColumn] = useState<number | null>(null)
 
@@ -71,7 +79,7 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
 
   const columnsWatch = form.watch('columns')
 
-  const { fields, append, remove } = useFieldArray({
+  const { append, remove } = useFieldArray({
     control: form.control,
     name: 'columns',
   })
@@ -105,21 +113,24 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
     setColumnOrder([...columnOrder, { id: columnsWatch.length.toString() }])
   }, [append, columnsWatch, columnOrder])
 
-  const scrollToColumn = useCallback((index: number) => {
-    const columnRef = columnRefs.current[index]
-    if (columnRef) {
-      // Set highlighted column for visual feedback
-      setHighlightedColumn(index)
+  const scrollToColumn = useCallback(
+    (index: number) => {
+      const columnRef = columnRefs.current[index]
+      if (columnRef) {
+        // Set highlighted column for visual feedback
+        setHighlightedColumn(index)
 
-      // Scroll to the column
-      scrollIntoViewSmooth(columnRef, 100)
+        // Scroll to the column
+        scrollIntoViewSmooth(columnRef, 100, scrollContainer ?? null)
 
-      // Clear highlight after animation completes
-      setTimeout(() => {
-        setHighlightedColumn(null)
-      }, 1200) // Slightly longer than scroll duration to ensure effect is visible
-    }
-  }, [])
+        // Clear highlight after animation completes
+        setTimeout(() => {
+          setHighlightedColumn(null)
+        }, 1200) // Slightly longer than scroll duration to ensure effect is visible
+      }
+    },
+    [scrollContainer],
+  )
 
   const overlayColumnCard = useCallback(
     (activeItem: { id: string | number }) => {
@@ -133,7 +144,7 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
             tables={{}}
             onDeleteNewColumn={() => {}}
             highlighted={false}
-            disabled={false}
+            disabled={true}
           />
         </SortableGroupItemOverlay>
       )
@@ -155,33 +166,60 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
     [form],
   )
 
+  const createScrollToColumn = useCallback(
+    (index: number) => {
+      return () => scrollToColumn(index)
+    },
+    [scrollToColumn],
+  )
+
+  const createDeleteColumn = useCallback(
+    (index: number) => {
+      return () => removeColumn(index)
+    },
+    [removeColumn],
+  )
+
+  const setRefColumn = useCallback((index: number) => {
+    return (el: HTMLDivElement) => {
+      columnRefs.current[index] = el
+    }
+  }, [])
+
+  const columnOrderItems = useMemo(() => {
+    return columnOrder
+      .map((column) => {
+        const index = Number(column.id)
+        const columnData = columnsWatch[index]
+        if (!columnData) return null
+        return {
+          ...columnData,
+          id: column.id,
+          index: index,
+        }
+      })
+      .filter((column) => column !== null)
+  }, [columnOrder, columnsWatch])
+
   return (
     <SortableGroupContext items={columnOrder} setItems={setColumnOrder}>
-      <div className="mx-auto grid max-w-7xl grid-cols-6 items-start gap-4">
+      <div className={cn('mx-auto grid max-w-7xl grid-cols-6 items-start gap-4', className)}>
         <div className="col-span-5 flex flex-col gap-4">
           <SortableGroupItemContext overlay={overlayColumnCard}>
             <AnimatePresence>
-              {columnOrder.map((column) => {
-                const index = Number(column.id)
-                const columnData = fields[index]
-                if (!columnData) return null
+              {columnOrderItems.map((column) => {
                 return (
                   <SortableGroupItem
-                    key={column.id}
+                    key={column.name}
                     id={column.id}
                     className={'rounded-md'}
-                    setRef={(el) => {
-                      columnRefs.current[index] = el
-                    }}
+                    setRef={setRefColumn(column.index)}
                   >
                     <ColumnCard
-                      columnData={columnData}
+                      columnData={column}
                       tables={tables}
-                      onDeleteNewColumn={() => {
-                        removeColumn(index)
-                      }}
-                      highlighted={highlightedColumn === index}
-                      disabled={false}
+                      onDeleteNewColumn={createDeleteColumn(column.index)}
+                      highlighted={highlightedColumn === column.index}
                     />
                   </SortableGroupItem>
                 )
@@ -192,16 +230,13 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
         <div className="sticky top-4 col-span-1 flex flex-col gap-2">
           <SortableGroupItemContext overlay={overlayColumnButton}>
             <AnimatePresence>
-              {columnOrder.map((column) => {
-                const index = Number(column.id)
-                const columnData = fields[index]
-                if (!columnData) return null
+              {columnOrderItems.map((column) => {
                 return (
                   <SortableGroupItem key={column.id} id={column.id} className={'rounded-md'}>
                     <ColumnButton
-                      key={columnData.name}
-                      columnData={columnData}
-                      onClick={() => scrollToColumn(index)}
+                      key={column.name}
+                      columnData={column}
+                      onClick={createScrollToColumn(column.index)}
                     />
                   </SortableGroupItem>
                 )
