@@ -34,10 +34,12 @@ export const SortableGroupItem = ({
   id,
   children,
   className,
+  setRef,
 }: {
   id: string
   children: React.ReactNode
   className?: string
+  setRef?: (node: HTMLDivElement) => void
 }) => {
   const { activeItem } = useSortableGroup()
   const isSortingGroup = useMemo(() => activeItem !== null, [activeItem])
@@ -48,6 +50,16 @@ export const SortableGroupItem = ({
       id,
     },
   })
+
+  const setNodeRefWithRef = useCallback(
+    (node: HTMLDivElement) => {
+      setNodeRef(node)
+      if (setRef) {
+        setRef(node)
+      }
+    },
+    [setRef, setNodeRef],
+  )
 
   const showRing = useMemo(
     () => isDragging || (relatedBeingDragged && !isSorting),
@@ -69,7 +81,7 @@ export const SortableGroupItem = ({
   return (
     <motion.div
       key={id}
-      ref={setNodeRef}
+      ref={setNodeRefWithRef}
       layout
       animate={{
         opacity: opacity,

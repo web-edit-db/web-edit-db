@@ -68,7 +68,10 @@ export const Default: Story = {}
 export const LongList: Story = {
   args: {
     name: 'posts',
-    columns: mockColumns.concat(mockColumns).concat(mockColumns),
+    columns: mockColumns
+      .concat(mockColumns)
+      .concat(mockColumns)
+      .map((column, index) => ({ ...column, name: `column ${index}` })),
   },
 }
 

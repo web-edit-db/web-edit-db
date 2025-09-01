@@ -15,14 +15,21 @@ import FormFieldWrapper from './form-field-wrapper'
 import NumberInputWithPlusMinus from './number-input-with-plus-minus'
 import ToggleButton from './toggle-button'
 import TypeSelector from './type-selector'
+import { cn } from '@/lib/utils'
 
 interface ColumnCardProps {
   columnData: Omit<ColumnData, 'deleted'>
   onDeleteNewColumn: () => void
   tables: Record<string, string[]> // table name -> column names
+  highlighted: boolean
 }
 
-export default function ColumnCard({ columnData, tables, onDeleteNewColumn }: ColumnCardProps) {
+export default function ColumnCard({
+  columnData,
+  tables,
+  onDeleteNewColumn,
+  highlighted,
+}: ColumnCardProps) {
   const zodSchema = createColumnSchema(tables)
   const [disabled, setDisabled] = useState(false)
 
@@ -85,7 +92,13 @@ export default function ColumnCard({ columnData, tables, onDeleteNewColumn }: Co
   }, [form])
   return (
     <Form {...form}>
-      <Card className="py-4">
+      <Card
+        className={cn(
+          'py-4',
+          highlighted &&
+            'bg-blue-50/20 shadow-2xl ring-4 shadow-blue-400/30 ring-blue-400/50 transition-all duration-300 ease-out dark:bg-blue-950/20',
+        )}
+      >
         <ColumnCardHeader
           columnName={columnData.name}
           modifiedState={modifiedState}
@@ -94,7 +107,6 @@ export default function ColumnCard({ columnData, tables, onDeleteNewColumn }: Co
           isResetDisabled={isResetDisabled}
           onReset={reset}
           onToggleDeleted={toggleDeleted}
-          // onDeleteNewColumn={onDeleteNewColumn}
         />
         <CardContent className="grid grid-cols-12 items-start gap-4 px-4">
           {/* Name */}
