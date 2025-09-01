@@ -44,7 +44,7 @@ export default function NumberInputWithPlusMinus({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // prevent the user entering anything that is not a number, -, or ., remove any non-numeric characters
-    const newValue = e.target.value.replace(/[^0-9.-]/g, '')
+    const newValue = e.target.value.replace(/[^\d.-]/g, '')
     if (newValue === '') {
       setInputValueAndOnChange('')
     } else {

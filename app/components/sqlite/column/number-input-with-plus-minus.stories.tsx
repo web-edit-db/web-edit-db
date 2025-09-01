@@ -30,7 +30,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const EmptyMinValue: Story = {
-  name: 'Empty Min Value',
   args: {
     value: undefined,
     disabled: false,
@@ -38,7 +37,6 @@ export const EmptyMinValue: Story = {
 }
 
 export const EmptyMaxValue: Story = {
-  name: 'Empty Max Value',
   args: {
     value: undefined,
     disabled: false,
@@ -86,7 +84,6 @@ export const IdRange: Story = {
 }
 
 export const LargeValue: Story = {
-  name: 'Large Value',
   args: {
     value: 999999,
     disabled: false,
@@ -102,7 +99,6 @@ export const Zero: Story = {
 }
 
 export const NegativeValue: Story = {
-  name: 'Negative Value',
   args: {
     value: -1,
     disabled: false,
@@ -110,7 +106,6 @@ export const NegativeValue: Story = {
 }
 
 export const DisabledWithValue: Story = {
-  name: 'Disabled with Value',
   args: {
     value: 100,
     disabled: true,
@@ -118,7 +113,6 @@ export const DisabledWithValue: Story = {
 }
 
 export const DisabledEmpty: Story = {
-  name: 'Disabled Empty',
   args: {
     value: undefined,
     disabled: true,

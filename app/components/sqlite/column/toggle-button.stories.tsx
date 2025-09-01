@@ -52,7 +52,6 @@ export const NotNullActive: Story = {
 }
 
 export const UniqueConstraint: Story = {
-  name: 'Unique Constraint',
   args: {
     checked: false,
     label: 'Unique',
@@ -88,7 +87,6 @@ export const PrimaryKeyActive: Story = {
 }
 
 export const DisabledState: Story = {
-  name: 'Disabled State',
   args: {
     checked: false,
     label: 'Not Null',
@@ -97,7 +95,6 @@ export const DisabledState: Story = {
 }
 
 export const DisabledCheckedState: Story = {
-  name: 'Disabled Checked State',
   args: {
     checked: true,
     label: 'Primary Key',

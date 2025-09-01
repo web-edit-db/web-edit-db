@@ -11,7 +11,7 @@ export const getTableSchema = (db: Database, tableName: string) => {
     `SELECT 
       info.name AS name, 
       info.type AS type, 
-      info.[notnull] AS [notnull],
+      info.[notNull] AS [notNull],
       info.dflt_value AS [default],
       info.pk AS primaryKey,
       fk_info.[table] AS foreignTable,
@@ -21,7 +21,7 @@ export const getTableSchema = (db: Database, tableName: string) => {
     z.looseObject({
       name: z.string(),
       type: z.string(),
-      notnull: sqliteBoolean,
+      notNull: sqliteBoolean,
       default: z.string().nullable(),
       primaryKey: sqliteBoolean,
       foreignTable: z.string().nullable(),

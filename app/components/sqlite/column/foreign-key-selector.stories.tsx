@@ -44,10 +44,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const NoSelection: Story = {
-  name: 'No Selection',
   args: {
     tables: mockTables,
-    value: {},
+    value: { table: null, column: null },
     disabled: false,
   },
 }
@@ -56,7 +55,7 @@ export const TableSelected: Story = {
   name: 'Table Selected (No Column)',
   args: {
     tables: mockTables,
-    value: { table: 'users' },
+    value: { table: 'users', column: null },
     disabled: false,
   },
 }
@@ -80,7 +79,6 @@ export const PostIdReference: Story = {
 }
 
 export const CategoryReference: Story = {
-  name: 'Category Reference',
   args: {
     tables: mockTables,
     value: { table: 'categories', column: 'id' },
@@ -98,10 +96,9 @@ export const EmailReference: Story = {
 }
 
 export const NoTablesAvailable: Story = {
-  name: 'No Tables Available',
   args: {
     tables: {},
-    value: {},
+    value: { table: null, column: null },
     disabled: false,
   },
 }
@@ -110,7 +107,7 @@ export const EmptyTable: Story = {
   name: 'Table with No Columns',
   args: {
     tables: emptyTableTables,
-    value: { table: 'empty_table' },
+    value: { table: 'empty_table', column: null },
     disabled: false,
   },
 }
@@ -119,7 +116,7 @@ export const DisabledEmpty: Story = {
   name: 'Disabled (Empty)',
   args: {
     tables: mockTables,
-    value: {},
+    value: { table: null, column: null },
     disabled: true,
   },
 }

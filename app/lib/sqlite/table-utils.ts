@@ -38,7 +38,7 @@ export function decodeTableName(encodedTableName: string): string {
           const hexChars = encodedTableName.substring(i + 1, i + 3)
 
           // Check if it's valid hex
-          if (/^[0-9A-Fa-f]{2}$/.test(hexChars)) {
+          if (/^[\dA-Fa-f]{2}$/.test(hexChars)) {
             try {
               const decoded = decodeURIComponent(encodedTableName.substring(i, i + 3))
               result += decoded
@@ -85,7 +85,7 @@ export function normalizeTableName(tableName: string): string {
  */
 export function isTableNameUrlSafe(tableName: string): boolean {
   // Allow alphanumeric characters, underscores, and hyphens
-  const urlSafePattern = /^[a-zA-Z0-9_-]+$/
+  const urlSafePattern = /^[\w-]+$/
   return urlSafePattern.test(tableName)
 }
 
