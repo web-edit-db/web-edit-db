@@ -133,6 +133,7 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
             tables={{}}
             onDeleteNewColumn={() => {}}
             highlighted={false}
+            disabled={false}
           />
         </SortableGroupItemOverlay>
       )
@@ -180,6 +181,7 @@ export default function ComponentList({ columns, tables, name }: ComponentListPr
                         removeColumn(index)
                       }}
                       highlighted={highlightedColumn === index}
+                      disabled={false}
                     />
                   </SortableGroupItem>
                 )

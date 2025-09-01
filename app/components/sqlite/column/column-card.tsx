@@ -22,6 +22,7 @@ interface ColumnCardProps {
   onDeleteNewColumn: () => void
   tables: Record<string, string[]> // table name -> column names
   highlighted: boolean
+  disabled: boolean
 }
 
 export default function ColumnCard({
@@ -29,6 +30,7 @@ export default function ColumnCard({
   tables,
   onDeleteNewColumn,
   highlighted,
+  disabled: disabledProp,
 }: ColumnCardProps) {
   const zodSchema = createColumnSchema(tables)
   const [disabled, setDisabled] = useState(false)
@@ -36,7 +38,7 @@ export default function ColumnCard({
   const form = useForm<ColumnData>({
     defaultValues: columnData,
     resolver: zodResolver(zodSchema),
-    disabled,
+    disabled: disabledProp || disabled,
     mode: 'all',
   })
 
