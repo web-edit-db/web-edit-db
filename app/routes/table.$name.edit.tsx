@@ -1,9 +1,9 @@
 import TableEditor from '@/components/sqlite/table/table-editor'
 import type { Route } from './+types/table.$name.edit'
 import { decodeTableName, normalizeTableName } from '@/lib/sqlite/table-utils'
-import { useTable } from '@/lib/sqlite/use-table'
+import { useTable, useTableTree } from '@/lib/sqlite/use-table'
 import type { ColumnData } from '@/components/sqlite/column/types'
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 export default function TableEdit({ params }: Route.ComponentProps) {
   // Decode the table name from the URL parameter
@@ -11,6 +11,12 @@ export default function TableEdit({ params }: Route.ComponentProps) {
 
   const schema = useTable(tableName)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  const tableTree = useTableTree()
+
+  useEffect(() => {
+    console.log('tableTree', tableTree)
+  }, [tableTree])
 
   const columns = useMemo(
     () =>
@@ -41,7 +47,7 @@ export default function TableEdit({ params }: Route.ComponentProps) {
         className="p-2"
         key={tableName}
         columns={columns}
-        tables={{}}
+        tables={tableTree}
         name={tableName}
         scrollContainer={scrollContainerRef.current}
       />

@@ -17,7 +17,8 @@ export const getTableSchema = (db: Database, tableName: string) => {
       fk_info.[table] AS foreignTable,
       fk_info.[to] AS foreignColumn
     FROM pragma_table_info("${tableName}") AS info
-      LEFT JOIN pragma_foreign_key_list("${tableName}") as fk_info ON fk_info.[from] = info.name`,
+      LEFT JOIN pragma_foreign_key_list("${tableName}") as fk_info ON fk_info.[from] = info.name
+    ORDER BY info.name`,
     z.looseObject({
       name: z.string(),
       type: z.string(),
@@ -38,7 +39,8 @@ export const getTableSchema = (db: Database, tableName: string) => {
       index_list.[unique] as [unique]
     FROM pragma_index_list("${tableName}") as index_list
     JOIN pragma_index_info(index_list.name) as index_info
-    WHERE index_list.[unique] = 1`,
+    WHERE index_list.[unique] = 1
+    ORDER BY index_list.name`,
     z.looseObject({
       name: z.string(),
       unique: sqliteBoolean,
@@ -72,10 +74,27 @@ export const getTableSchema = (db: Database, tableName: string) => {
 export const getTableNames = (db: Database) => {
   return parsedQuery(
     db.getDb(),
-    'SELECT name, tbl_name FROM sqlite_master WHERE type = "table"',
+    'SELECT name, tbl_name FROM sqlite_master WHERE type = "table" ORDER BY name',
     z.object({
       name: z.string(),
       tbl_name: z.string(),
+    }),
+  )
+}
+
+export const getTableTree = (db: Database) => {
+  const talbeNames = getTableNames(db)
+
+  return Object.fromEntries(
+    talbeNames.map((table) => {
+      const columnNames = parsedQuery(
+        db.getDb(),
+        `SELECT name FROM pragma_table_info("${table.name}") ORDER BY name`,
+        z.object({
+          name: z.string(),
+        }),
+      )
+      return [table.name, columnNames.map((column) => column.name)]
     }),
   )
 }
