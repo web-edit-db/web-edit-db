@@ -46,7 +46,7 @@ export const parsedQuerySingle = <T extends z.ZodObject>(
 
 export const deconsturctColumn = (column: string) => {
   const match = column.match(COLUMN_REGEX)
-  if (!match) return null
+  if (!match) return undefined
   const { type, min, max } = match.groups || {}
   return {
     type: type.toLowerCase(),

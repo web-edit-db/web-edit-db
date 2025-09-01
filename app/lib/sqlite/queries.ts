@@ -1,6 +1,6 @@
 import { sqliteBoolean } from '@/lib/zod-utils'
 import type { Database } from './database'
-import { parsedQuery, parsedQuerySingle } from './helpers'
+import { deconsturctColumn, parsedQuery, parsedQuerySingle } from './helpers'
 import z from 'zod'
 import type { SqlJsStatic } from 'sql.js'
 
@@ -53,8 +53,16 @@ export const getTableSchema = (db: Database, tableName: string) => {
   )
 
   return columns.map((column) => {
+    const { type, min, max } = deconsturctColumn(column.type) ?? {
+      type: column.type,
+      min: undefined,
+      max: undefined,
+    }
     return {
       ...column,
+      type,
+      min,
+      max,
       unique: indexMap[column.name]?.unique ?? false,
     }
   })

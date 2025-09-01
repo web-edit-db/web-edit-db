@@ -37,19 +37,19 @@ describe('helpers', () => {
     )
 
     it('should handle an empty string', () => {
-      expect(deconsturctColumn('')).toBeNull()
+      expect(deconsturctColumn('')).toBeUndefined()
     })
 
     it('should handle an invalid column', () => {
-      expect(deconsturctColumn('*')).toBeNull()
+      expect(deconsturctColumn('*')).toBeUndefined()
     })
 
     it("should handle '(10)'", () => {
-      expect(deconsturctColumn('(10)')).toBeNull()
+      expect(deconsturctColumn('(10)')).toBeUndefined()
     })
 
     it("should handle '(10, 20)'", () => {
-      expect(deconsturctColumn('(10, 20)')).toBeNull()
+      expect(deconsturctColumn('(10, 20)')).toBeUndefined()
     })
   })
 
