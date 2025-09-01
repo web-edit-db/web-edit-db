@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import TableEdit from './table-edit'
+import TableEdit from './table-editor'
 import type { ColumnData } from '@/components/sqlite/column/types'
 
 const mockTables = {
