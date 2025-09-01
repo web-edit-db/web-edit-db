@@ -18,9 +18,13 @@ function SidebarGroupTableMenuItem({ table }: { table: { name: string } }) {
   }, [table.name])
 
   return (
-    <SidebarMenuItem>
-      <NavLink to={link} end>
-        {({ isActive }) => <SidebarMenuButton isActive={isActive}>{table.name}</SidebarMenuButton>}
+    <SidebarMenuItem key={table.name}>
+      <NavLink to={link}>
+        {({ isActive }) => (
+          <SidebarMenuButton asChild isActive={isActive}>
+            <div>{table.name}</div>
+          </SidebarMenuButton>
+        )}
       </NavLink>
     </SidebarMenuItem>
   )

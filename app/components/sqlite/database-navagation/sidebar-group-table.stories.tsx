@@ -31,7 +31,7 @@ const mockTablesData: Record<string, Array<{ name: string }>> = {
 }
 
 const meta = {
-  title: 'SQLite/SidebarGroupTable',
+  title: 'SQLite/DatabaseNavagation/SidebarGroupTable',
   component: SidebarGroupTable,
   parameters: {
     layout: 'centered',
