@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { createColumnSchema, type ColumnData } from './types'
-import ColumnCard from './column-card'
+import { createColumnSchema, type ColumnData } from '@/components/sqlite/column/types'
+import ColumnCard from '@/components/sqlite/column/column-card'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useCallback, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,7 +30,11 @@ const ColumnButton = ({ columnData }: { columnData: ColumnData }) => {
     <Button
       key={columnData.name}
       variant="outline"
-      className={cn('w-full justify-start', columnData.new && 'italic')}
+      className={cn(
+        'w-full justify-start',
+        columnData.new && 'italic',
+        columnData.deleted && 'line-through',
+      )}
     >
       {columnData.name}
     </Button>

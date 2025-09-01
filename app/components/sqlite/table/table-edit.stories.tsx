@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import ComponentList from './component-list'
-import type { ColumnData } from './types'
+import TableEdit from './table-edit'
+import type { ColumnData } from '@/components/sqlite/column/types'
 
 const mockTables = {
   users: ['id', 'name', 'email'],
@@ -47,8 +47,8 @@ const mockColumns: Omit<ColumnData, 'deleted'>[] = [
 ]
 
 const meta = {
-  title: 'SQLite/Column/ComponentList',
-  component: ComponentList,
+  title: 'SQLite/Table/TableEdit',
+  component: TableEdit,
   parameters: {
     layout: 'padded',
   },
@@ -57,7 +57,7 @@ const meta = {
     columns: mockColumns,
     tables: mockTables,
   },
-} satisfies Meta<typeof ComponentList>
+} satisfies Meta<typeof TableEdit>
 
 export default meta
 
