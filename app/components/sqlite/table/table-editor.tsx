@@ -99,7 +99,7 @@ export default function ComponentList({
   const addColumn = useCallback(() => {
     append({
       name: `Column ${columnsWatch.length + 1}`,
-      type: 'Integer',
+      type: 'integer',
       new: true,
       deleted: false,
       notNull: false,

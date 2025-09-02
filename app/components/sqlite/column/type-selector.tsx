@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { columnTypes } from './types'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 interface TypeSelectorProps {
   value: string
@@ -18,6 +18,9 @@ export default function TypeSelector({ value, onChange, disabled }: TypeSelector
   const formatTitle = useCallback((type: string) => {
     return type.charAt(0).toUpperCase() + type.slice(1)
   }, [])
+  const displayOther = useMemo(() => {
+    return !([...columnTypes] as string[]).includes(value)
+  }, [value])
   return (
     <Select onValueChange={onChange} value={value} disabled={disabled}>
       <SelectTrigger className="w-full">
@@ -29,6 +32,11 @@ export default function TypeSelector({ value, onChange, disabled }: TypeSelector
             {formatTitle(type)}
           </SelectItem>
         ))}
+        {displayOther && (
+          <SelectItem key="other" value={value} disabled>
+            {value}
+          </SelectItem>
+        )}
       </SelectContent>
     </Select>
   )

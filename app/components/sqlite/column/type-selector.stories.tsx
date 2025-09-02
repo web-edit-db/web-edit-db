@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import TypeSelector from './type-selector'
 
 const meta = {
-  title: 'SQLite/Column/ColumnCard/TypeSelector',
+  title: 'SQLite/ColumnCard/TypeSelector',
   component: TypeSelector,
   parameters: {
     layout: 'centered',
@@ -91,5 +91,12 @@ export const DisabledWithType: Story = {
   args: {
     value: 'Integer',
     disabled: true,
+  },
+}
+
+export const UnknownType: Story = {
+  args: {
+    value: 'Unknown',
+    disabled: false,
   },
 }

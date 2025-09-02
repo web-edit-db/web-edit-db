@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import ToggleButton from './toggle-button'
 
 const meta = {
-  title: 'SQLite/Column/ColumnCard/ToggleButton',
+  title: 'SQLite/ColumnCard/ToggleButton',
   component: ToggleButton,
   parameters: {
     layout: 'centered',

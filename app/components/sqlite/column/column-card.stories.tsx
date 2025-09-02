@@ -9,7 +9,7 @@ const mockTables = {
 }
 
 const meta: Meta<typeof ColumnCard> = {
-  title: 'SQLite/Column/ColumnCard',
+  title: 'SQLite/ColumnCard',
   component: ColumnCard,
   parameters: {
     layout: 'padded',
@@ -32,7 +32,7 @@ export const NewColumn: Story = {
   args: {
     columnData: {
       name: 'user_id',
-      type: 'Integer',
+      type: 'integer',
       new: true,
       notNull: false,
       unique: false,
@@ -57,7 +57,7 @@ export const BasicTextColumn: Story = {
   args: {
     columnData: {
       name: 'title',
-      type: 'Text',
+      type: 'text',
       new: false,
       notNull: true,
       unique: false,
@@ -81,7 +81,7 @@ export const PrimaryKeyColumn: Story = {
   args: {
     columnData: {
       name: 'id',
-      type: 'Integer',
+      type: 'integer',
       new: false,
       notNull: true,
       unique: true,
@@ -105,7 +105,7 @@ export const ForeignKeyColumn: Story = {
   args: {
     columnData: {
       name: 'user_id',
-      type: 'Integer',
+      type: 'integer',
       new: false,
       notNull: true,
       unique: false,
@@ -130,7 +130,7 @@ export const NumericWithRange: Story = {
   args: {
     columnData: {
       name: 'rating',
-      type: 'Numeric',
+      type: 'numeric',
       new: false,
       notNull: false,
       unique: false,
@@ -155,7 +155,7 @@ export const UniqueEmailColumn: Story = {
   args: {
     columnData: {
       name: 'email',
-      type: 'Text',
+      type: 'text',
       new: false,
       notNull: true,
       unique: true,
@@ -180,7 +180,7 @@ export const BlobColumn: Story = {
   args: {
     columnData: {
       name: 'avatar',
-      type: 'Blob',
+      type: 'blob',
       new: false,
       notNull: false,
       unique: false,
@@ -206,7 +206,7 @@ export const TimestampColumn: Story = {
   args: {
     columnData: {
       name: 'created_at',
-      type: 'Text',
+      type: 'text',
       new: false,
       notNull: true,
       unique: false,
@@ -232,7 +232,7 @@ export const AllConstraintsColumn: Story = {
   args: {
     columnData: {
       name: 'special_id',
-      type: 'Integer',
+      type: 'integer',
       new: false,
       notNull: true,
       unique: true,

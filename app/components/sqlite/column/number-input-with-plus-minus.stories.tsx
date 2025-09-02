@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import NumberInputWithPlusMinus from './number-input-with-plus-minus'
 
 const meta = {
-  title: 'SQLite/Column/ColumnCard/NumberInputWithPlusMinus',
+  title: 'SQLite/ColumnCard/NumberInputWithPlusMinus',
   component: NumberInputWithPlusMinus,
   parameters: {
     layout: 'centered',

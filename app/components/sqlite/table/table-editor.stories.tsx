@@ -10,7 +10,7 @@ const mockTables = {
 const mockColumns: Omit<ColumnData, 'deleted'>[] = [
   {
     name: 'id',
-    type: 'Integer',
+    type: 'integer',
     new: false,
     notNull: true,
     unique: true,
@@ -22,7 +22,7 @@ const mockColumns: Omit<ColumnData, 'deleted'>[] = [
   },
   {
     name: 'title',
-    type: 'Text',
+    type: 'text',
     new: false,
     notNull: true,
     unique: false,
@@ -34,7 +34,7 @@ const mockColumns: Omit<ColumnData, 'deleted'>[] = [
   },
   {
     name: 'user_id',
-    type: 'Integer',
+    type: 'integer',
     new: true,
     notNull: false,
     unique: false,
@@ -81,7 +81,7 @@ export const WithValidation: Story = {
     columns: [
       {
         name: '', // Invalid: empty name
-        type: 'Text',
+        type: 'text',
         new: true,
         notNull: true,
         unique: false,

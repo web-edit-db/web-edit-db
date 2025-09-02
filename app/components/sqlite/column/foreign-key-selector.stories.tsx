@@ -15,7 +15,7 @@ const emptyTableTables = {
 }
 
 const meta = {
-  title: 'SQLite/Column/ColumnCard/ForeignKeySelector',
+  title: 'SQLite/ColumnCard/ForeignKeySelector',
   component: ForeignKeySelector,
   parameters: {
     layout: 'centered',

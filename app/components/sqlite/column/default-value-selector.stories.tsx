@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import DefaultValueSelector from './default-value-selector'
 
 const meta = {
-  title: 'SQLite/Column/ColumnCard/DefaultValueSelector',
+  title: 'SQLite/ColumnCard/DefaultValueSelector',
   component: DefaultValueSelector,
   parameters: {
     layout: 'centered',
